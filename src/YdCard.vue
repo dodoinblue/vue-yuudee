@@ -4,27 +4,50 @@
     <img :src="card_bg_image">
   </div>
   <div class="card-content">
-    <img :src="image">
+    <img :src="content_image">
   </div>
-  <div class="card-text"><div>Card: {{card}}</div></div>
+  <div class="card-text"><div>{{card.name}}</div></div>
   <div class="card-edit-button"></div>
 </div>
 </template>
 
 <script>
 export default {
-  props: ['card'],
+  props: ['card', 'isEditMode'],
   data() {
     return {
-      card_bg_image: 'static/img/card_bg.png',
-      image: 'static/card-assets/01/02.xydcard/images/2.jpg',
-      title: 'Card Title',
-      isEditMode: ''
     };
   },
   methods: {
     onCardClick: function() {
       console.log("card clicked: " + this.card);
+    }
+  },
+  computed: {
+    isStack: function() {
+      if (this.card.children) {
+        // It has children field, then it is a stack.
+        return true;
+      } else {
+        return false;
+      }
+    },
+    card_bg_image: function() {
+      if (this.isStack) {
+        return 'static/img/cat_bg.png';
+      } else {
+        return 'static/img/card_bg.png';
+      }
+    },
+    content_image: function() {
+      if (this.isStack) {
+        if (! this.card.cover) {
+          return 'static/img/dummy_content.jpg';
+        }
+        return 'static/card-assets/' + this.card.cover;
+      } else {
+        return 'static/card-assets/' + this.card.path + '/images/' + this.card.images[0];
+      }
     }
   }
 }

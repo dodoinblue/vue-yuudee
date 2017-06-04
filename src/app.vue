@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <yd-drawer></yd-drawer>
+  <yd-drawer :path="path"></yd-drawer>
 </div>
 </template>
 
@@ -25,6 +25,11 @@ import YdCard from './YdCard.vue'
 import YdDrawer from './YdDrawer.vue'
 
 export default {
+  data() {
+    return {
+      path: '.',
+    }
+  },
   components: { YdCard, YdDrawer }
 }
 </script>

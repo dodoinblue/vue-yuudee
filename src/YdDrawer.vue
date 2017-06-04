@@ -4,7 +4,7 @@
 <div class="drawer with-background animated slideInRight">
   <div class="drawer-back" @click="backClicked()"></div>
   <f7-swiper class="drawer-content">
-    <f7-swiper-slide class="swiper-slide full-height align-center-vertical" v-for="page in cards">
+    <f7-swiper-slide class="swiper-slide full-height align-center-vertical" v-for="page in sortedCards">
       <div class="row" v-for="r in page">
         <div class="col-50 no-padding" v-for="card in r">
           <yd-card :card="card"></yd-card>
@@ -18,6 +18,7 @@
 <script>
 import YdCard from './YdCard.vue'
 import Vue from 'vue'
+import CardProvider from './CardProvider'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -30,13 +31,37 @@ Vue.component('debug', {
   }
 });
 
+/* Arrange cards to pages, and row x col grid on each page
+ *
+ * E.g. cards = [1,2,3,4,5,6,7,8,9] to 2x2 grid. result should be:
+ * [ [ [1, 2], [3, 4] ],
+ *   [ [5, 6], [7, 8] ],
+ *   [ [9] ]
+ * ]
+ */
+var sortCards = function (cards, row, col) {
+  var pages = cards.length / (row * col) + 1;
+  var sortedCards = [];
+  for (var i = 0; i < pages; i++) {
+    var page = cards.slice(i * row * col, (i + 1) * row * col);
+    if (page.length === 0) break; // avoid pushing blank page in.
+    var sortedPage = [];
+    for (var j = 0; j <= page.length / col; j++) {
+      var rowConent = page.slice(j * col, (j + 1) * col);
+      if (rowConent.length === 0) break; // avoid pushing blank row in.
+      sortedPage.push(rowConent);
+    }
+    sortedCards.push(sortedPage);
+  }
+  return sortedCards;
+};
+
 export default {
-  props: [],
+  props: ['path'],
   components: { YdCard },
   data() {
     return {
-      path: '',
-      cards: [ [ ["1", "2"], ["3", "4"] ], [ ["5"] ] ],
+      sortedCards: [ [ [{"name": "Loading"}, {"name": "Loading"}], [{"name": "Loading"}] ] ],
     }
   },
   methods: {
@@ -51,7 +76,11 @@ export default {
     isLoaded() {
 
     }
-  }
+  },
+  created() {
+    var cardList = CardProvider.getCardsByPath(this.path);
+    this.sortedCards = sortCards(cardList, 2, 2);
+  },
 }
 </script>
 
