@@ -31,7 +31,8 @@
     "framework7": "^1.6.0",
     "framework7-vue": "^0.8.5",
     "q": "^1.5.0",
-    "vue": "^2.2.4"
+    "vue": "^2.2.4",
+    "vue-select": "^2.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",

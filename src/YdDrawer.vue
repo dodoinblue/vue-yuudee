@@ -1,13 +1,13 @@
 <template>
 <!--<div class="button button-block button-calm" ng-click="testClick()">Click Me</div>-->
 <!--<div ng-class="{'drawer animated slideInRight': clicked}" ng-show="clicked">-->
-<div class="drawer with-background animated slideInRight">
-  <div class="drawer-back" @click="backClicked()"></div>
+<div class="drawer" :class="{'with-background animated slideInRight' : !root}">
+  <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
   <f7-swiper class="drawer-content">
     <f7-swiper-slide class="swiper-slide full-height align-center-vertical" v-for="page in sortedCards">
-      <div class="row" v-for="r in page">
-        <div class="col-50 no-padding" v-for="card in r">
-          <yd-card :card="card"></yd-card>
+      <div class="row" v-for="row in page">
+        <div class="col-50 no-padding" v-for="card in row">
+          <yd-card :card="card" :edit-mode="editMode"></yd-card>
         </div>
       </div>
     </f7-swiper-slide>
@@ -19,6 +19,7 @@
 import YdCard from './YdCard.vue'
 import Vue from 'vue'
 import CardProvider from './CardProvider'
+import { EventBus } from './EventBus.js'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -57,29 +58,26 @@ var sortCards = function (cards, row, col) {
 };
 
 export default {
-  props: ['path'],
+  props: ['path', 'root', 'editMode'],
   components: { YdCard },
   data() {
     return {
-      sortedCards: [ [ [{"name": "Loading"}, {"name": "Loading"}], [{"name": "Loading"}] ] ],
     }
   },
   methods: {
     backClicked: function() {
       console.log("back clicked");
+      EventBus.$emit('DrawerBackClicked', this.path);
     }
   },
   computed: {
-    isBase() {
-
-    },
-    isLoaded() {
-
+    sortedCards: function() {
+      console.log("displaying drawer: " + this.path);
+      var cardList = CardProvider.getCardsByPath(this.path);
+      return sortCards(cardList, 2, 2);
     }
   },
   created() {
-    var cardList = CardProvider.getCardsByPath(this.path);
-    this.sortedCards = sortCards(cardList, 2, 2);
   },
 }
 </script>

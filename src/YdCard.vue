@@ -7,20 +7,22 @@
     <img :src="content_image">
   </div>
   <div class="card-text"><div>{{card.name}}</div></div>
-  <div class="card-edit-button"></div>
+  <div class="card-edit-button" v-if="editMode" @click.stop="onCardEditClick"></div>
 </div>
 </template>
 
 <script>
+import { EventBus } from './EventBus.js'
 export default {
-  props: ['card', 'isEditMode'],
-  data() {
-    return {
-    };
-  },
+  props: ['card', 'editMode'],
   methods: {
     onCardClick: function() {
-      console.log("card clicked: " + this.card);
+      if (this.isStack) {
+        EventBus.$emit('StackClicked', this.card.path);
+      }
+    },
+    onCardEditClick: function() {
+      console.log("Card Edit clicked: " + this.card.path);
     }
   },
   computed: {
@@ -64,9 +66,9 @@ export default {
   max-width: 100%;
 }
 
-.yd-card .card-frame {
+/*.yd-card .card-frame {
   z-index: 999;
-}
+}*/
 
 .yd-card .card-content img {
   height: 100%;
@@ -102,7 +104,7 @@ export default {
   right: 12.82%;
   height: 20%;
   font-size: 1.0em;
-  z-index: 10;
+  /*z-index: 10;*/
   padding-top: 0.2em;
   color: rgb(80,45,17);
 }

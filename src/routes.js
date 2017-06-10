@@ -5,7 +5,7 @@ export default [
   },
   {
       path: '/form/',
-      component: require('./pages/form.vue')
+      component: require('./pages/about.vue')
   },
   {
       path: '/dynamic-route/blog/:blogId/post/:postId/',
