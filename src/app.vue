@@ -104,6 +104,7 @@ export default {
   background-position: center;
   background-size: cover;
   margin: 0px;
+  height: 100%;
 }
 .app-logo {
   height: 18%;

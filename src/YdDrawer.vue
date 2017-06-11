@@ -1,19 +1,20 @@
 <template>
-<!--<div class="button button-block button-calm" ng-click="testClick()">Click Me</div>-->
-<!--<div ng-class="{'drawer animated slideInRight': clicked}" ng-show="clicked">-->
 <transition name="slide">
-<div class="drawer" :class="{'with-background': !root}">
-  <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
-  <f7-swiper class="drawer-content">
-    <f7-swiper-slide class="swiper-slide full-height align-center-vertical" v-for="page in sortedCards">
-      <div class="row" v-for="row in page">
-        <div class="col-50 no-padding" v-for="card in row">
-          <yd-card :card="card" :edit-mode="editMode"></yd-card>
+  <div class="drawer" :class="{'with-background': !root}">
+    <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
+    <div class="swiper-container drawer-content">
+      <div class="swiper-wrapper">
+        <!-- Slides -->
+        <div class="swiper-slide" v-for="page in sortedCards">
+          <div class="row" v-for="row in page">
+            <div class="col-50 no-padding" v-for="card in row">
+              <yd-card :card="card" :edit-mode="editMode"></yd-card>
+            </div>
+          </div>
         </div>
       </div>
-    </f7-swiper-slide>
-  </f7-swiper>
-</div>
+    </div>
+  </div>
 </transition>
 </template>
 
@@ -22,6 +23,7 @@ import YdCard from './YdCard.vue'
 import Vue from 'vue'
 import CardProvider from './CardProvider'
 import { EventBus } from './EventBus.js'
+import Swiper from 'swiper'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -81,6 +83,12 @@ export default {
   },
   created() {
   },
+  mounted() {
+    this.mySwiper = new Swiper ('.swiper-container', {
+    // Optional parameters
+    direction: 'horizontal',
+  })
+  }
 }
 </script>
 
