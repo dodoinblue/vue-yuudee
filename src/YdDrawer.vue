@@ -1,7 +1,8 @@
 <template>
 <!--<div class="button button-block button-calm" ng-click="testClick()">Click Me</div>-->
 <!--<div ng-class="{'drawer animated slideInRight': clicked}" ng-show="clicked">-->
-<div class="drawer" :class="{'with-background animated slideInRight' : !root}">
+<transition name="slide">
+<div class="drawer" :class="{'with-background': !root}">
   <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
   <f7-swiper class="drawer-content">
     <f7-swiper-slide class="swiper-slide full-height align-center-vertical" v-for="page in sortedCards">
@@ -13,6 +14,7 @@
     </f7-swiper-slide>
   </f7-swiper>
 </div>
+</transition>
 </template>
 
 <script>
@@ -68,7 +70,7 @@ export default {
     backClicked: function() {
       console.log("back clicked");
       EventBus.$emit('DrawerBackClicked', this.path);
-    }
+    },
   },
   computed: {
     sortedCards: function() {
@@ -95,6 +97,7 @@ export default {
   left:-10%;
   top:20%;
   right: 0;
+  z-index: 100;
 }
 
 .drawer.with-background {
@@ -121,5 +124,18 @@ export default {
   height: 16.33%;
   top: -13.61%;
   left: 14.88%;
+}
+
+/* Animations */
+.slide-enter-active {
+  transition: all .5s ease;
+}
+.slide-leave-active {
+  /*transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
+  transition: all .5s ease;
+}
+.slide-enter, .slide-leave-to
+/* .slide-fade-leave-active for <2.1.8 */ {
+  transform: translateX(100%);
 }
 </style>

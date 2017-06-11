@@ -13,12 +13,82 @@
 
 <script>
 import { EventBus } from './EventBus.js'
+import { TweenLite } from './TweenMax.min.js'
+
+/*
+ * Calculate the parameters to animate a card to the center of screen.
+ * win: window obj contains current windows's width and height
+ * rect: element's rect from vm.$el.getBoundingClientRect()
+ */
+var calcToCenterAnimParams = function(win, rect) {
+  var scale = win.width / rect.width;
+  var winCenterLeft = win.width / 2;
+  var winCenterTop = win.height / 2;
+  var cardCenterLeft = rect.left + rect.width / 2;
+  var cardCenterTop = rect.top + rect.height / 2;
+  var xTrans = winCenterLeft - cardCenterLeft;
+  var yTrans = winCenterTop - cardCenterTop;
+
+  return {
+    scaleX: scale,
+    scaleY: scale,
+    x: xTrans,
+    y: yTrans
+  }
+}
+
+var buildTweenAnimation = function(parameters, element, onComplete, onReverseComplete) {
+  var animationParams = parameters;
+  animationParams.zIndex = 999;
+  animationParams.paused = true;
+  animationParams.onComplete = onComplete;
+  animationParams.onReverseComplete = onReverseComplete;
+
+  return TweenLite.to(element, 1, animationParams);
+}
+
+
 export default {
   props: ['card', 'editMode'],
+  data() {
+    return {
+      currentImageIndex: 0
+    }
+  },
   methods: {
     onCardClick: function() {
       if (this.isStack) {
         EventBus.$emit('StackClicked', this.card.path);
+      } else {
+        var slideshow = window.setInterval(() => {
+          if (this.currentImageIndex == this.card.images.length - 1) {
+            this.currentImageIndex = 0;
+          } else {
+            this.currentImageIndex ++;
+          }
+        }, 500);
+
+        var animation;
+
+        // Play card
+        var win = {width: window.innerWidth, height: window.innerHeight};
+        var animationParams = calcToCenterAnimParams(win, this.$el.getBoundingClientRect());
+        var onComplete = function() {
+          console.log("onAnimationComplete");
+          window.setTimeout(function () {
+            animation.reverse();
+          }, 3000);
+        }
+        var onReverseComplete = function () {
+          animation = null;
+          window.clearInterval(slideshow);
+          this.currentImageIndex = 0;
+          console.log("onAnimationReverseComplete");
+        };
+        animation = buildTweenAnimation(animationParams, this.$el, onComplete, onReverseComplete);
+        if( animation && ! animation.isActive()) {
+          animation.play();
+        }
       }
     },
     onCardEditClick: function() {
@@ -48,7 +118,7 @@ export default {
         }
         return 'static/card-assets/' + this.card.cover;
       } else {
-        return 'static/card-assets/' + this.card.path + '/images/' + this.card.images[0];
+        return 'static/card-assets/' + this.card.path + '/images/' + this.card.images[this.currentImageIndex];
       }
     }
   }

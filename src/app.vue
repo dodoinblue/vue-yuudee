@@ -18,7 +18,7 @@
 
   <!--v-for-->
   <yd-drawer :path="rootPath" :edit-mode="editMode" :root="rootPath === rootPath"></yd-drawer>
-  <yd-drawer v-for="drawer in drawers" :path="drawer" :edit-mode="editMode" :root="drawer === rootPath"></yd-drawer>
+  <yd-drawer v-for="(drawer, index) in drawers" :path="drawer" :edit-mode="editMode" :root="drawer === rootPath"></yd-drawer>
 
   <!-- settings layer -->
   <div id="app-settings-header" v-if="editMode">
