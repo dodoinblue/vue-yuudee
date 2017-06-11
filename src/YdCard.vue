@@ -60,6 +60,7 @@ export default {
       if (this.isStack) {
         EventBus.$emit('StackClicked', this.card.path);
       } else {
+        // Start slideshow
         var slideshow = window.setInterval(() => {
           if (this.currentImageIndex == this.card.images.length - 1) {
             this.currentImageIndex = 0;
@@ -68,9 +69,16 @@ export default {
           }
         }, 500);
 
+        // Play audio
+        var aud = new Audio();
+        // TODO: chain audios if necessary
+        aud.src='static/card-assets/' + this.card.path + '/audios/' + this.card.audios[0];
+        aud.play();
+
         var animation;
 
-        // Play card
+        // Animation to center and revese
+        // TODO: disable touch if there is an active animation
         var win = {width: window.innerWidth, height: window.innerHeight};
         var animationParams = calcToCenterAnimParams(win, this.$el.getBoundingClientRect());
         var onComplete = function() {
