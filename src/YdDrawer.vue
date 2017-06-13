@@ -3,14 +3,19 @@
   <div class="drawer" :class="{'with-background': !root}">
     <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
     <div class="swiper-container drawer-content">
-      <div class="swiper-wrapper">
+      <div class="swiper-wrapper card-group">
         <!-- Slides -->
-        <div class="swiper-slide" v-for="page in sortedCards">
+        <!--<div class="swiper-slide" v-for="page in sortedCards">
           <div class="row" v-for="row in page">
             <div class="col-50 no-padding" v-for="card in row">
-              <yd-card :card="card" :edit-mode="editMode"></yd-card>
+              <div class="card-wrapper">
+                <yd-card :card="card" :edit-mode="editMode"></yd-card>
+              </div>
             </div>
           </div>
+        </div>-->
+        <div class="swiper-slide card-group-item" v-for="card in cardList">
+          <yd-card :card="card" :edit-mode="editMode" :key="card.path"></yd-card>
         </div>
       </div>
     </div>
@@ -24,6 +29,8 @@ import Vue from 'vue'
 import CardProvider from './CardProvider'
 import { EventBus } from './EventBus.js'
 import Swiper from 'swiper'
+import Sortable from 'sortablejs'
+import _ from 'lodash'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -66,6 +73,7 @@ export default {
   components: { YdCard },
   data() {
     return {
+      cardList: [],
     }
   },
   methods: {
@@ -77,17 +85,95 @@ export default {
   computed: {
     sortedCards: function() {
       console.log("displaying drawer: " + this.path);
-      var cardList = CardProvider.getCardsByPath(this.path);
-      return sortCards(cardList, 2, 2);
+      return sortCards(this.cardList, 2, 2);
     }
   },
   created() {
+    this.cardList = CardProvider.getCardsByPath(this.path);
   },
   mounted() {
+    // Swiper
     this.mySwiper = new Swiper ('.swiper-container', {
-    // Optional parameters
-    direction: 'horizontal',
-  })
+      // Optional parameters
+      direction: 'horizontal',
+      slidesPerView: 2,
+      slidesPerColumn: 2,
+      slidesPerGroup: 2,
+      // slidesPerColumnFill: 'row',
+      spaceBetween: 0
+    });
+    window.swiper = this.mySwiper;
+    console.log(this.mySwiper);
+
+    // Draggable - Sortable
+    var that = this;
+    // TODO: Use id, not class
+    var el = this.$el.getElementsByClassName('card-group')[0];
+    var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
+    var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
+
+    this.sortable = Sortable.create(el, {
+      group: 'cards',
+      sort: true,
+      delay: 500,
+      animation: 0,
+      draggable: ".card-group-item",
+      dragClass: "dragging-card",
+      ghostClass: "ghost-card",
+      disabled: false,
+      preventOnFilter: true,
+      fallbackOnBody: true,
+      scrollFn: function(offsetX, offsetY, originalEvent) { 
+        // console.log(`offsetX: ${offsetX}, offsetY: ${offsetY}, originalEvent: ${originalEvent}`);
+        // console.log(originalEvent);
+        if (offsetX < 0) {
+          delayedScrollPrev();
+        } else if (offsetX > 0){
+          console.log("calling");
+          delayedScrollNext();
+        }
+      },
+      scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
+	    scrollSpeed: 10,
+      onChoose: function (/**Event*/evt) {
+        console.log(`onChoose: oldIndex: ${evt.oldIndex}`);  // element index within parent
+      },
+      onStart: function (/**Event*/evt) {
+        console.log(`onStart: oldIndex: ${evt.oldIndex}`);  // element index within parent
+      },
+      onMove: function(evt, originalEvent) {
+        console.log(evt);
+        // console.log(originalEvent);
+        // console.log(evt.dragged.getBoundingClientRect())
+        // window.dbg = {};
+        // window.dbg.event = evt;
+        // window.dbg.orig = originalEvent;
+
+        // debugger;
+        // console.log('event:');
+        // console.log(event);
+        // console.log('oringal event:');
+        // console.log(originalEvent)
+        // console.log(`evt.dragged: ${evt.dragged}`);// dragged HTMLElement
+        // console.log(`evt.draggedRect: ${evt.draggedRect}`); // TextRectangle {left, top, right и bottom}
+        // console.log(`evt.related: ${evt.related}`); // HTMLElement on which have guided
+        // console.log(`evt.relatedRect: ${evt.relatedRect}`); // TextRectangle
+        // console.log(`originalEvent.clientY: ${originalEvent.clientY}`); // mouse position
+        // console.log(`originalEvent.clientX: ${originalEvent.clientX}`); // mouse position
+      },
+      onUpdate: function(event) {
+        console.log(event);
+      },
+      onClone: function (/**Event*/evt) {
+        console.log('onClone');
+      },
+      onEnd: function (/**Event*/evt) {
+        console.log(`evt.oldIndex: ${evt.oldIndex}`);  // element's old index within parent
+        console.log(`evt.newIndex: ${evt.newIndex}`);  // element's new index within parent
+      },
+      
+    });
+    // console.log(this.sortable);
   }
 }
 </script>
@@ -132,6 +218,14 @@ export default {
   height: 16.33%;
   top: -13.61%;
   left: 14.88%;
+}
+
+.ghost-card {
+  background-color: black;
+}
+
+.dragging-card {
+  background-color: red;
 }
 
 /* Animations */

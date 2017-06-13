@@ -30,7 +30,9 @@
   "dependencies": {
     "framework7": "^1.6.0",
     "framework7-vue": "^0.8.5",
+    "lodash": "^4.17.4",
     "q": "^1.5.0",
+    "sortablejs": "^1.6.0",
     "swiper": "^3.4.2",
     "vue": "^2.2.4",
     "vue-select": "^2.2.0"
