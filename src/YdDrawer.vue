@@ -92,18 +92,18 @@ export default {
     this.cardList = CardProvider.getCardsByPath(this.path);
   },
   mounted() {
+    var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
     // Swiper
-    this.mySwiper = new Swiper ('.swiper-container', {
+    this.mySwiper = new Swiper (swiperContainerElement, {
       // Optional parameters
       direction: 'horizontal',
       slidesPerView: 2,
       slidesPerColumn: 2,
       slidesPerGroup: 2,
-      // slidesPerColumnFill: 'row',
+      slidesPerColumnFill: 'row', /* column conflicts with sortable */
       spaceBetween: 0
     });
-    window.swiper = this.mySwiper;
-    console.log(this.mySwiper);
+    // window.swiper = this.mySwiper;
 
     // Draggable - Sortable
     var that = this;
@@ -116,7 +116,7 @@ export default {
       group: 'cards',
       sort: true,
       delay: 500,
-      animation: 0,
+      animation: 100,
       draggable: ".card-group-item",
       dragClass: "dragging-card",
       ghostClass: "ghost-card",
@@ -124,8 +124,6 @@ export default {
       preventOnFilter: true,
       fallbackOnBody: true,
       scrollFn: function(offsetX, offsetY, originalEvent) { 
-        // console.log(`offsetX: ${offsetX}, offsetY: ${offsetY}, originalEvent: ${originalEvent}`);
-        // console.log(originalEvent);
         if (offsetX < 0) {
           delayedScrollPrev();
         } else if (offsetX > 0){
@@ -135,45 +133,7 @@ export default {
       },
       scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
 	    scrollSpeed: 10,
-      onChoose: function (/**Event*/evt) {
-        console.log(`onChoose: oldIndex: ${evt.oldIndex}`);  // element index within parent
-      },
-      onStart: function (/**Event*/evt) {
-        console.log(`onStart: oldIndex: ${evt.oldIndex}`);  // element index within parent
-      },
-      onMove: function(evt, originalEvent) {
-        console.log(evt);
-        // console.log(originalEvent);
-        // console.log(evt.dragged.getBoundingClientRect())
-        // window.dbg = {};
-        // window.dbg.event = evt;
-        // window.dbg.orig = originalEvent;
-
-        // debugger;
-        // console.log('event:');
-        // console.log(event);
-        // console.log('oringal event:');
-        // console.log(originalEvent)
-        // console.log(`evt.dragged: ${evt.dragged}`);// dragged HTMLElement
-        // console.log(`evt.draggedRect: ${evt.draggedRect}`); // TextRectangle {left, top, right и bottom}
-        // console.log(`evt.related: ${evt.related}`); // HTMLElement on which have guided
-        // console.log(`evt.relatedRect: ${evt.relatedRect}`); // TextRectangle
-        // console.log(`originalEvent.clientY: ${originalEvent.clientY}`); // mouse position
-        // console.log(`originalEvent.clientX: ${originalEvent.clientX}`); // mouse position
-      },
-      onUpdate: function(event) {
-        console.log(event);
-      },
-      onClone: function (/**Event*/evt) {
-        console.log('onClone');
-      },
-      onEnd: function (/**Event*/evt) {
-        console.log(`evt.oldIndex: ${evt.oldIndex}`);  // element's old index within parent
-        console.log(`evt.newIndex: ${evt.newIndex}`);  // element's new index within parent
-      },
-      
     });
-    // console.log(this.sortable);
   }
 }
 </script>
