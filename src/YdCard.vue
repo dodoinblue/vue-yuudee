@@ -13,7 +13,7 @@
 
 <script>
 import { EventBus } from './EventBus.js'
-// import { TweenLite } from './TweenMax.min.js'
+import { TweenLite } from "gsap";
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
