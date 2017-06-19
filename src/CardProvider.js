@@ -1,8 +1,13 @@
-import $q from 'q'
+import Q from 'q'
+import {EventBus} from './EventBus'
 
+// var allCards = {};
 var allCards = require('../static/card-assets/cards.json');
-console.log('Local cards loaded.');
-// console.log(allCards);
+
+var setAllCards = function(allCardsJson) {
+  allCards = allCardsJson;
+  EventBus.$emit('ALL_CARDS_LOADED');
+}
 
 var getSubCardsList = function (wholeTree, subPath) {
   // Whole tree should be an object with 2 params: path & children
@@ -73,4 +78,5 @@ function clone(obj) {
 
 export default {
   getCardsByPath,
+  setAllCards
 }

@@ -17,8 +17,8 @@
   </div>
 
   <!--v-for-->
-  <yd-drawer :path="rootPath" :edit-mode="editMode" :root="rootPath === rootPath"></yd-drawer>
-  <yd-drawer v-for="(drawer, index) in drawers" :path="drawer" :edit-mode="editMode" :root="drawer === rootPath"></yd-drawer>
+  <yd-drawer :path="rootPath" :edit-mode="editMode" :root="true"></yd-drawer>
+  <yd-drawer v-for="(drawer, index) in drawers" :path="drawer" :edit-mode="editMode" :root="false"></yd-drawer>
 
   <!-- settings layer -->
   <div id="app-settings-header" v-if="editMode">
@@ -54,6 +54,9 @@ import YdCard from './YdCard.vue'
 import YdDrawer from './YdDrawer.vue'
 import { EventBus } from './EventBus.js'
 import Dropdown from './dropdown.vue'
+import FileHelper from './FileHelper.js'
+import CardProvider from './CardProvider'
+import Q from 'q'
 
 export default {
   data() {
@@ -72,19 +75,64 @@ export default {
       }
       console.log("returning path: " + result);
       return result;
-    },
-    root: function() {
-      if (this.path == this.rootPath) {
-        return true;
-      } else {
-        return false;
-      }
     }
   },
   methods: {
     toogleEditMode: function() {
       this.editMode = ! this.editMode;
     },
+    loadConfiguration: function() {
+
+    },
+    startupChecks: function() {
+      var that = this;
+      // Check if official cards exists
+      var pathToCardListJson = `${cordova.file.dataDirectory}/card-assets/cards.json`
+      FileHelper.readFromFilePromise(pathToCardListJson).then(function(content){
+        // CardProvider.setAllCards(content);
+      }).catch(function(e){
+        if (e.code == FileError.NOT_FOUND_ERR) {
+          EventBus.$emit("NO_OFFICIAL_CARDS");
+        } else {
+          console.log("something is seriously wrong.")
+        }
+      });
+    },
+    downloadOfficalCards: function() {
+      var sourceZip = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip";
+      var targetPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`;
+      var onProgress = function(progressEvent) {
+        if (progressEvent.lengthComputable) {
+          console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
+        } else {
+          console.log('onProgress')
+        }
+      }
+      var f7 = this.$root.$f7;
+      f7.showPreloader("Downloading...");
+      FileHelper.downloadFilePromise(sourceZip, targetPath, onProgress).then(function(entry){
+        console.log("caller: downloaded: " + entry.toURL())
+        EventBus.$emit('OFFICIAL_CARD_DOWNLOADED')
+        f7.hidePreloader();
+      }).catch(function(error){
+        console.log("On Error: " + error);
+        f7.hidePreloader();
+      });
+      console.log(zip);
+
+
+    },
+    unzipCardzip: function() {
+      var f7 = this.$root.$f7;
+      f7.showPreloader("Unzipping...");
+      zip.unzip(`${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`,
+                  cordova.file.dataDirectory, function(){
+                    console.log("unzip done");
+                    f7.hidePreloader();
+                  }, function(progressEvent){
+                    console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
+                  })
+    }
   },
   created() {
     EventBus.$on('DrawerBackClicked', path => {
@@ -92,7 +140,21 @@ export default {
     });
     EventBus.$on('StackClicked', path => {
       this.drawers.push(path);
-    });    
+    });
+    // Should get root path from settings
+    this.rootPath="."
+
+    EventBus.$on('ROOT_MOUNTED', () => {
+      this.startupChecks();
+    });
+
+    EventBus.$on('NO_OFFICIAL_CARDS', () => {
+      this.downloadOfficalCards();
+    });
+
+    EventBus.$on('OFFICIAL_CARD_DOWNLOADED', () => {
+      this.unzipCardzip();
+    })
   }
 }
 </script>

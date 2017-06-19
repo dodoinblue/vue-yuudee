@@ -14,6 +14,7 @@ Vue.use(Framework7Vue)
 
 // Import App Component
 import App from './app'
+import {EventBus} from 'EventBus.js'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {
@@ -35,6 +36,9 @@ document.addEventListener("deviceready", function(){
     components: {
       app: App
     },
+    mounted() {
+      EventBus.$emit('ROOT_MOUNTED');
+    }
   });
   window.app = app;
 }, false);

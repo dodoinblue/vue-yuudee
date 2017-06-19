@@ -81,6 +81,19 @@ export default {
       console.log("back clicked");
       EventBus.$emit('DrawerBackClicked', this.path);
     },
+    createSwiper: function() {
+      var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
+      // Swiper
+      this.mySwiper = new Swiper (swiperContainerElement, {
+        // Optional parameters
+        direction: 'horizontal',
+        slidesPerView: 2,
+        slidesPerColumn: 2,
+        slidesPerGroup: 2,
+        slidesPerColumnFill: 'row', /* column conflicts with sortable */
+        spaceBetween: 0
+      });
+    }
   },
   computed: {
     sortedCards: function() {
@@ -89,20 +102,14 @@ export default {
     }
   },
   created() {
+    EventBus.$on('ALL_CARDS_LOADED', () => {
+      // this.cardList = CardProvider.getCardsByPath(this.path);
+      // this.createSwiper();
+    });
     this.cardList = CardProvider.getCardsByPath(this.path);
   },
   mounted() {
-    var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
-    // Swiper
-    this.mySwiper = new Swiper (swiperContainerElement, {
-      // Optional parameters
-      direction: 'horizontal',
-      slidesPerView: 2,
-      slidesPerColumn: 2,
-      slidesPerGroup: 2,
-      slidesPerColumnFill: 'row', /* column conflicts with sortable */
-      spaceBetween: 0
-    });
+    this.createSwiper();
     // window.swiper = this.mySwiper;
 
     // Draggable - Sortable
@@ -117,7 +124,7 @@ export default {
       sort: true,
       delay: 500,
       animation: 100,
-      draggable: ".card-group-item",
+      draggable: "x.card-group-item", /* remove x to enable swipe */
       dragClass: "dragging-card",
       ghostClass: "ghost-card",
       disabled: false,
