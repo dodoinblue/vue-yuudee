@@ -164,8 +164,38 @@ function downloadFilePromise(url, pathToFile, onProgress) {
   return deferred.promise;
 }
 
+function toArray(list) {
+  return Array.prototype.slice.call(list || [], 0);
+}
+
+function listDirectoryPromise(pathToDir) {
+  var deferred = Q.defer();
+
+  // TODO: polyfill window.resolveLocalFileSystemURL
+  window.resolveLocalFileSystemURL(folder, function (directoryEntry) {
+    var dirReader = directoryEntry.createReader();
+    var entries = [];
+    // Call the reader.readEntries() until no more results are returned.
+    var readEntries = function() {
+      dirReader.readEntries (function(results) {
+        if (!results.length) {
+          // listResults(entries.sort());
+          resolve(entries.sort());
+        } else {
+          entries = entries.concat(toArray(results));
+          readEntries();
+        }
+      }, errorHandlerPromise.bind(null, pathToDir, deferred));
+    };
+    readEntries(); // Start reading dirs.
+
+  }, errorHandlerPromise.bind(null, pathToFile, deferred));
+  return deferred.promise;
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
   readFromFilePromise,
+  listDirectoryPromise,
 }
