@@ -9,8 +9,8 @@
     <!-- Yuudee's logo' -->
     <div class="col-33">
     </div>
-    <div class="col-33">
-      <img class="app-logo" src="../static/img/yuudee_logo.svg" @click="toogleEditMode">
+    <div class="col-33 app-logo">
+      <img src="../static/img/yuudee_logo.svg" @click="toogleEditMode">
     </div>
     <div class="col-33">
     </div>
@@ -179,10 +179,17 @@ export default {
   height: 100%;
 }
 .app-logo {
-  height: 18%;
-  padding: 5% 0 0 0;
-  text-align: center;
-  width: 80%;
+  /*height: 18%;*/
+  /*padding: 5% 0 0 0;*/
+  /*text-align: center;
+  width: 80%;*/
+  display: flex;
+  justify-content: center;
+  padding-top: 5%;
+}
+.app-logo img{
+  width: 90%;
+  height: 90%;
 }
 .grid-display {
   height: 100%;
