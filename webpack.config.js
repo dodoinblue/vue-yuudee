@@ -14,6 +14,8 @@ const path = require('path'),
 let config = function (env) {
   let returner = {
     entry: entryFile,
+
+    node: { fs: 'empty' },
     
     resolve: {
       extensions: ['.js', '.json', '.vue'],
