@@ -5,7 +5,13 @@ import {EventBus} from './EventBus'
 var allCards = require('../static/card-assets/cards.json');
 
 var setAllCards = function(allCardsJson) {
-  allCards = allCardsJson;
+
+  // if (typeof cordova == 'undefined') {
+  //   console.log("using preloaded cards.json");
+  //   allCards = require('../static/card-assets/cards.json');
+  // } else {
+  //   allCards = allCardsJson;
+  // }
   EventBus.$emit('ALL_CARDS_LOADED');
 }
 

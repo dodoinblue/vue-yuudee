@@ -18,7 +18,11 @@
 
   <!--v-for-->
   <yd-drawer :path="rootPath" :edit-mode="editMode" :root="true"></yd-drawer>
-  <yd-drawer v-for="(drawer, index) in drawers" :path="drawer" :edit-mode="editMode" :root="false"></yd-drawer>
+  <yd-drawer v-for="(drawer, index) in drawers"
+             :path="drawer"
+             :edit-mode="editMode"
+             :root="false"
+             :key="index"></yd-drawer>
 
   <!-- settings layer -->
   <div id="app-settings-header" v-if="editMode">
@@ -56,7 +60,7 @@ import { EventBus } from './EventBus.js'
 import Dropdown from './dropdown.vue'
 import FileHelper from './FileHelper.js'
 import CardProvider from './CardProvider'
-import Q from 'q'
+// import Q from 'q'
 
 export default {
   data() {
@@ -87,9 +91,15 @@ export default {
     startupChecks: function() {
       var that = this;
       // Check if official cards exists
+      if (typeof cordova == 'undefined') {
+        console.log('using preloaded cards.json');
+        // var cards = require('../static/card-assets/cards-lite.json');
+        // CardProvider.setAllCards(cards);
+        return;
+      }
       var pathToCardListJson = `${cordova.file.dataDirectory}/card-assets/cards.json`
       FileHelper.readFromFilePromise(pathToCardListJson).then(function(content){
-        // CardProvider.setAllCards(content);
+        CardProvider.setAllCards(content);
       }).catch(function(e){
         if (e.code == FileError.NOT_FOUND_ERR) {
           EventBus.$emit("NO_OFFICIAL_CARDS");
@@ -145,7 +155,7 @@ export default {
     this.rootPath="."
 
     EventBus.$on('ROOT_MOUNTED', () => {
-      this.startupChecks();
+      // this.startupChecks();
     });
 
     EventBus.$on('NO_OFFICIAL_CARDS', () => {

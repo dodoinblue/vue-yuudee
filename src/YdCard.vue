@@ -14,6 +14,7 @@
 <script>
 import { EventBus } from './EventBus.js'
 import { TweenLite } from "gsap";
+import _ from 'lodash'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -47,6 +48,56 @@ var buildTweenAnimation = function(parameters, element, onComplete, onReverseCom
   return TweenLite.to(element, 1, animationParams);
 }
 
+var isPlaying = false;
+
+var playCard = function(context) {
+  if (isPlaying) {
+    console.log("Card is playing, ignore card click");
+    return
+  }
+  isPlaying = true;
+
+  // Start slideshow
+  var slideshow = window.setInterval(() => {
+    if (context.currentImageIndex == context.card.images.length - 1) {
+      context.currentImageIndex = 0;
+    } else {
+      context.currentImageIndex ++;
+    }
+  }, 500);
+
+  // Play audio
+  var aud = new Audio();
+  // TODO: chain audios if necessary
+  aud.src='static/card-assets/' + context.card.path + '/audios/' + context.card.audios[0];
+  aud.onended = function(){
+    console.log("audio end");
+  };
+  aud.play();
+  console.log(aud);
+
+  var animation;
+
+  // Animation to center and revese
+  // TODO: disable touch if there is an active animation
+  var win = {width: window.innerWidth, height: window.innerHeight};
+  var animationParams = calcToCenterAnimParams(win, context.$el.getBoundingClientRect());
+  var onComplete = function() {
+    window.setTimeout(function () {
+      animation.reverse();
+    }, 3000);
+  }
+  var onReverseComplete = function () {
+    animation = null;
+    window.clearInterval(slideshow);
+    context.currentImageIndex = 0;
+    isPlaying = false;
+  };
+  animation = buildTweenAnimation(animationParams, context.$el, onComplete, onReverseComplete);
+  if( animation && ! animation.isActive()) {
+    animation.play();
+  }
+}
 
 export default {
   props: ['card', 'editMode'],
@@ -56,49 +107,13 @@ export default {
     }
   },
   methods: {
-    onCardClick: function() {
+    onCardClick: _.throttle(function() {
       if (this.isStack) {
         EventBus.$emit('StackClicked', this.card.path);
       } else {
-        // Start slideshow
-        var slideshow = window.setInterval(() => {
-          if (this.currentImageIndex == this.card.images.length - 1) {
-            this.currentImageIndex = 0;
-          } else {
-            this.currentImageIndex ++;
-          }
-        }, 500);
-
-        // Play audio
-        var aud = new Audio();
-        // TODO: chain audios if necessary
-        aud.src='static/card-assets/' + this.card.path + '/audios/' + this.card.audios[0];
-        aud.play();
-
-        var animation;
-
-        // Animation to center and revese
-        // TODO: disable touch if there is an active animation
-        var win = {width: window.innerWidth, height: window.innerHeight};
-        var animationParams = calcToCenterAnimParams(win, this.$el.getBoundingClientRect());
-        var onComplete = function() {
-          console.log("onAnimationComplete");
-          window.setTimeout(function () {
-            animation.reverse();
-          }, 3000);
-        }
-        var onReverseComplete = function () {
-          animation = null;
-          window.clearInterval(slideshow);
-          this.currentImageIndex = 0;
-          console.log("onAnimationReverseComplete");
-        };
-        animation = buildTweenAnimation(animationParams, this.$el, onComplete, onReverseComplete);
-        if( animation && ! animation.isActive()) {
-          animation.play();
-        }
+        playCard(this);
       }
-    },
+    }, 500, {trailing: false}),
     onCardEditClick: function() {
       console.log("Card Edit clicked: " + this.card.path);
     }

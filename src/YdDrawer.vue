@@ -3,19 +3,14 @@
   <div class="drawer" :class="{'with-background': !root}">
     <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
     <div class="swiper-container drawer-content">
-      <div class="swiper-wrapper card-group">
+      <div class="swiper-wrapper">
         <!-- Slides -->
-        <!--<div class="swiper-slide" v-for="page in sortedCards">
-          <div class="row" v-for="row in page">
-            <div class="col-50 no-padding" v-for="card in row">
-              <div class="card-wrapper">
-                <yd-card :card="card" :edit-mode="editMode"></yd-card>
-              </div>
+        <div class="swiper-slide" v-for="page in pagedCards">
+          <div class="card-group">
+            <div class="card-group-item" v-for="card in page">
+              <yd-card :card="card" :edit-mode="editMode"></yd-card>
             </div>
           </div>
-        </div>-->
-        <div class="swiper-slide card-group-item" v-for="card in cardList">
-          <yd-card :card="card" :edit-mode="editMode" :key="card.path"></yd-card>
         </div>
       </div>
     </div>
@@ -31,6 +26,7 @@ import { EventBus } from './EventBus.js'
 import Swiper from 'swiper'
 import Sortable from 'sortablejs'
 import _ from 'lodash'
+import Utils from './utils.js'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -43,30 +39,6 @@ Vue.component('debug', {
   }
 });
 
-/* Arrange cards to pages, and row x col grid on each page
- *
- * E.g. cards = [1,2,3,4,5,6,7,8,9] to 2x2 grid. result should be:
- * [ [ [1, 2], [3, 4] ],
- *   [ [5, 6], [7, 8] ],
- *   [ [9] ]
- * ]
- */
-var sortCards = function (cards, row, col) {
-  var pages = cards.length / (row * col) + 1;
-  var sortedCards = [];
-  for (var i = 0; i < pages; i++) {
-    var page = cards.slice(i * row * col, (i + 1) * row * col);
-    if (page.length === 0) break; // avoid pushing blank page in.
-    var sortedPage = [];
-    for (var j = 0; j <= page.length / col; j++) {
-      var rowConent = page.slice(j * col, (j + 1) * col);
-      if (rowConent.length === 0) break; // avoid pushing blank row in.
-      sortedPage.push(rowConent);
-    }
-    sortedCards.push(sortedPage);
-  }
-  return sortedCards;
-};
 
 export default {
   props: ['path', 'root', 'editMode'],
@@ -74,31 +46,27 @@ export default {
   data() {
     return {
       cardList: [],
+      row: 2,
+      col: 2
     }
   },
   methods: {
     backClicked: function() {
-      console.log("back clicked");
       EventBus.$emit('DrawerBackClicked', this.path);
     },
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
       // Swiper
-      this.mySwiper = new Swiper (swiperContainerElement, {
-        // Optional parameters
-        direction: 'horizontal',
-        slidesPerView: 2,
-        slidesPerColumn: 2,
-        slidesPerGroup: 2,
-        slidesPerColumnFill: 'row', /* column conflicts with sortable */
-        spaceBetween: 0
-      });
-    }
+      this.mySwiper = new Swiper (swiperContainerElement);
+    },
   },
   computed: {
     sortedCards: function() {
       console.log("displaying drawer: " + this.path);
       return sortCards(this.cardList, 2, 2);
+    },
+    pagedCards: function() {
+      return Utils.arrangeCards(this.cardList, this.row, this.col);
     }
   },
   created() {
@@ -112,35 +80,35 @@ export default {
     this.createSwiper();
     // window.swiper = this.mySwiper;
 
-    // Draggable - Sortable
-    var that = this;
-    // TODO: Use id, not class
-    var el = this.$el.getElementsByClassName('card-group')[0];
-    var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
-    var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
+    // // Draggable - Sortable
+    // var that = this;
+    // // TODO: Use id, not class
+    // var el = this.$el.getElementsByClassName('card-group')[0];
+    // var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
+    // var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
 
-    this.sortable = Sortable.create(el, {
-      group: 'cards',
-      sort: true,
-      delay: 500,
-      animation: 100,
-      draggable: "x.card-group-item", /* remove x to enable swipe */
-      dragClass: "dragging-card",
-      ghostClass: "ghost-card",
-      disabled: false,
-      preventOnFilter: true,
-      fallbackOnBody: true,
-      scrollFn: function(offsetX, offsetY, originalEvent) { 
-        if (offsetX < 0) {
-          delayedScrollPrev();
-        } else if (offsetX > 0){
-          console.log("calling");
-          delayedScrollNext();
-        }
-      },
-      scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
-	    scrollSpeed: 10,
-    });
+    // this.sortable = Sortable.create(el, {
+    //   group: 'cards',
+    //   sort: true,
+    //   delay: 500,
+    //   animation: 100,
+    //   draggable: "x.card-group-item", /* remove x to enable swipe */
+    //   dragClass: "dragging-card",
+    //   ghostClass: "ghost-card",
+    //   disabled: false,
+    //   preventOnFilter: true,
+    //   fallbackOnBody: true,
+    //   scrollFn: function(offsetX, offsetY, originalEvent) { 
+    //     if (offsetX < 0) {
+    //       delayedScrollPrev();
+    //     } else if (offsetX > 0){
+    //       console.log("calling");
+    //       delayedScrollNext();
+    //     }
+    //   },
+    //   scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
+	  //   scrollSpeed: 10,
+    // });
   }
 }
 </script>
@@ -185,6 +153,22 @@ export default {
   height: 16.33%;
   top: -13.61%;
   left: 14.88%;
+}
+
+.card-group {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.card-group-item {
+  width:50%;
+  margin: 0px;
+  padding: 0px;
 }
 
 .ghost-card {

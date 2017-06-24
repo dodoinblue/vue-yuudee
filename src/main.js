@@ -14,7 +14,8 @@ Vue.use(Framework7Vue)
 
 // Import App Component
 import App from './app'
-import {EventBus} from 'EventBus.js'
+import { EventBus } from './EventBus.js'
+import Utils from './utils.js'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {
@@ -23,8 +24,7 @@ window.oncontextmenu = function(event) {
   return false;
 };
 
-document.addEventListener("deviceready", function(){
-  console.log("device ready");
+var initApp = function() {
   // Init App after device is ready. This is generally fast so no loading modal is needed.
   var app = new Vue({
     el: '#app',
@@ -34,11 +34,23 @@ document.addEventListener("deviceready", function(){
       routes: Routes,
     },
     components: {
-      app: App
+      app: App // TODO: can I use promise here to load components?
     },
     mounted() {
+      // It appears that components can be mounted/created earlier than root app.
       EventBus.$emit('ROOT_MOUNTED');
     }
   });
   window.app = app;
-}, false);
+}
+
+if (!Utils.isCordova()) {
+  // Make sure the app works in browsers
+  console.log("not cordova env")
+  initApp();
+} else {
+  document.addEventListener("deviceready", function(){
+    console.log("device ready");
+    initApp();
+  }, false);
+}
