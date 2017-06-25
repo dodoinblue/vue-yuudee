@@ -170,9 +170,10 @@ function toArray(list) {
 
 function listDirectoryPromise(pathToDir) {
   var deferred = Q.defer();
+  console.log(pathToDir);
 
   // TODO: polyfill window.resolveLocalFileSystemURL
-  window.resolveLocalFileSystemURL(folder, function (directoryEntry) {
+  window.resolveLocalFileSystemURL(pathToDir, function (directoryEntry) {
     var dirReader = directoryEntry.createReader();
     var entries = [];
     // Call the reader.readEntries() until no more results are returned.
@@ -180,7 +181,7 @@ function listDirectoryPromise(pathToDir) {
       dirReader.readEntries (function(results) {
         if (!results.length) {
           // listResults(entries.sort());
-          resolve(entries.sort());
+          deferred.resolve(entries.sort());
         } else {
           entries = entries.concat(toArray(results));
           readEntries();
@@ -189,7 +190,7 @@ function listDirectoryPromise(pathToDir) {
     };
     readEntries(); // Start reading dirs.
 
-  }, errorHandlerPromise.bind(null, pathToFile, deferred));
+  }, errorHandlerPromise.bind(null, pathToDir, deferred));
   return deferred.promise;
 }
 
