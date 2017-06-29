@@ -16,7 +16,7 @@ Vue.use(Framework7Vue)
 import App from './app'
 import { EventBus } from './EventBus.js'
 import Utils from './utils.js'
-// import 'db.js'
+import db from './db.js'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {
@@ -45,13 +45,14 @@ var initApp = function() {
   window.app = app;
 }
 
-if (Utils.isCordova()) {
+// if (Utils.isCordova()) {
   document.addEventListener("deviceready", function(){
     console.log("device ready");
+    db.initDB();
     initApp();
   }, false);
-} else {
-  // Make sure the app works in browsers
-  console.log("not cordova env")
-  initApp();
-}
+// } else {
+//   // Make sure the app works in browsers
+//   console.log("not cordova env")
+//   initApp();
+// }

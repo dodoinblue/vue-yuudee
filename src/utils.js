@@ -1,6 +1,10 @@
 export default {
   isCordova: () => {
+    console.log(typeof cordova);
     return typeof cordova != 'undefined';
+  },
+  isBrowser: () => {
+    return typeof cordova == 'undefined' || cordova.platformId == 'browser'
   },
 
   /*

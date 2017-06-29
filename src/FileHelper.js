@@ -55,7 +55,7 @@ function readFromFilePromise(pathToFile) {
 
     reader.onloadend = function (e) {
       // cb(JSON.parse(this.result));
-      deferred.resolve(JSON.parse(this.result));
+      deferred.resolve(this.result);
     };
 
     reader.readAsText(file);
@@ -159,6 +159,7 @@ function downloadFilePromise(url, pathToFile, onProgress) {
       console.log("download error code" + error.code);
       deferred.reject(error);
     },
+    false,
     {}
   );
   return deferred.promise;
@@ -170,7 +171,7 @@ function toArray(list) {
 
 function listDirectoryPromise(pathToDir) {
   var deferred = Q.defer();
-  console.log(pathToDir);
+  // console.log(pathToDir);
 
   // TODO: polyfill window.resolveLocalFileSystemURL
   window.resolveLocalFileSystemURL(pathToDir, function (directoryEntry) {
