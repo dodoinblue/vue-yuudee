@@ -147,6 +147,7 @@ function downloadFilePromise(url, pathToFile, onProgress) {
   if(onProgress) {
     ft.onprogress = onProgress;
   }
+  console.log('downloading');
   ft.download(
     url,
     pathToFile,
@@ -195,9 +196,34 @@ function listDirectoryPromise(pathToDir) {
   return deferred.promise;
 }
 
+function removeFolderIfExistPromise(pathToDir) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToDir, function (directoryEntry) {
+    // directoryEntry.removeRecursively(deferred.resolve, deferred.reject);
+    directoryEntry.removeRecursively(deferred.resolve, deferred.reject)
+  }, function(error){
+    if (error.code == FileError.NOT_FOUND_ERR) {
+      deferred.resolve();
+    } else {
+      errorHandlerPromise(pathToDir, deferred, error);
+    }
+  });
+  return deferred.promise;
+}
+
+function removeFile(pathToFile) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
+    fileEntry.remove(deferred.resolve, deferred.reject);
+  });
+  return deferred.promise;
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
   readFromFilePromise,
   listDirectoryPromise,
+  removeFolderIfExistPromise,
+  removeFile
 }

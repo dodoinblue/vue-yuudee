@@ -6,64 +6,66 @@ import _ from 'lodash'
 import FileHelper from './FileHelper'
 import uuidv4 from 'uuid/v4'
 
-var db_settings;
-var db_cards;
+var database;
+var settingsCollection;
+var resourceCollection;
+var classwareCollection;
 
 const CLASSWARE_COLLECTION = 'classwares'
 const RESOURCE_COLLECTION = 'resources'
-const CONFIG_COLLECTION = 'appConfig'
+const SETTINGS_COLLECTION = 'settings'
 const DB_PREFIX = 'yuudee'
-const SETTINGS_DB_NAME = 'settings.db'
-const CARDS_DB_NAME = 'cards.db'
+const DATABASE_NAME = 'database.db'
+
+const SETTINGS_CLASSWARE_BUILT_TIMESTAMP = 'timestampClasswareBuiltDate'
+const SETTINGS_DATABASE_VERSION = 'databaseVersion'
 
 var initDB = function() {
-  var settingsDbAdapter = new LokiCordovaFSAdapter({"prefix": DB_PREFIX});
-  var cardsDbAdapter = new LokiCordovaFSAdapter({"prefix": DB_PREFIX});
-  var settingsDbConfig = {
-    unique: true,
-    autoload: true,
-    autosave: true,
-    autosaveInterval: 1000, // 1 second
+  var deferred = Q.defer();
+
+  var autoloadCallback = function(){
+    settingsCollection = getSettingsCollection();
+    resourceCollection = getResourceCollection();
+    classwareCollection = getClasswareCollection();
+    deferred.resolve("database loaded");
   }
 
-  var cardsDbConfig = {
+  var dbConfig = {
     unique: true,
     autoload: true,
+    autoloadCallback: autoloadCallback,
     autosave: true,
     autosaveInterval: 1000, // 1 second
   }
+  
+  var dbFSAdapter = new LokiCordovaFSAdapter({"prefix": DB_PREFIX});
 
   if (Utils.isCordova) {
-    settingsDbConfig.adapter = settingsDbAdapter;
-    cardsDbConfig.adapter = cardsDbAdapter;
+    dbConfig.adapter = dbFSAdapter;
   }
 
-  db_settings = new Loki(SETTINGS_DB_NAME, settingsDbConfig);
-  db_cards = new Loki(CARDS_DB_NAME, cardsDbConfig);
+  database = new Loki(DATABASE_NAME, dbConfig);
+  return deferred.promise;
+}
+
+var getCollection = function(collectionName, uniqueField) {
+  var collection = database.getCollection(collectionName);
+  if (collection === null) {
+    collection = database.addCollection(collectionName, {unique: [uniqueField]});
+  }
+  return collection;
 }
 
 var getSettingsCollection = function() {
-  var appConfig = db_settings.getCollection(CONFIG_COLLECTION);
-  if (appConfig === null) {
-    appConfig = db_settings.addCollection(CONFIG_COLLECTION, {unique: ['name']});
-  }
-  return appConfig;
-}
-
-var getClasswareCollection = function() {
-  var classwares = db_cards.getCollection(CLASSWARE_COLLECTION);
-  if (classwares === null) {
-    classwares = db_cards.addCollection(CLASSWARE_COLLECTION, {unique: ['uuid']});
-  }
-  return classwares;
+  return getCollection(SETTINGS_COLLECTION, 'name');
 }
 
 var getResourceCollection = function() {
-  var resources = db_cards.getCollection(RESOURCE_COLLECTION);
-  if (resources === null) {
-    resources = db_cards.addCollection(RESOURCE_COLLECTION, {unique: ['uuid']});
-  }
-  return resources;
+  return getCollection(RESOURCE_COLLECTION, 'uuid');
+}
+
+var getClasswareCollection = function() {
+  return getCollection(CLASSWARE_COLLECTION, 'uuid');
 }
 
 var isFirstStartup = function() {
@@ -74,6 +76,13 @@ var isFirstStartup = function() {
     var defaultValue = getSettingsCollection().insert({'name': 'isFirstStartup', 'value': true});
     return defaultValue.value;
   }
+}
+
+var hasClasswareBuilt = function() {
+  var result = getSettingsCollection().find({name: SETTINGS_CLASSWARE_BUILT_TIMESTAMP});
+  var classwareTimestampDoc = getSettingsCollection().find();
+
+  return ! _.isEmpty(result);
 }
 
 var setFirstStartupFalse = function() {
@@ -93,12 +102,12 @@ var getDisplayGridSize = function() {
 // Top-level folders are considered as categories. There should not be any xydcards
 // appears at the top level. If there is any, put them into other category.
 var buildOfficialResourceCollection = function() {
-  buildResourceCollection(cordova.file.dataDirectory + "card-assets/", true);
+  return buildResourceCollection(cordova.file.dataDirectory + "card-assets/", true);
 }
 
 var buildResourceCollection = function(resourceRootPath, isOfficial) {
   // Walkthough card-assets folder. Resource should not have layers.
-  FileHelper.listDirectoryPromise(resourceRootPath)
+  return FileHelper.listDirectoryPromise(resourceRootPath)
   .then(function(list){
     var filtered = _.filter(list, function(item){
       return item.isDirectory && ! _.endsWith(item.nativeURL, 'xydcard/')
@@ -129,12 +138,8 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
     }));
   }).then(function(cards){
     // Save cards to db
-    // console.log(_.flatten(cards));
     getResourceCollection().insert(_.flatten(cards));
-  }).catch(function(error){
-    console.log(error);
-    console.log(new Error().stack);
-  });
+  })
 }
 
 var getCardsInPath = function(category) {
@@ -142,7 +147,6 @@ var getCardsInPath = function(category) {
     var cards = _.filter(list, function(node){
       return node.isDirectory && _.endsWith(node.nativeURL, '.xydcard/');
     });
-    // console.log(cards);
     return Q.all(cards.map(function(node){
       // var node = list[i];
       var card = {};
@@ -214,9 +218,10 @@ var getOrderFromPath = function(path) {
 // }
 // For card
 // {
+//   uuid: uuid,
 //   type: card,
 //   content: uuid,
-//   folder: uuid,
+//   parent: uuid,
 //   animation: no | enlarge | shake
 // }
 var generateOfficialClasswares = function() {
@@ -239,9 +244,10 @@ var generateOfficialClasswares = function() {
     var cardsOfCat = getResourceCollection().find({'category': folder.uuid});
     cardsOfCat.map(function(item){
       var card = {};
+      card.uuid = item.uuid;
       card.type = 'card';
       card.content = item.uuid;
-      card.folder = folder.uuid;
+      card.parent = folder.uuid;
       card.animation = 'enlarge';
       cards.push(card);
     })
@@ -249,10 +255,47 @@ var generateOfficialClasswares = function() {
 
   getClasswareCollection().insert(classwares);
   getClasswareCollection().insert(cards);
+
+  updateClasswareTimestamp();
+}
+
+var updateClasswareTimestamp = function() {
+  var classwareTimestampDoc = getSettingsCollection().find({name: SETTINGS_CLASSWARE_BUILT_TIMESTAMP});
+  var timestamp = Date.now();
+  if (_.isEmpty(classwareTimestampDoc)) {
+    getSettingsCollection().insert({
+      name: SETTINGS_CLASSWARE_BUILT_TIMESTAMP,
+      value: timestamp
+    });
+  } else {
+    classwareTimestampDoc.value = timestamp;
+    getSettingsCollection().update(classwareTimestampDoc);
+  }
+}
+
+var removeCollection = function(collectionName) {
+  var deferred = Q.defer();
+  database.removeCollection(collectionName);
+  database.saveDatabase(function(error){
+    if (error) {
+      deferred.reject(error);
+    } else {
+      deferred.resolve(collectionName + " removed");
+    }
+  });
+  return deferred.promise;
+}
+
+var removeSettingsCollection = function() {
+  return removeCollection(SETTINGS_COLLECTION);
+}
+
+var removeClasswareCollection = function() {
+  return removeCollection(CLASSWARE_COLLECTION);
 }
 
 var removeResourceCollection = function() {
-  db_cards.removeCollection(RESOURCE_COLLECTION);
+  return removeCollection(RESOURCE_COLLECTION);
 }
 
 export default {
@@ -263,11 +306,9 @@ export default {
   generateOfficialClasswares,
   buildResourceCollection,
   buildOfficialResourceCollection,
-  removeResourceCollection,
   generateOfficialClasswares,
-
-  // These shouldn't be accessed directly ..
-  getResourceCollection,
-  getSettingsCollection,
-  getClasswareCollection
+  hasClasswareBuilt,
+  removeSettingsCollection,
+  removeClasswareCollection,
+  removeResourceCollection
 }

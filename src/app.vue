@@ -13,6 +13,7 @@ import {EventBus} from './EventBus.js'
 import Utils from './utils.js'
 import FileHelper from './FileHelper.js'
 import CardProvider from './CardProvider.js'
+import Q from 'q'
 
 export default {
   components: {
@@ -25,59 +26,58 @@ export default {
   },
   methods: {
     startupChecks: function() {
-      var that = this;
-      // Check if official cards exists
-      if (Utils.isBrowser()) {
-        console.log('using preloaded cards.json');
-        // var cards = require('../static/card-assets/cards-lite.json');
-        // CardProvider.setAllCards(cards);
-        return;
+      // Check if classwareCollection has been built
+      if (! db.hasClasswareBuilt()) {
+        console.log('building');
+        var f7 = this.$root.$f7;
+        f7.showPreloader("Downloading...");
+        // Start fresh
+        db.removeResourceCollection();
+        db.removeClasswareCollection();
+        var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
+        var downloadTempPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`
+        var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip"
+        FileHelper.removeFolderIfExistPromise(cardResourceFolder).then(function(){
+          var onProgress = function(progressEvent) {
+            if (progressEvent.lengthComputable) {
+              console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
+            } else {
+              console.log('onProgress');
+            }
+          }
+          // return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+        }).then(function(){
+          // return unzipDownloaded(downloadTempPath, cardResourceFolder)
+          var deferred = Q.defer();
+          zip.unzip(downloadTempPath, cordova.file.dataDirectory, function(){
+            deferred.resolve();
+          }, function(progressEvent){
+            // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
+          });
+          return deferred.promise;
+        }).then(function(){
+          return db.buildOfficialResourceCollection();
+        }).then(function(){
+          return db.generateOfficialClasswares();
+        }).then(function(){
+          // TODO: load external user cards
+          // return db.removeResourceCollection('USER_RESOURCE_PATH');
+          // Cleanup
+          // TODO: Remove temp file
+          EventBus.$emit("RESOURCE_LOADED");
+          f7.hidePreloader();
+        }).catch(function(error){
+          // Close preloader
+          f7.hidePreloader();
+          console.log(error);
+        })
+      } else {
+        // Load configuration
+        // Load classware
+        // Done
+        EventBus.$emit("RESOURCE_LOADED");
       }
-      var pathToCardListJson = `${cordova.file.dataDirectory}card-assets/cards.json`
-      FileHelper.readFromFilePromise(pathToCardListJson).then(function(content){
-        // CardProvider.setAllCards(JSON.parse(content));
-      }).catch(function(e){
-        if (e.code == FileError.NOT_FOUND_ERR) {
-          EventBus.$emit("NO_OFFICIAL_CARDS");
-        } else {
-          console.log("something is seriously wrong.")
-          console.log(e);
-        }
-      });
     },
-    downloadOfficalCards: function() {
-      var sourceZip = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip";
-      var targetPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`;
-      var onProgress = function(progressEvent) {
-        if (progressEvent.lengthComputable) {
-          console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
-        } else {
-          console.log('onProgress');
-        }
-      }
-      var f7 = this.$root.$f7;
-      f7.showPreloader("Downloading...");
-      FileHelper.downloadFilePromise(sourceZip, targetPath, onProgress).then(function(entry){
-        console.log("caller: downloaded: " + entry.toURL())
-        f7.hidePreloader();
-        EventBus.$emit('OFFICIAL_CARD_DOWNLOADED')
-      }).catch(function(error){
-        console.log("On Error: " + error);
-        f7.hidePreloader();
-      });
-    }, 
-    unzipCardzip: function() {
-      var f7 = this.$root.$f7;
-      f7.showPreloader("Unzipping...");
-      zip.unzip(`${cordova.file.cacheDirectory}Download/yuudee-card-lite.zip`,
-                  cordova.file.dataDirectory, function(){
-                    console.log("unzip done");
-                    f7.hidePreloader();
-                    EventBus.$emit("RESOURCE_LOADED")
-                  }, function(progressEvent){
-                    console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
-                  })
-    }
   },
   created() {
     console.log("app created")

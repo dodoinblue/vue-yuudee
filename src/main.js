@@ -48,8 +48,9 @@ var initApp = function() {
 // if (Utils.isCordova()) {
   document.addEventListener("deviceready", function(){
     console.log("device ready");
-    db.initDB();
-    initApp();
+    db.initDB().then(function(){
+      initApp();
+    });
   }, false);
 // } else {
 //   // Make sure the app works in browsers
