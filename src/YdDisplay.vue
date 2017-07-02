@@ -12,12 +12,21 @@
   </div>
 
   <!--v-for-->
-  <yd-drawer :path="rootPath" :edit-mode="editMode" :root="true"></yd-drawer>
-  <yd-drawer v-for="(drawer, index) in drawers"
-             :path="drawer"
+  <yd-drawer :path="rootPath"
+             :uuid="rootUuid"
+             :edit-mode="editMode"
+             :col="drawerSize.column"
+             :row="drawerSize.row"
+             :root="true">
+  </yd-drawer>
+  <yd-drawer v-for="(uuid, index) in drawers"
+             :uuid="uuid"
+             :col="drawerSize.column"
+             :row="drawerSize.row"
              :edit-mode="editMode"
              :root="false"
-             :key="index"></yd-drawer>
+             :key="index">
+  </yd-drawer>
 
   <!-- settings layer -->
   <div id="app-settings-header" v-if="editMode">
@@ -45,7 +54,7 @@
       <div class="yd-button">设置</div>
     </div>
   </div>
-</div>  
+</div>
 </template>
 
 <style scoped>
@@ -111,10 +120,7 @@ import YdCard from './YdCard.vue'
 import YdDrawer from './YdDrawer.vue'
 import { EventBus } from './EventBus.js'
 import Dropdown from './dropdown.vue'
-import FileHelper from './FileHelper.js'
-import CardProvider from './CardProvider'
-import Utils from './utils.js'
-// import Q from 'q'
+import db from 'db.js'
 
 export default {
   data() {
@@ -122,6 +128,9 @@ export default {
       rootPath: '.',
       drawers: [],
       editMode: false,
+      rootUuid: '',
+      classwares: [],
+      gridSize: {}
     }
   },
   components: { YdDrawer, Dropdown },
@@ -141,14 +150,25 @@ export default {
     },
   },
   created() {
-    EventBus.$on('DrawerBackClicked', path => {
+    EventBus.$on('DrawerBackClicked', uuid => {
       this.drawers.pop();
     });
-    EventBus.$on('StackClicked', path => {
-      this.drawers.push(path);
+    EventBus.$on('StackClicked', uuid => {
+      this.drawers.push(uuid);
+    });
+    // Listen to ROOT_CLASSWARE_CHANGED event
+    EventBus.$on('ROOT_CLASSWARE_CHANGED', uuid => {
+      this.rootUuid = uuid;
     });
     // Should get root path from settings
     this.rootPath="."
+
+    // Load root classware uuid
+    this.classwares = db.getClasswareList().data;
+    this.rootUuid = db.getRootClasswareUuid();
+    // this.rootUuid = "daa015b2-a37c-46dd-b93e-05abe502fafb"
+    // Load layout grid size
+    this.drawerSize = db.getDisplayGridSize();
   }
 }
 </script>

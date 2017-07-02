@@ -90,15 +90,23 @@ var setFirstStartupFalse = function() {
 }
 
 var getDisplayGridSize = function() {
-  var result = getSettingsCollection().find({'name': 'displayGridSize'});
-  if (result != null && result.length > 0) {
-    return result[0];
-  } else {
-    getSettingsCollection().insert({'name': 'displayGridSize', 'row': 2, 'column': 2});
-    return {'name': 'displayGridSize', 'row': 2, 'column': 2};
+  var result = getSettingsCollection().findOne({'name': 'displayGridSize'});
+  if (result == null) {
+    result = getSettingsCollection().insert({'name': 'displayGridSize', 'row': 2, 'column': 2});
   }
+  return {
+    'row': result.row,
+    'column': result.column
+  };
 }
 
+var getRootClasswareUuid = function() {
+  var rootUuid = getSettingsCollection().findOne({'name': 'rootClassware'});
+  if (rootUuid == null) {
+    rootUuid = getSettingsCollection().insert({'name': 'rootClassware', 'value': 'all'});
+  }
+  return rootUuid.value;
+}
 // Top-level folders are considered as categories. There should not be any xydcards
 // appears at the top level. If there is any, put them into other category.
 var buildOfficialResourceCollection = function() {
@@ -114,14 +122,17 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
     });
     // var categories = [];
     return Q.all(filtered.map(function(node){
+      console.log(node.toInternalURL());
       var category = {};
       category.uuid = uuidv4();
       category.cordovaFullPath = node.fullPath;
       category.nativeFullPath = node.nativeURL;
+      category.cdvpath = node.toInternalURL();
       category.originalOrder = getOrderFromPath(node.fullPath);
       category.isCategory = true;
       category.isOffcial = isOfficial;
-      category.coverPath = node.fullPath + 'cover.jpg';
+      // TODO: verify existance before write to db
+      category.coverPath = category.cdvpath + 'cover.jpg';
 
       // Read name.txt
       return FileHelper.readFromFilePromise(node.nativeURL + 'name.txt').then(function(content){
@@ -155,6 +166,7 @@ var getCardsInPath = function(category) {
       card.originalOrder = getOrderFromPath(node.fullPath);
       card.isCategory = false;
       card.isOffcial = category.isOffcial;
+      card.cdvpath = node.toInternalURL();
       return getCardImages(node.nativeURL + 'images/').then(function(images){
         return card.images = images;
       }).then(function(){
@@ -177,7 +189,7 @@ var getCardImages = function(imagesPath) {
   return FileHelper.listDirectoryPromise(imagesPath).then(function(list){
     return Q.all(list.map(function(node){
       if(_.endsWith(node.nativeURL, '.jpg')) {
-        return node.fullPath;
+        return node.toInternalURL();
       }
     }));
   });
@@ -187,7 +199,7 @@ var getCardAudios = function(audioPath) {
   return FileHelper.listDirectoryPromise(audioPath).then(function(list){
     return Q.all(list.map(function(node){
       if(_.endsWith(node.nativeURL, '.mp3')) {
-        return node.fullPath;
+        return node.toInternalURL();
       }
     }));
   });
@@ -212,7 +224,7 @@ var getOrderFromPath = function(path) {
 // {
 //   uuid: uuid,
 //   name: name,
-//   type: folder | card,
+//   type: folder,
 //   parent: uuid | root,
 //   cover: path_to_image
 // }
@@ -233,7 +245,7 @@ var generateOfficialClasswares = function() {
     classware.uuid = result.uuid;
     classware.name = result.name;
     classware.type = 'folder';
-    classware.parent = 'root'
+    classware.parent = 'root';
     classware.cover = result.coverPath;
     classwares.push(classware);
   });
@@ -298,16 +310,37 @@ var removeResourceCollection = function() {
   return removeCollection(RESOURCE_COLLECTION);
 }
 
+var getClasswareList = function() {
+  return getClasswareCollection().find({'parent': 'root'});
+}
+
+var getCardsOfClassware = function(uuid) {
+  if (uuid == 'all') {
+    return getClasswareCollection().find({'parent': 'root'})
+  } else {
+    return getClasswareCollection().find({'parent': uuid});
+  }
+}
+
+var getCardByUuid = function(uuid) {
+  return getResourceCollection().findOne({'uuid': uuid});
+}
+
+
 export default {
   initDB,
   isFirstStartup,
   setFirstStartupFalse,
   getDisplayGridSize,
+  getRootClasswareUuid,
   generateOfficialClasswares,
   buildResourceCollection,
   buildOfficialResourceCollection,
   generateOfficialClasswares,
   hasClasswareBuilt,
+  getClasswareList,
+  getCardsOfClassware,
+  getCardByUuid,
   removeSettingsCollection,
   removeClasswareCollection,
   removeResourceCollection

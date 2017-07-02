@@ -13,8 +13,9 @@
 
 <script>
 import { EventBus } from './EventBus.js'
-import { TweenLite } from "gsap";
+import { TweenLite } from "gsap"
 import _ from 'lodash'
+import db from './db.js'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -69,7 +70,7 @@ var playCard = function(context) {
   // Play audio
   var aud = new Audio();
   // TODO: chain audios if necessary
-  aud.src='static/card-assets/' + context.card.path + '/audios/' + context.card.audios[0];
+  aud.src=context.card.audios[0];
   aud.onended = function(){
     console.log("audio end");
   };
@@ -100,32 +101,28 @@ var playCard = function(context) {
 }
 
 export default {
-  props: ['card', 'editMode'],
+  props: ['editMode', 'classware'],
   data() {
     return {
-      currentImageIndex: 0
+      currentImageIndex: 0,
+      card: {}
     }
   },
   methods: {
     onCardClick: _.throttle(function() {
       if (this.isStack) {
-        EventBus.$emit('StackClicked', this.card.path);
+        EventBus.$emit('StackClicked', this.card.uuid);
       } else {
         playCard(this);
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {
-      console.log("Card Edit clicked: " + this.card.path);
+      console.log("Card Edit clicked: " + this.card.uuid);
     }
   },
   computed: {
     isStack: function() {
-      if (this.card.children) {
-        // It has children field, then it is a stack.
-        return true;
-      } else {
-        return false;
-      }
+      return this.card.type == 'folder'
     },
     card_bg_image: function() {
       if (this.isStack) {
@@ -139,10 +136,18 @@ export default {
         if (! this.card.cover) {
           return 'static/img/dummy_content.jpg';
         }
-        return 'static/card-assets/' + this.card.cover;
+        return this.card.cover;
       } else {
-        return 'static/card-assets/' + this.card.path + '/images/' + this.card.images[this.currentImageIndex];
+        return this.card.images[0];
       }
+    },
+  },
+  created() {
+    if (this.classware.type == 'folder') {
+      this.card = this.classware;
+    } else {
+      var content = db.getCardByUuid(this.classware.content);
+      this.card = content;
     }
   }
 }

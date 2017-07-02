@@ -27,11 +27,14 @@ export default {
   methods: {
     startupChecks: function() {
       // Check if classwareCollection has been built
+      // TODO: do init db here
       if (! db.hasClasswareBuilt()) {
+      // if (true) {
         console.log('building');
         var f7 = this.$root.$f7;
         f7.showPreloader("Downloading...");
         // Start fresh
+        // TODO: use promise
         db.removeResourceCollection();
         db.removeClasswareCollection();
         var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`

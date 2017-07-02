@@ -5,10 +5,10 @@
     <div class="swiper-container drawer-content">
       <div class="swiper-wrapper">
         <!-- Slides -->
-        <div class="swiper-slide" v-for="page in pagedCards">
+        <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group">
-            <div class="card-group-item" v-for="card in page">
-              <yd-card :card="card" :edit-mode="editMode"></yd-card>
+            <div class="card-group-item" v-for="(card , index) in page" :key="index">
+              <yd-card :classware="card" :edit-mode="editMode"></yd-card>
             </div>
           </div>
         </div>
@@ -27,6 +27,7 @@ import Swiper from 'swiper'
 import Sortable from 'sortablejs'
 import _ from 'lodash'
 import Utils from './utils.js'
+import db from './db.js'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -39,15 +40,12 @@ Vue.component('debug', {
   }
 });
 
-
 export default {
-  props: ['path', 'root', 'editMode'],
+  props: ['path', 'root', 'editMode', 'uuid', 'row', 'col'],
   components: { YdCard },
   data() {
     return {
       cardList: [],
-      row: 2,
-      col: 2
     }
   },
   methods: {
@@ -63,7 +61,7 @@ export default {
   computed: {
     sortedCards: function() {
       console.log("displaying drawer: " + this.path);
-      return sortCards(this.cardList, 2, 2);
+      return sortCards(this.cardList, this.row, this.col);
     },
     pagedCards: function() {
       return Utils.arrangeCards(this.cardList, this.row, this.col);
@@ -74,7 +72,8 @@ export default {
       // this.cardList = CardProvider.getCardsByPath(this.path);
       // this.createSwiper();
     });
-    this.cardList = CardProvider.getCardsByPath(this.path);
+    this.cardList = db.getCardsOfClassware(this.uuid);
+    // console.log(this.cardList);
   },
   mounted() {
     this.createSwiper();
