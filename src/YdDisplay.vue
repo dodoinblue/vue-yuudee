@@ -59,7 +59,8 @@
         </div>
       </div>
   </div>
-
+  <!--<yd-classware-settings></yd-classware-settings>-->
+  <!--<yd-card-settings></yd-card-settings>-->
 </div>
 </template>
 
@@ -135,8 +136,9 @@
 import YdCard from './YdCard.vue'
 import YdDrawer from './YdDrawer.vue'
 import { EventBus } from './EventBus.js'
-import Dropdown from './dropdown.vue'
 import db from 'db.js'
+import YdClasswareSettings from './YdClasswareSettings'
+import YdCardSettings from './YdCardSettings'
 
 export default {
   data() {
@@ -149,7 +151,7 @@ export default {
       gridSize: {}
     }
   },
-  components: { YdDrawer, Dropdown },
+  components: { YdDrawer, YdClasswareSettings, YdCardSettings },
   computed: {
     path: function() {
       var result = this.rootPath;
