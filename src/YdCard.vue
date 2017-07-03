@@ -138,7 +138,7 @@ export default {
         }
         return this.card.cover;
       } else {
-        return this.card.images[0];
+        return this.card.images[this.currentImageIndex];
       }
     },
   },

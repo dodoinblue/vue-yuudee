@@ -12,20 +12,13 @@
   </div>
 
   <!--v-for-->
-  <yd-drawer :path="rootPath"
-             :uuid="rootUuid"
-             :edit-mode="editMode"
-             :col="drawerSize.column"
-             :row="drawerSize.row"
-             :root="true">
-  </yd-drawer>
   <yd-drawer v-for="(uuid, index) in drawers"
              :uuid="uuid"
-             :col="drawerSize.column"
-             :row="drawerSize.row"
+             :col="gridSize.column"
+             :row="gridSize.row"
              :edit-mode="editMode"
-             :root="false"
-             :key="index">
+             :root="isRoot(uuid)"
+             :key="uuid">
   </yd-drawer>
 
   <!-- settings layer -->
@@ -35,9 +28,7 @@
         <div class="yd-button" @click="toogleEditMode">结束编辑</div>
       </div>
       <div class="col col-50">
-        <div class="yd-button">
-          <dropdown></dropdown>
-        </div>
+        <div class="yd-button" ref="classwarePopover" @click="openClasswarePopover">{{classwareName}}</div>
       </div>
       <div class="col col-25">
         <div class="yd-button" ng-click="goToResource()">素材库</div>
@@ -48,16 +39,41 @@
   <!--footer-->
   <div id="app-settings-footer" class="row row-bottom align-center" v-if="editMode">
     <div class="col col-25">
-      <div class="yd-button">新建</div>
+      <div class="yd-button" @click="newClick" ref="newbutton">新建</div>
     </div>
     <div class="col col-25 col-offset-50">
       <div class="yd-button">设置</div>
     </div>
   </div>
+
+  <!--Popover-->
+    <div class="popover popover-classwares">
+      <div class="popover-angle"></div>
+      <div class="popover-inner">
+        <div class="list-block inset">
+          <ul>
+            <li v-for="(classware, index) in classwares" :key="index">
+              <a href="#" class="list-button item-link" @click="onChooseRootClassware(classware.uuid)">{{classware.name}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+  </div>
+
 </div>
 </template>
 
 <style scoped>
+.popover-classwares {
+  max-height: 50%;
+  width: 50%;
+}
+
+.popover-inner {
+  height: 100%;
+  overflow-y: scroll;
+}
+
 .app-logo {
   display: flex;
   justify-content: center;
@@ -142,14 +158,35 @@ export default {
       }
       console.log("returning path: " + result);
       return result;
+    },
+    classwareName: function() {
+      return db.getClasswareByUuid(this.rootUuid).name;
     }
   },
   methods: {
+    isRoot: function(uuid) {
+      return this.rootUuid == uuid;
+    },
+    newClick: function() {
+
+    },
     toogleEditMode: function() {
       this.editMode = ! this.editMode;
     },
+    openClasswarePopover: function() {
+      var f7 = this.$f7;
+      this.popover = f7.popover('.popover-classwares', this.$refs.classwarePopover);
+    },
+    onChooseRootClassware: function(uuid) {
+      this.$f7.closeModal(this.popover, false)
+      this.popover = null;
+      this.drawers = [];
+      this.rootUuid = uuid;
+      this.drawers.push(uuid);
+      db.setRootClasswareUuid(uuid);
+    }
   },
-  created() {
+  mounted() {
     EventBus.$on('DrawerBackClicked', uuid => {
       this.drawers.pop();
     });
@@ -164,11 +201,12 @@ export default {
     this.rootPath="."
 
     // Load root classware uuid
-    this.classwares = db.getClasswareList().data;
+    this.classwares = db.getClasswareList();
     this.rootUuid = db.getRootClasswareUuid();
-    // this.rootUuid = "daa015b2-a37c-46dd-b93e-05abe502fafb"
     // Load layout grid size
-    this.drawerSize = db.getDisplayGridSize();
+    this.gridSize = db.getDisplayGridSize();
+
+    this.drawers.push(this.rootUuid);
   }
 }
 </script>

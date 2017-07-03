@@ -48,7 +48,7 @@ export default {
               console.log('onProgress');
             }
           }
-          // return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+          return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
         }).then(function(){
           // return unzipDownloaded(downloadTempPath, cardResourceFolder)
           var deferred = Q.defer();

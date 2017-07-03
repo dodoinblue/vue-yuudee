@@ -45,12 +45,19 @@ export default {
   components: { YdCard },
   data() {
     return {
-      cardList: [],
+      // cardList: [],
     }
+  },
+  watch: {
+    uuid: function(val, oldVal) {
+      console.log(val);
+      console.log(oldVal);
+      console.log('uuid changed')
+    },
   },
   methods: {
     backClicked: function() {
-      EventBus.$emit('DrawerBackClicked', this.path);
+      EventBus.$emit('DrawerBackClicked', this.uuid);
     },
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
@@ -64,15 +71,18 @@ export default {
       return sortCards(this.cardList, this.row, this.col);
     },
     pagedCards: function() {
-      return Utils.arrangeCards(this.cardList, this.row, this.col);
+      console.log('recalc')
+      var cardList = db.getCardsOfClassware(this.uuid);
+      return Utils.arrangeCards(cardList, this.row, this.col);
     }
   },
   created() {
+    console.log('drawer created');
     EventBus.$on('ALL_CARDS_LOADED', () => {
       // this.cardList = CardProvider.getCardsByPath(this.path);
       // this.createSwiper();
     });
-    this.cardList = db.getCardsOfClassware(this.uuid);
+    // this.cardList = db.getCardsOfClassware(this.uuid);
     // console.log(this.cardList);
   },
   mounted() {

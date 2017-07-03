@@ -107,6 +107,23 @@ var getRootClasswareUuid = function() {
   }
   return rootUuid.value;
 }
+
+var setRootClasswareUuid = function(uuid) {
+  var rootUuid = getSettingsCollection().findOne({'name': 'rootClassware'});
+  if (rootUuid == null) {
+    rootUuid = getSettingsCollection().insert({'name': 'rootClassware', 'value': uuid});
+  } else {
+    rootUuid.value = uuid;
+    getSettingsCollection().update(rootUuid);
+  }
+}
+
+var getClasswareByUuid = function(uuid) {
+  if (uuid == 'all') {
+    return {'name': 'All'}
+  }
+  return getClasswareCollection().findOne({'uuid': uuid});
+}
 // Top-level folders are considered as categories. There should not be any xydcards
 // appears at the top level. If there is any, put them into other category.
 var buildOfficialResourceCollection = function() {
@@ -311,7 +328,9 @@ var removeResourceCollection = function() {
 }
 
 var getClasswareList = function() {
-  return getClasswareCollection().find({'parent': 'root'});
+  var fromDB = getClasswareCollection().find({'parent': 'root'});
+  fromDB.push({'name': 'All', 'uuid': 'all'});
+  return fromDB;
 }
 
 var getCardsOfClassware = function(uuid) {
@@ -333,6 +352,7 @@ export default {
   setFirstStartupFalse,
   getDisplayGridSize,
   getRootClasswareUuid,
+  setRootClasswareUuid,
   generateOfficialClasswares,
   buildResourceCollection,
   buildOfficialResourceCollection,
@@ -341,6 +361,7 @@ export default {
   getClasswareList,
   getCardsOfClassware,
   getCardByUuid,
+  getClasswareByUuid,
   removeSettingsCollection,
   removeClasswareCollection,
   removeResourceCollection
