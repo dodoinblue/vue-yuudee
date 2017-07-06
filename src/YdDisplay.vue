@@ -176,11 +176,10 @@ export default {
       this.editMode = ! this.editMode;
     },
     openClasswarePopover: function() {
-      var f7 = this.$f7;
-      this.popover = f7.popover('.popover-classwares', this.$refs.classwarePopover);
+      this.popover = this.f7.popover('.popover-classwares', this.$refs.classwarePopover);
     },
     onChooseRootClassware: function(uuid) {
-      this.$f7.closeModal(this.popover, false)
+      this.f7.closeModal(this.popover, false)
       this.popover = null;
       this.drawers = [];
       this.rootUuid = uuid;
@@ -189,6 +188,7 @@ export default {
     }
   },
   mounted() {
+    this.f7 = new Framework7();
     EventBus.$on('DrawerBackClicked', uuid => {
       this.drawers.pop();
     });

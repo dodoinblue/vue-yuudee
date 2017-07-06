@@ -1,8 +1,7 @@
 <template>
 <!-- App -->
 <div id="app">
-  <yd-display>
-  </yd-display>
+  <router-view></router-view>
 </div>
 </template>
 
@@ -31,7 +30,7 @@ export default {
       if (! db.hasClasswareBuilt()) {
       // if (true) {
         console.log('building');
-        var f7 = this.$root.$f7;
+        var f7 = this.f7;
         f7.showPreloader("Downloading...");
         // Start fresh
         // TODO: use promise
@@ -103,6 +102,7 @@ export default {
     
   },
   mounted() {
+    this.f7 = new Framework7();
     console.log("app mounted")
     // TODO: move this to proper location
     setTimeout(function(){

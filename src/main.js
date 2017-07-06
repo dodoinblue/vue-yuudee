@@ -1,23 +1,23 @@
 // Import Vue
 import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
 
 // Import F7, F7-Vue
 import 'framework7'
-import Framework7Vue from 'framework7-vue'
 
 // Import F7 iOS Theme Styles
 import 'framework7/dist/css/framework7.ios.min.css'
 import 'framework7/dist/css/framework7.ios.colors.min.css'
-
-// Import Routes
-import Routes from './routes.js'
-Vue.use(Framework7Vue)
 
 // Import App Component
 import App from './app'
 import { EventBus } from './EventBus.js'
 import Utils from './utils.js'
 import db from './db.js'
+
+import YdDisplay from './YdDisplay'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {
@@ -26,35 +26,36 @@ window.oncontextmenu = function(event) {
   return false;
 };
 
+var routes = [
+  { path: '/display',
+    name: 'YdDisplay',
+    component: YdDisplay },
+  {
+    path: '/',
+    redirect: '/display'
+  }
+]
+
+var router = new Router({ routes })
+
 var initApp = function() {
   // Init App after device is ready. This is generally fast so no loading modal is needed.
   var app = new Vue({
     el: '#app',
-    template: '<app/>',
-    framework7: {
-      root: '#app',
-      routes: Routes,
-    },
-    components: {
-      app: App // TODO: can I use promise here to load components?
-    },
+    router,
+    render: h => h(App),
     mounted() {
       // It appears that components can be mounted/created earlier than root app.
       EventBus.$emit('ROOT_MOUNTED');
     }
-  });
+  })
   window.app = app;
 }
 
-// if (Utils.isCordova()) {
-  document.addEventListener("deviceready", function(){
-    console.log("device ready");
-    db.initDB().then(function(){
-      initApp();
-    });
-  }, false);
-// } else {
-//   // Make sure the app works in browsers
-//   console.log("not cordova env")
-//   initApp();
-// }
+document.addEventListener("deviceready", function(){
+  console.log("device ready");
+  db.initDB().then(function(){
+    initApp();
+  });
+}, false);
+
