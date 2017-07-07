@@ -18,6 +18,7 @@ import Utils from './utils.js'
 import db from './db.js'
 
 import YdDisplay from './YdDisplay'
+import YdResource from './YdResource'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {
@@ -30,6 +31,11 @@ var routes = [
   { path: '/display',
     name: 'YdDisplay',
     component: YdDisplay },
+  {
+    path: '/resource',
+    name: 'YdResource',
+    component: YdResource
+  },
   {
     path: '/',
     redirect: '/display'

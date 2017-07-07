@@ -67,17 +67,14 @@ export default {
   },
   computed: {
     sortedCards: function() {
-      console.log("displaying drawer: " + this.path);
       return sortCards(this.cardList, this.row, this.col);
     },
     pagedCards: function() {
-      console.log('recalc')
       var cardList = db.getCardsOfClassware(this.uuid);
       return Utils.arrangeCards(cardList, this.row, this.col);
     }
   },
   created() {
-    console.log('drawer created');
     EventBus.$on('ALL_CARDS_LOADED', () => {
       // this.cardList = CardProvider.getCardsByPath(this.path);
       // this.createSwiper();

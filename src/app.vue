@@ -112,7 +112,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 #app {
   background-image: url("../static/img/background.png");
   background-repeat: no-repeat;
@@ -120,5 +120,21 @@ export default {
   background-size: cover;
   margin: 0px;
   height: 100%;
+}
+.yd-button {
+  border-radius: 5px;
+  background: url("../static/img/button-raw.png");
+  border-style: solid;
+  border-color: rgb(105,61,34);
+  border-width: 1px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  color: rgb(230,220,210);
+  font-weight: bold;
+  text-align: center;
 }
 </style>

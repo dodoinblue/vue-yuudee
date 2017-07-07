@@ -20,7 +20,7 @@
     </div>
     <div class="classware-delete">Delete this courseware</div>
     <div class="classware-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised">Cancel</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
     </div>
   </div>
@@ -29,8 +29,13 @@
 </template>
 
 <script>
+import { EventBus } from './EventBus'
 export default {
-
+  methods: {
+    cancel: function() {
+      EventBus.$emit('CLOSE_CLASSWARE_SETTINGS');
+    }
+  }
 }
 </script>
 

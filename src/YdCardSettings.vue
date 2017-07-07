@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="classware-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised">Cancel</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
     </div>
   </div>
@@ -44,8 +44,18 @@
 </template>
 
 <script>
-export default {
+import {EventBus} from './EventBus'
 
+export default {
+  props: ['uuid'],
+  methods: {
+    cancel: function() {
+      EventBus.$emit("CARD_SETTINGS_CLOSE", this.uuid);
+    }
+  },
+  mounted() {
+    console.log('YdCardSettings: ' + this.uuid);
+  }
 }
 </script>
 
@@ -63,12 +73,12 @@ export default {
   z-index: 900;
 }
 .settings-dialog {
-    position: relative;
-    top: 20%;
-    left: 10%;
-    width:80%;
-    height:60%;
-    z-index: 1000;
+  position: relative;
+  top: 20%;
+  left: 10%;
+  width:80%;
+  height:60%;
+  z-index: 1000;
 }
 
 .settings-dialog img {

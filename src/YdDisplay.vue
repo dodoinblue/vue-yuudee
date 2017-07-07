@@ -31,7 +31,7 @@
         <div class="yd-button" ref="classwarePopover" @click="openClasswarePopover">{{classwareName}}</div>
       </div>
       <div class="col col-25">
-        <div class="yd-button" ng-click="goToResource()">素材库</div>
+        <div class="yd-button"><router-link to="/resource">素材库</router-link></div>
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@
       <div class="yd-button" @click="newClick" ref="newbutton">新建</div>
     </div>
     <div class="col col-25 col-offset-50">
-      <div class="yd-button">设置</div>
+      <div class="yd-button" @click="openClasswareSettings">设置</div>
     </div>
   </div>
 
@@ -59,8 +59,8 @@
         </div>
       </div>
   </div>
-  <!--<yd-classware-settings></yd-classware-settings>-->
-  <!--<yd-card-settings></yd-card-settings>-->
+  <yd-classware-settings v-if="showClasswareSettings"></yd-classware-settings>
+  <yd-card-settings v-if="cardUuid" :uuid="cardUuid"></yd-card-settings>
 </div>
 </template>
 
@@ -113,23 +113,6 @@
   margin-right: 2.5%;
   margin-bottom: 1.5%;
 }
-
-.yd-button {
-  border-radius: 5px;
-  background: url("../static/img/button-raw.png");
-  border-style: solid;
-  border-color: rgb(105,61,34);
-  border-width: 1px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 100%;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  color: rgb(230,220,210);
-  font-weight: bold;
-  text-align: center;
-}
 </style>
 
 <script>
@@ -148,7 +131,9 @@ export default {
       editMode: false,
       rootUuid: '',
       classwares: [],
-      gridSize: {}
+      gridSize: {},
+      cardUuid: null,
+      showClasswareSettings: false
     }
   },
   components: { YdDrawer, YdClasswareSettings, YdCardSettings },
@@ -185,6 +170,9 @@ export default {
       this.rootUuid = uuid;
       this.drawers.push(uuid);
       db.setRootClasswareUuid(uuid);
+    },
+    openClasswareSettings: function() {
+      this.showClasswareSettings = true;
     }
   },
   mounted() {
@@ -195,10 +183,21 @@ export default {
     EventBus.$on('StackClicked', uuid => {
       this.drawers.push(uuid);
     });
+    EventBus.$on('CARD_EDIT_CLICKED', uuid => {
+      console.log('editing: ' + uuid);
+      this.cardUuid = uuid;
+    })
+    EventBus.$on('CARD_SETTINGS_CLOSE', uuid => {
+      this.cardUuid = null;
+    });
     // Listen to ROOT_CLASSWARE_CHANGED event
     EventBus.$on('ROOT_CLASSWARE_CHANGED', uuid => {
       this.rootUuid = uuid;
     });
+    EventBus.$on('CLOSE_CLASSWARE_SETTINGS', () => {
+      this.showClasswareSettings = false;
+    })
+    
     // Should get root path from settings
     this.rootPath="."
 
