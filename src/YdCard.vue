@@ -117,7 +117,7 @@ export default {
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {
-      EventBus.$emit('CARD_EDIT_CLICKED', this.card.uuid);
+      EventBus.$emit('CARD_EDIT_CLICKED', this.classware);
     }
   },
   computed: {

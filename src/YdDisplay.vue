@@ -60,7 +60,7 @@
       </div>
   </div>
   <yd-classware-settings v-if="showClasswareSettings"></yd-classware-settings>
-  <yd-card-settings v-if="cardUuid" :uuid="cardUuid"></yd-card-settings>
+  <yd-card-settings v-if="cardInEdit" :card="cardInEdit"></yd-card-settings>
 </div>
 </template>
 
@@ -132,7 +132,7 @@ export default {
       rootUuid: '',
       classwares: [],
       gridSize: {},
-      cardUuid: null,
+      cardInEdit: null,
       showClasswareSettings: false
     }
   },
@@ -183,12 +183,12 @@ export default {
     EventBus.$on('StackClicked', uuid => {
       this.drawers.push(uuid);
     });
-    EventBus.$on('CARD_EDIT_CLICKED', uuid => {
-      console.log('editing: ' + uuid);
-      this.cardUuid = uuid;
+    EventBus.$on('CARD_EDIT_CLICKED', card => {
+      console.log('editing: ' + card.uuid);
+      this.cardInEdit = card;
     })
     EventBus.$on('CARD_SETTINGS_CLOSE', uuid => {
-      this.cardUuid = null;
+      this.cardInEdit = null;
     });
     // Listen to ROOT_CLASSWARE_CHANGED event
     EventBus.$on('ROOT_CLASSWARE_CHANGED', uuid => {

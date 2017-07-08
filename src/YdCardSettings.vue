@@ -9,18 +9,18 @@
     <div class="classware-layout">
       <div class="row">Choose layout</div>
       <div class="row">
-        <div class="col col-33 selected">
-          <img class="layout selected" src="../static/img/parent_settingspop_layout1_1.png">
-          <small>no animation</small>
+        <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.id)">
+          <img class="layout" :class="{'selected': animation.id === selected}" :src="animation.pic">
+          <small>{{ animation.name}}</small>
         </div>
-        <div class="col col-33">
-          <img class="layout"src="../static/img/parent_settingspop_layout2_2.png">
+        <!--<div class="col col-33">
+          <img class="layout selected" src="../static/img/parent_settingspop_layout2_2.png">
           <small>enlarge</small>
         </div>
         <div class="col col-33">
           <img class="layout"src="../static/img/parent_settingspop_layout2_2.png">
           <small>enlarge and shake</small>
-        </div>
+        </div>-->
       </div>
     </div>
     <div class="classware-delete row">
@@ -36,7 +36,7 @@
     </div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
     </div>
   </div>
 </div>
@@ -47,14 +47,52 @@
 import {EventBus} from './EventBus'
 
 export default {
-  props: ['uuid'],
+  props: ['card'],
+  data() {
+    return {
+      selected: 1,
+      animations: [
+        {
+          id: 0,
+          name: 'no animation',
+          pic: '../static/img/parent_settingspop_layout1_1.png'
+        },
+        {
+          id: 1,
+          name: 'enlarge',
+          pic: '../static/img/parent_settingspop_layout2_2.png'
+        },
+        {
+          id: 2,
+          name: 'enlarge and shake',
+          pic: '../static/img/parent_settingspop_layout2_2.png'
+        }
+      ],
+      mute: false
+    }
+  },
   methods: {
     cancel: function() {
       EventBus.$emit("CARD_SETTINGS_CLOSE", this.uuid);
+    },
+    select: function(id) {
+      this.selected = id;
+    },
+    confirm: function() {
+      var f7 = new window.Framework7();
+      f7.addNotification({
+        title: 'Yuudee',
+        message: 'This operation is not supported!',
+        hold: 2000,
+      });
     }
   },
   mounted() {
-    console.log('YdCardSettings: ' + this.uuid);
+    console.log(this.card);
+  },
+  created() {
+    console.log('YdCardSettings: Created');
+    // Load data
   }
 }
 </script>
