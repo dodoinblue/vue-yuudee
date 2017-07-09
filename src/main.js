@@ -11,6 +11,8 @@ import 'framework7'
 import 'framework7/dist/css/framework7.ios.min.css'
 import 'framework7/dist/css/framework7.ios.colors.min.css'
 
+import './font-awesome/css/font-awesome.min.css'
+
 // Import App Component
 import App from './app'
 import { EventBus } from './EventBus.js'

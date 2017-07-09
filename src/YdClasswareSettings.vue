@@ -5,6 +5,7 @@
     <div class="settings-frame">
       <img src="../static/img/parent_settingspop_bg.png">
     </div>
+    <div class="settings-dialog-title">Edit Classware</div>
     <div class="classware-title">classware title</div>
     <div class="classware-layout">
       <div class="row">Choose layout</div>
@@ -63,6 +64,17 @@ export default {
 
 .settings-dialog img {
   width: 100%;
+}
+
+.settings-dialog .settings-dialog-title {
+  position: absolute;
+  top: 6%;
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+  text-align: center;
+  font-size: 15px;
+  color: lightgrey;
 }
 
 .settings-dialog .classware-title {

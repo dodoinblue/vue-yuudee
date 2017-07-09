@@ -5,22 +5,15 @@
     <div class="settings-frame">
       <img src="../static/img/parent_settingspop_bg.png">
     </div>
-    <div class="classware-title">classware title</div>
+    <div class="settings-dialog-title">Edit Card</div>
+    <div class="classware-title">Card name</div>
     <div class="classware-layout">
-      <div class="row">Choose layout</div>
+      <div class="row">Choose animation</div>
       <div class="row">
         <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.id)">
           <img class="layout" :class="{'selected': animation.id === selected}" :src="animation.pic">
           <small>{{ animation.name}}</small>
         </div>
-        <!--<div class="col col-33">
-          <img class="layout selected" src="../static/img/parent_settingspop_layout2_2.png">
-          <small>enlarge</small>
-        </div>
-        <div class="col col-33">
-          <img class="layout"src="../static/img/parent_settingspop_layout2_2.png">
-          <small>enlarge and shake</small>
-        </div>-->
       </div>
     </div>
     <div class="classware-delete row">
@@ -54,18 +47,18 @@ export default {
       animations: [
         {
           id: 0,
-          name: 'no animation',
+          name: 'None',
           pic: '../static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
-          name: 'enlarge',
-          pic: '../static/img/parent_settingspop_layout2_2.png'
+          name: 'Enlarge',
+          pic: '../static/img/animation-enlarge.png'
         },
         {
           id: 2,
-          name: 'enlarge and shake',
-          pic: '../static/img/parent_settingspop_layout2_2.png'
+          name: 'Rotate',
+          pic: '../static/img/animation-rotate.png'
         }
       ],
       mute: false
@@ -123,6 +116,17 @@ export default {
   width: 100%;
 }
 
+.settings-dialog .settings-dialog-title {
+  position: absolute;
+  top: 6%;
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
+  text-align: center;
+  font-size: 15px;
+  color: lightgrey;
+}
+
 .settings-dialog .classware-title {
   position: absolute;
   top: 19%;
@@ -137,6 +141,7 @@ export default {
   width: 70%;
   margin-left: 15%;
   margin-right: 15%;
+  text-align: center;
 }
 
 .settings-dialog .classware-delete {
