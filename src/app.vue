@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import YdDisplay from './YdDisplay.vue'
+import YdDisplay from './pages/YdDisplay.vue'
 import db from './db.js'
 import {EventBus} from './EventBus.js'
 import Utils from './utils.js'

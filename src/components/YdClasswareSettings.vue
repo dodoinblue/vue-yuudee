@@ -3,7 +3,7 @@
   <div class="settings-container"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
-      <img src="../static/img/parent_settingspop_bg.png">
+      <img src="static/img/parent_settingspop_bg.png">
     </div>
     <div class="settings-dialog-title">Edit Classware</div>
     <div class="classware-title">
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { EventBus } from './EventBus'
+import { EventBus } from '../EventBus'
 export default {
   props: ['uuid'],
   data() {
@@ -37,12 +37,12 @@ export default {
         {
           id: 0,
           size: 1,
-          pic: '../static/img/parent_settingspop_layout1_1.png'
+          pic: 'static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
           size: 2,
-          pic: '../static/img/parent_settingspop_layout2_2.png'
+          pic: 'static/img/parent_settingspop_layout2_2.png'
         }
       ],
       selectedGridSize: 2,

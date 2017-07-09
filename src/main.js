@@ -19,8 +19,8 @@ import { EventBus } from './EventBus.js'
 import Utils from './utils.js'
 import db from './db.js'
 
-import YdDisplay from './YdDisplay'
-import YdResource from './YdResource'
+import YdDisplay from './pages/YdDisplay'
+import YdResource from './pages/YdResource'
 
 // Stop native context menu
 window.oncontextmenu = function(event) {

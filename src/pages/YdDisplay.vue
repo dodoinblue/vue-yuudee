@@ -5,7 +5,7 @@
     <div class="col-33">
     </div>
     <div class="col-33 app-logo">
-      <img src="../static/img/yuudee_logo.svg" @click="toogleEditMode">
+      <img src="static/img/yuudee_logo.svg" @click="toogleEditMode">
     </div>
     <div class="col-33">
     </div>
@@ -119,13 +119,13 @@
 </style>
 
 <script>
-import YdCard from './YdCard.vue'
-import YdDrawer from './YdDrawer.vue'
-import { EventBus } from './EventBus.js'
-import db from 'db.js'
-import YdClasswareSettings from './YdClasswareSettings'
-import YdCardSettings from './YdCardSettings'
-import YdEditCategoryDialog from './YdEditCategoryDialog'
+import YdCard from '../components/YdCard.vue'
+import YdDrawer from '../components/YdDrawer.vue'
+import { EventBus } from '../EventBus.js'
+import db from '../db.js'
+import YdClasswareSettings from '../components/YdClasswareSettings'
+import YdCardSettings from '../components/YdCardSettings'
+import YdEditCategoryDialog from '../components/YdEditCategoryDialog'
 
 export default {
   data() {

@@ -26,7 +26,7 @@
   </yd-drawer>
 
   <!--Dialogs-->
-  <yd-edit-card-dialog></yd-edit-card-dialog>
+  <yd-edit-card-dialog v-if="showNewCardDialog"></yd-edit-card-dialog>
 
   <!--Popover-->
   <div class="popover popover-new-card">
@@ -45,8 +45,8 @@
 </template>
 
 <script>
-import YdDrawer from './YdDrawer'
-import YdEditCardDialog from './YdEditCardDialog'
+import YdDrawer from '../components/YdDrawer'
+import YdEditCardDialog from '../components/YdEditCardDialog'
 
 export default {
   components: { YdDrawer, YdEditCardDialog },
@@ -56,6 +56,7 @@ export default {
       gridSize: {column: 2, row: 2},
       editMode: false,
       drawers: [],
+      showNewCardDialog: false
     }
   },
   methods: {

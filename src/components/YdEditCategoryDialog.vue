@@ -3,7 +3,7 @@
   <div class="settings-container"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
-      <img src="../static/img/edit-dialog-with-text-field.png">
+      <img src="static/img/edit-dialog-with-text-field.png">
     </div>
     <div class="settings-dialog-title">Edit Category</div>
     <div class="classware-title">
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { EventBus } from './EventBus'
+import { EventBus } from '../EventBus'
 export default {
   props: ['uuid'],
   data() {

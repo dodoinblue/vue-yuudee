@@ -12,10 +12,10 @@
 </template>
 
 <script>
-import { EventBus } from './EventBus.js'
+import { EventBus } from '../EventBus.js'
 import { TweenLite } from "gsap"
 import _ from 'lodash'
-import db from './db.js'
+import db from '../db.js'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -215,7 +215,7 @@ export default {
 
 .yd-card .card-edit-button {
   max-width: 30%;
-  content: url("../static/img/edit.png");
+  content: url("../../static/img/edit.png");
   position: absolute;
   top: -5%;
   right: 0%;

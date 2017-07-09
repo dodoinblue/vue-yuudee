@@ -21,13 +21,13 @@
 <script>
 import YdCard from './YdCard.vue'
 import Vue from 'vue'
-import CardProvider from './CardProvider'
-import { EventBus } from './EventBus.js'
+import CardProvider from '../CardProvider'
+import { EventBus } from '../EventBus.js'
 import Swiper from 'swiper'
 import Sortable from 'sortablejs'
 import _ from 'lodash'
-import Utils from './utils.js'
-import db from './db.js'
+import Utils from '../utils.js'
+import db from '../db.js'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -136,7 +136,7 @@ export default {
 }
 
 .drawer.with-background {
-  background-image: url("../static/img/child_incat_woodbg.png");
+  background-image: url("../../static/img/child_incat_woodbg.png");
 }
 /*.drawer:after {*/
 /*content: " ";*/
@@ -155,7 +155,7 @@ export default {
 
 .drawer-back {
   position: absolute;
-  content: url("../static/img/child_incat_backbutton.png");
+  content: url("../../static/img/child_incat_backbutton.png");
   height: 16.33%;
   top: -13.61%;
   left: 14.88%;

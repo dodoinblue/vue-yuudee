@@ -3,7 +3,7 @@
   <div class="settings-container"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
-      <img src="../static/img/parent_settingspop_bg.png">
+      <img src="static/img/parent_settingspop_bg.png">
     </div>
     <div class="settings-dialog-title">Edit Card</div>
     <div class="classware-title">Card name</div>
@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import {EventBus} from './EventBus'
+import {EventBus} from '../EventBus'
 
 export default {
   props: ['card'],
@@ -48,17 +48,17 @@ export default {
         {
           id: 0,
           name: 'None',
-          pic: '../static/img/parent_settingspop_layout1_1.png'
+          pic: 'static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
           name: 'Enlarge',
-          pic: '../static/img/animation-enlarge.png'
+          pic: 'static/img/animation-enlarge.png'
         },
         {
           id: 2,
           name: 'Rotate',
-          pic: '../static/img/animation-rotate.png'
+          pic: 'static/img/animation-rotate.png'
         }
       ],
       mute: false

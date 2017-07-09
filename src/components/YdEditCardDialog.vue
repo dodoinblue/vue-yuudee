@@ -3,7 +3,7 @@
   <div class="container-background"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
-      <img src="../static/img/edit-dialog-big-background.png">
+      <img src="static/img/edit-dialog-big-background.png">
     </div>
     <div class="settings-dialog-title">Edit Card</div>
     <div class="settings-dialog-content row">
@@ -18,7 +18,7 @@
       <div class="col col-50">
         <div class="row">
           <div class="col-100 light-button">
-            <img src="../static/img/choose.png">
+            <img src="static/img/choose.png">
             <span class="dropdown-text">abc</span>
           </div>
         </div>
@@ -28,7 +28,7 @@
         </div>
         <div class="row">
           <div class="col-100 light-button">
-            <img src="../static/img/single-line-text-field.png" @click="setName2">
+            <img src="static/img/single-line-text-field.png" @click="setName2">
             <span><input type="text"></input></span>
           </div>
         </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import {EventBus} from './EventBus'
+import {EventBus} from '../EventBus'
 
 export default {
   props: ['mode'],
@@ -236,7 +236,7 @@ img.selected {
 
 .yd-button-light {
   border-radius: 5px;
-  background: url("../static/img/blank-button-light.png") center no-repeat;
+  background: url("../../static/img/blank-button-light.png") center no-repeat;
   width: 100%;
   height: 100%;
   padding-top: 0.5em;
