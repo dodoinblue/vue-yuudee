@@ -1,6 +1,6 @@
 <template>
-<div>
-  <div class="settings-container"></div>
+<div class="settings-container">
+  <div class="container-background"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
       <img src="../static/img/edit-dialog-big-background.png">
@@ -28,8 +28,8 @@
         </div>
         <div class="row">
           <div class="col-100 light-button">
-            <img src="../static/img/single-line-text-field.png" @click="setName">
-            <!--<span><input type="text"></input></span>-->
+            <img src="../static/img/single-line-text-field.png" @click="setName2">
+            <span><input type="text"></input></span>
           </div>
         </div>
       </div>
@@ -91,9 +91,18 @@ export default {
   margin: 0px;
   top:0;
   left:0;
-  background: #aaaaaa;
+  z-index: 100;
+}
+
+.container-background {
+  position:fixed;
+  background: black;
   opacity: 0.5;
-  z-index: 900;
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
 }
 
 .settings-dialog {
@@ -101,8 +110,7 @@ export default {
   top: 20%;
   left: 0%;
   width: 100%;
-  height: 60%;
-  z-index: 1000;
+  z-index: 300;
 }
 
 .settings-dialog img {

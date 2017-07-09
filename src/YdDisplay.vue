@@ -59,8 +59,11 @@
         </div>
       </div>
   </div>
+
+  <!--Dialogs-->
   <yd-classware-settings v-if="showClasswareSettings"></yd-classware-settings>
   <yd-card-settings v-if="cardInEdit" :card="cardInEdit"></yd-card-settings>
+  <yd-edit-category-dialog v-if="showCategoryDialog"></yd-edit-category-dialog>
 </div>
 </template>
 
@@ -122,6 +125,7 @@ import { EventBus } from './EventBus.js'
 import db from 'db.js'
 import YdClasswareSettings from './YdClasswareSettings'
 import YdCardSettings from './YdCardSettings'
+import YdEditCategoryDialog from './YdEditCategoryDialog'
 
 export default {
   data() {
@@ -133,10 +137,11 @@ export default {
       classwares: [],
       gridSize: {},
       cardInEdit: null,
-      showClasswareSettings: false
+      showClasswareSettings: false,
+      showCategoryDialog: false
     }
   },
-  components: { YdDrawer, YdClasswareSettings, YdCardSettings },
+  components: { YdDrawer, YdClasswareSettings, YdCardSettings, YdEditCategoryDialog },
   computed: {
     path: function() {
       var result = this.rootPath;

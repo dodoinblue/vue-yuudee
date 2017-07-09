@@ -3,20 +3,13 @@
   <div class="settings-container"></div>
   <div class="settings-dialog">
     <div class="settings-frame">
-      <img src="../static/img/parent_settingspop_bg.png">
+      <img src="../static/img/edit-dialog-with-text-field.png">
     </div>
-    <div class="settings-dialog-title">Edit Classware</div>
+    <div class="settings-dialog-title">Edit Category</div>
     <div class="classware-title">
-      <input type="text" placeholder="Classware title"></input>
+      <input type=text placeholder="Category title"></input>
     </div>
-    <div class="classware-layout">
-      <div class="row">Choose layout</div>
-      <div class="row">
-        <div v-for="setting in gridSettings" class="col col-50" :key="setting.id" @click="select(setting.size)">
-          <img class="layout" :class="{'selected': setting.size == selectedGridSize}" :src="setting.pic">
-        </div>
-      </div>
-    </div>
+
     <div class="classware-delete">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
@@ -33,28 +26,10 @@ export default {
   props: ['uuid'],
   data() {
     return {
-      gridSettings: [
-        {
-          id: 0,
-          size: 1,
-          pic: '../static/img/parent_settingspop_layout1_1.png'
-        },
-        {
-          id: 1,
-          size: 2,
-          pic: '../static/img/parent_settingspop_layout2_2.png'
-        }
-      ],
-      selectedGridSize: 2,
     }
   },
   methods: {
-    cancel: function() {
-      EventBus.$emit('CLOSE_CLASSWARE_SETTINGS');
-    },
-    select: function(size) {
-      this.selectedGridSize = size;
-    }
+
   }
 }
 </script>
@@ -68,17 +43,17 @@ export default {
   margin: 0px;
   top:0;
   left:0;
-  background: #aaaaaa;
+  background: darkgrey;
   opacity: 0.5;
-  z-index: 200;
+  z-index: 900;
 }
 .settings-dialog {
     position: relative;
-    top: 20%;
+    top: 30%;
     left: 10%;
     width:80%;
     height:60%;
-    z-index: 300;
+    z-index: 1000;
 }
 
 .settings-dialog img {
@@ -87,7 +62,7 @@ export default {
 
 .settings-dialog .settings-dialog-title {
   position: absolute;
-  top: 6%;
+  top: 8%;
   width: 70%;
   margin-left: 15%;
   margin-right: 15%;
@@ -98,7 +73,7 @@ export default {
 
 .settings-dialog .classware-title {
   position: absolute;
-  top: 19%;
+  top: 30%;
   width: 70%;
   margin-left: 15%;
   margin-right: 15%;
@@ -106,43 +81,22 @@ export default {
 
 .classware-title input {
   border: none;
-  background: transparent;
-}
-
-.settings-dialog .classware-layout {
-  position: absolute;
-  top: 27%;
-  width: 70%;
-  margin-left: 15%;
-  margin-right: 15%;
 }
 
 .settings-dialog .classware-delete {
   position: absolute;
-  top: 69%;
-  width: 74%;
-  margin-left: 13%;
-  margin-right: 13%;
+  top: 45%;
+  width: 70%;
+  margin-left: 15%;
+  margin-right: 15%;
   color: red;
 }
 
 .settings-dialog .classware-confirm {
   position: absolute;
-  top: 81.5%;
+  top: 68%;
   width: 80%;
   margin-left: 10%;
   margin-right: 10%;
-}
-
-img.layout {
-  border-width: 3px;
-  border-color: transparent;
-  border-radius: 7px;
-  border-style: solid;
-  border-spacing: 3px;
-}
-
-img.selected {
-  border-color: lightskyblue;
 }
 </style>
