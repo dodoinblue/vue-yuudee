@@ -13,7 +13,6 @@ import db from './db.js'
 import {EventBus} from './EventBus.js'
 import Utils from './utils.js'
 import FileHelper from './FileHelper.js'
-import CardProvider from './CardProvider.js'
 import Q from 'q'
 
 export default {

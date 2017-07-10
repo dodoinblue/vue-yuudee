@@ -21,7 +21,6 @@
 <script>
 import YdCard from './YdCard.vue'
 import Vue from 'vue'
-import CardProvider from '../CardProvider'
 import { EventBus } from '../EventBus.js'
 import Swiper from 'swiper'
 import Sortable from 'sortablejs'
@@ -76,8 +75,7 @@ export default {
   },
   created() {
     EventBus.$on('ALL_CARDS_LOADED', () => {
-      // this.cardList = CardProvider.getCardsByPath(this.path);
-      // this.createSwiper();
+
     });
     // this.cardList = db.getCardsOfClassware(this.uuid);
     // console.log(this.cardList);
