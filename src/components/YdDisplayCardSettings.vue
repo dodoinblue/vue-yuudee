@@ -6,7 +6,10 @@
       <img src="static/img/parent_settingspop_bg.png">
     </div>
     <div class="settings-dialog-title">Edit Card</div>
-    <div class="classware-title">Card name</div>
+    <div class="classware-title">
+      <!--<input type="text" :placeholder="cardContent.name"></input>-->
+      {{cardContent.name}}
+    </div>
     <div class="classware-layout">
       <div class="row">Choose animation</div>
       <div class="row">
@@ -61,7 +64,8 @@ export default {
           pic: 'static/img/animation-rotate.png'
         }
       ],
-      mute: false
+      mute: false,
+      cardContent: {}
     }
   },
   methods: {
@@ -80,12 +84,9 @@ export default {
       });
     }
   },
-  mounted() {
-    console.log(this.card);
-  },
   created() {
-    console.log('YdCardSettings: Created');
     // Load data
+    this.cardContent = db.getCardByUuid(this.card.uuid);
   }
 }
 </script>
@@ -99,9 +100,9 @@ export default {
   margin: 0px;
   top:0;
   left:0;
-  background: #aaaaaa;
+  background: black;
   opacity: 0.5;
-  z-index: 900;
+  z-index: 200;
 }
 .settings-dialog {
   position: relative;
@@ -109,7 +110,7 @@ export default {
   left: 10%;
   width:80%;
   height:60%;
-  z-index: 1000;
+  z-index: 300;
 }
 
 .settings-dialog img {
@@ -135,6 +136,10 @@ export default {
   margin-right: 15%;
 }
 
+.classware-title input {
+  border: none;
+  background-color: transparent;
+}
 .settings-dialog .classware-layout {
   position: absolute;
   top: 27%;

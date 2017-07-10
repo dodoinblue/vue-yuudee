@@ -7,7 +7,7 @@
     </div>
     <div class="settings-dialog-title">Edit Classware</div>
     <div class="classware-title">
-      <input type="text" placeholder="Classware title"></input>
+      <input type="text" :placeholder="classwareInfo.name"></input>
     </div>
     <div class="classware-layout">
       <div class="row">Choose layout</div>
@@ -20,7 +20,7 @@
     <div class="classware-delete">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
     </div>
   </div>
 </div>
@@ -29,8 +29,10 @@
 
 <script>
 import { EventBus, Events } from '../EventBus'
+import db from '../db.js'
+
 export default {
-  props: ['uuid'],
+  props: ['classwareId'],
   data() {
     return {
       gridSettings: [
@@ -46,6 +48,7 @@ export default {
         }
       ],
       selectedGridSize: 2,
+      classwareInfo: {}
     }
   },
   methods: {
@@ -54,7 +57,22 @@ export default {
     },
     select: function(size) {
       this.selectedGridSize = size;
+    },
+    confirm: function() {
     }
+  },
+  created() {
+    console.log(this.classwareId);
+    if (this.classwareId == 'all') {
+      this.classwareInfo = {
+        name: 'All'
+      }
+    } else  {
+      this.classwareInfo = db.getClasswareItemByUuid(this.classwareId);
+    }
+  },
+  mounted() {
+    this.f7 = new window.Framework7();
   }
 }
 </script>

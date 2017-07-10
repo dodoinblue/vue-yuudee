@@ -7,13 +7,13 @@
     </div>
     <div class="settings-dialog-title">Edit Category</div>
     <div class="classware-title">
-      <input type=text placeholder="Category title"></input>
+      <input type=text :placeholder="card.name"></input>
     </div>
 
     <div class="classware-delete">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
     </div>
   </div>
 </div>
@@ -21,15 +21,28 @@
 </template>
 
 <script>
-import { EventBus } from '../EventBus'
+import { EventBus, Events } from '../EventBus'
 export default {
-  props: ['uuid'],
+  props: ['card'],
   data() {
     return {
     }
   },
   methods: {
+    cancel: function() {
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.uuid);
+    },
+    confirm: function() {
+      // if (card.isOfficial) {
+      //   this.f7.alert("", "", function(){
 
+      //   })
+      // }
+    }
+  },
+  mounted() {
+    console.log(this.card);
+    this.f7 = new window.Framework7();
   }
 }
 </script>
@@ -43,17 +56,17 @@ export default {
   margin: 0px;
   top:0;
   left:0;
-  background: darkgrey;
+  background: black;
   opacity: 0.5;
-  z-index: 900;
+  z-index: 200;
 }
 .settings-dialog {
-    position: relative;
-    top: 30%;
-    left: 10%;
-    width:80%;
-    height:60%;
-    z-index: 1000;
+  position: relative;
+  top: 30%;
+  left: 10%;
+  width:80%;
+  height:60%;
+  z-index: 300;
 }
 
 .settings-dialog img {

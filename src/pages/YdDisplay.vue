@@ -61,9 +61,9 @@
   </div>
 
   <!--Dialogs-->
-  <yd-display-classware-settings v-if="showClasswareSettings"></yd-display-classware-settings>
-  <yd-display-card-settings v-if="cardInEdit" :card="cardInEdit"></yd-display-card-settings>
-  <yd-edit-category-dialog v-if="showCategoryDialog"></yd-edit-category-dialog>
+  <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
+  <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
+  <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit"></yd-edit-category-dialog>
 </div>
 </template>
 
@@ -135,15 +135,27 @@ export default {
       rootUuid: '',
       classwares: [],
       gridSize: {},
-      cardInEdit: null,
+      cardInEdit: {},
       showClasswareSettings: false,
-      showCategoryDialog: false
+      // showCategoryDialog: false
     }
   },
   components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
   computed: {
     classwareName: function() {
-      return db.getClasswareByUuid(this.rootUuid).name;
+      return db.getClasswareItemByUuid(this.rootUuid).name;
+    },
+    showCardSettings: function() {
+      if (this.cardInEdit && this.cardInEdit.type == 'card') {
+        return true
+      }
+      return false
+    },
+    showCategorySettings: function() {
+      if (this.cardInEdit && this.cardInEdit.type == 'folder') {
+        return true
+      }
+      return false
     }
   },
   methods: {
@@ -178,14 +190,14 @@ export default {
     EventBus.$on(Events.DISPLAY_CATEGORY, uuid => {
       this.drawers.push(uuid);
     });
-    EventBus.$on(Events.DISPLAY_CARD_SETTINGS_OPEN, card => {
-      console.log('editing: ' + card.uuid);
-      this.cardInEdit = card;
+    EventBus.$on(Events.DISPLAY_CARD_SETTINGS_OPEN, cardOrCategory => {
+      this.cardInEdit = cardOrCategory;
     })
     EventBus.$on(Events.DISPLAY_CARD_SETTINGS_CLOSE, uuid => {
-      this.cardInEdit = null;
+      this.cardInEdit = {};
     });
     EventBus.$on(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, () => {
+      // TODO: Close drawers or warn if root is not the same with top classware
       this.showClasswareSettings = false;
     });
 

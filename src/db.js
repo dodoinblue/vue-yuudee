@@ -68,25 +68,11 @@ var getClasswareCollection = function() {
   return getCollection(CLASSWARE_COLLECTION, 'uuid');
 }
 
-var isFirstStartup = function() {
-  var result = getSettingsCollection().findOne({'name': 'isFirstStartup'});
-  if (result != null) {
-    return result.value;
-  } else {
-    var defaultValue = getSettingsCollection().insert({'name': 'isFirstStartup', 'value': true});
-    return defaultValue.value;
-  }
-}
-
 var hasClasswareBuilt = function() {
   var result = getSettingsCollection().find({name: SETTINGS_CLASSWARE_BUILT_TIMESTAMP});
   var classwareTimestampDoc = getSettingsCollection().find();
 
   return ! _.isEmpty(result);
-}
-
-var setFirstStartupFalse = function() {
-  getSettingsCollection().insert({'name': 'isFirstStartup', 'value': false});
 }
 
 var getDisplayGridSize = function() {
@@ -118,12 +104,13 @@ var setRootClasswareUuid = function(uuid) {
   }
 }
 
-var getClasswareByUuid = function(uuid) {
+var getClasswareItemByUuid = function(uuid) {
   if (uuid == 'all') {
     return {'name': 'All'}
   }
   return getClasswareCollection().findOne({'uuid': uuid});
 }
+
 // Top-level folders are considered as categories. There should not be any xydcards
 // appears at the top level. If there is any, put them into other category.
 var buildOfficialResourceCollection = function() {
@@ -235,7 +222,11 @@ var getOrderFromPath = function(path) {
   return order;
 }
 
-// Classware should have 2 types, one is folder, that can contain cards
+// Classwares are displayed in YdDisplay page. Classwares also have tree structure.
+// Top-level folder (parent == root) are classares showed in dropdown list.
+// And special 'All' classware is added dynamically.
+//
+// Classware item should have 2 types, one is folder, that can contain cards
 // the other one is cards, which can be a card in resource or a resource category.
 // For folder
 // {
@@ -244,6 +235,8 @@ var getOrderFromPath = function(path) {
 //   type: folder,
 //   parent: uuid | root,
 //   cover: path_to_image
+// TODO: order: order // order in parent
+// TODO: grid: 2  // 1 - > 1x1; 2 -> 2x2; 3-> 3x3
 // }
 // For card
 // {
@@ -252,6 +245,8 @@ var getOrderFromPath = function(path) {
 //   content: uuid,
 //   parent: uuid,
 //   animation: no | enlarge | shake
+// TODO: order: order  // order in parent
+// TODO: mute: false
 // }
 var generateOfficialClasswares = function() {
   // Official categories should be classware
@@ -348,21 +343,27 @@ var getCardByUuid = function(uuid) {
 
 export default {
   initDB,
-  isFirstStartup,
-  setFirstStartupFalse,
+
+  // YdDisplay methods
   getDisplayGridSize,
   getRootClasswareUuid,
   setRootClasswareUuid,
+  getCardsOfClassware,
+  getClasswareItemByUuid,
+
+  // YdResource methods
+  getCardByUuid,
+
+  // Build database
   generateOfficialClasswares,
   buildResourceCollection,
   buildOfficialResourceCollection,
   generateOfficialClasswares,
-  hasClasswareBuilt,
-  getClasswareList,
-  getCardsOfClassware,
-  getCardByUuid,
-  getClasswareByUuid,
   removeSettingsCollection,
   removeClasswareCollection,
-  removeResourceCollection
+  removeResourceCollection,
+
+  hasClasswareBuilt,
+  getClasswareList,
+
 }

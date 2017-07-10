@@ -113,6 +113,9 @@ export default {
       if (this.isStack) {
         EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
       } else {
+        if (this.editMode) {
+          return
+        }
         playCard(this);
       }
     }, 500, {trailing: false}),
