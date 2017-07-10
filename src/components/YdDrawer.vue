@@ -21,7 +21,7 @@
 <script>
 import YdCard from './YdCard.vue'
 import Vue from 'vue'
-import { EventBus } from '../EventBus.js'
+import { EventBus, Events } from '../EventBus.js'
 import Swiper from 'swiper'
 import Sortable from 'sortablejs'
 import _ from 'lodash'
@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     backClicked: function() {
-      EventBus.$emit('DrawerBackClicked', this.uuid);
+      EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
     },
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];

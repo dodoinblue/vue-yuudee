@@ -5,31 +5,22 @@
     <div class="settings-frame">
       <img src="static/img/parent_settingspop_bg.png">
     </div>
-    <div class="settings-dialog-title">Edit Card</div>
-    <div class="classware-title">Card name</div>
+    <div class="settings-dialog-title">Edit Classware</div>
+    <div class="classware-title">
+      <input type="text" placeholder="Classware title"></input>
+    </div>
     <div class="classware-layout">
-      <div class="row">Choose animation</div>
+      <div class="row">Choose layout</div>
       <div class="row">
-        <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.id)">
-          <img class="layout" :class="{'selected': animation.id === selected}" :src="animation.pic">
-          <small>{{ animation.name}}</small>
+        <div v-for="setting in gridSettings" class="col col-50" :key="setting.id" @click="select(setting.size)">
+          <img class="layout" :class="{'selected': setting.size == selectedGridSize}" :src="setting.pic">
         </div>
       </div>
     </div>
-    <div class="classware-delete row">
-      <div class="col col-50">Delete this card</div>
-      <div class="col col-50">
-        <div class="item-input">
-          <label class="label-switch">
-            <input type="checkbox">
-            <div class="checkbox"></div>
-          </label>
-        </div>
-      </div>
-    </div>
+    <div class="classware-delete">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised">Confirm</a></div>
     </div>
   </div>
 </div>
@@ -37,55 +28,33 @@
 </template>
 
 <script>
-import {EventBus} from '../EventBus'
-
+import { EventBus, Events } from '../EventBus'
 export default {
-  props: ['card'],
+  props: ['uuid'],
   data() {
     return {
-      selected: 1,
-      animations: [
+      gridSettings: [
         {
           id: 0,
-          name: 'None',
+          size: 1,
           pic: 'static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
-          name: 'Enlarge',
-          pic: 'static/img/animation-enlarge.png'
-        },
-        {
-          id: 2,
-          name: 'Rotate',
-          pic: 'static/img/animation-rotate.png'
+          size: 2,
+          pic: 'static/img/parent_settingspop_layout2_2.png'
         }
       ],
-      mute: false
+      selectedGridSize: 2,
     }
   },
   methods: {
     cancel: function() {
-      EventBus.$emit("CARD_SETTINGS_CLOSE", this.uuid);
+      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE);
     },
-    select: function(id) {
-      this.selected = id;
-    },
-    confirm: function() {
-      var f7 = new window.Framework7();
-      f7.addNotification({
-        title: 'Yuudee',
-        message: 'This operation is not supported!',
-        hold: 2000,
-      });
+    select: function(size) {
+      this.selectedGridSize = size;
     }
-  },
-  mounted() {
-    console.log(this.card);
-  },
-  created() {
-    console.log('YdCardSettings: Created');
-    // Load data
   }
 }
 </script>
@@ -101,15 +70,15 @@ export default {
   left:0;
   background: #aaaaaa;
   opacity: 0.5;
-  z-index: 900;
+  z-index: 200;
 }
 .settings-dialog {
-  position: relative;
-  top: 20%;
-  left: 10%;
-  width:80%;
-  height:60%;
-  z-index: 1000;
+    position: relative;
+    top: 20%;
+    left: 10%;
+    width:80%;
+    height:60%;
+    z-index: 300;
 }
 
 .settings-dialog img {
@@ -135,13 +104,17 @@ export default {
   margin-right: 15%;
 }
 
+.classware-title input {
+  border: none;
+  background: transparent;
+}
+
 .settings-dialog .classware-layout {
   position: absolute;
   top: 27%;
   width: 70%;
   margin-left: 15%;
   margin-right: 15%;
-  text-align: center;
 }
 
 .settings-dialog .classware-delete {

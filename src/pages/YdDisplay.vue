@@ -61,8 +61,8 @@
   </div>
 
   <!--Dialogs-->
-  <yd-classware-settings v-if="showClasswareSettings"></yd-classware-settings>
-  <yd-card-settings v-if="cardInEdit" :card="cardInEdit"></yd-card-settings>
+  <yd-display-classware-settings v-if="showClasswareSettings"></yd-display-classware-settings>
+  <yd-display-card-settings v-if="cardInEdit" :card="cardInEdit"></yd-display-card-settings>
   <yd-edit-category-dialog v-if="showCategoryDialog"></yd-edit-category-dialog>
 </div>
 </template>
@@ -121,16 +121,15 @@
 <script>
 import YdCard from '../components/YdCard.vue'
 import YdDrawer from '../components/YdDrawer.vue'
-import { EventBus } from '../EventBus.js'
+import { EventBus, Events } from '../EventBus.js'
 import db from '../db.js'
-import YdClasswareSettings from '../components/YdClasswareSettings'
-import YdCardSettings from '../components/YdCardSettings'
+import YdDisplayClasswareSettings from '../components/YdDisplayClasswareSettings'
+import YdDisplayCardSettings from '../components/YdDisplayCardSettings'
 import YdEditCategoryDialog from '../components/YdEditCategoryDialog'
 
 export default {
   data() {
     return {
-      rootPath: '.',
       drawers: [],
       editMode: false,
       rootUuid: '',
@@ -141,16 +140,8 @@ export default {
       showCategoryDialog: false
     }
   },
-  components: { YdDrawer, YdClasswareSettings, YdCardSettings, YdEditCategoryDialog },
+  components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
   computed: {
-    path: function() {
-      var result = this.rootPath;
-      if (this.drawers.length != 0) {
-        result = this.drawers[this.drawers.length - 1];
-      }
-      console.log("returning path: " + result);
-      return result;
-    },
     classwareName: function() {
       return db.getClasswareByUuid(this.rootUuid).name;
     }
@@ -180,39 +171,34 @@ export default {
       this.showClasswareSettings = true;
     }
   },
-  mounted() {
-    this.f7 = new Framework7();
-    EventBus.$on('DrawerBackClicked', uuid => {
+  created() {
+    EventBus.$on(Events.DISPLAY_DRAWER_CLOSE, uuid => {
       this.drawers.pop();
     });
-    EventBus.$on('StackClicked', uuid => {
+    EventBus.$on(Events.DISPLAY_CATEGORY, uuid => {
       this.drawers.push(uuid);
     });
-    EventBus.$on('CARD_EDIT_CLICKED', card => {
+    EventBus.$on(Events.DISPLAY_CARD_SETTINGS_OPEN, card => {
       console.log('editing: ' + card.uuid);
       this.cardInEdit = card;
     })
-    EventBus.$on('CARD_SETTINGS_CLOSE', uuid => {
+    EventBus.$on(Events.DISPLAY_CARD_SETTINGS_CLOSE, uuid => {
       this.cardInEdit = null;
     });
-    // Listen to ROOT_CLASSWARE_CHANGED event
-    EventBus.$on('ROOT_CLASSWARE_CHANGED', uuid => {
-      this.rootUuid = uuid;
-    });
-    EventBus.$on('CLOSE_CLASSWARE_SETTINGS', () => {
+    EventBus.$on(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, () => {
       this.showClasswareSettings = false;
-    })
-    
-    // Should get root path from settings
-    this.rootPath="."
+    });
 
     // Load root classware uuid
     this.classwares = db.getClasswareList();
     this.rootUuid = db.getRootClasswareUuid();
-    // Load layout grid size
-    this.gridSize = db.getDisplayGridSize();
-
     this.drawers.push(this.rootUuid);
+
+    // TODO: Grid size should be classware specific
+    this.gridSize = db.getDisplayGridSize();
+  },
+  mounted() {
+    this.f7 = new Framework7();
   }
 }
 </script>

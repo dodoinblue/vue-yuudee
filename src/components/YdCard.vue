@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { EventBus } from '../EventBus.js'
+import { EventBus, Events } from '../EventBus.js'
 import { TweenLite } from "gsap"
 import _ from 'lodash'
 import db from '../db.js'
@@ -111,13 +111,13 @@ export default {
   methods: {
     onCardClick: _.throttle(function() {
       if (this.isStack) {
-        EventBus.$emit('StackClicked', this.card.uuid);
+        EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
       } else {
         playCard(this);
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {
-      EventBus.$emit('CARD_EDIT_CLICKED', this.classware);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
     }
   },
   computed: {
