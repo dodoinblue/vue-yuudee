@@ -47,6 +47,20 @@ function readFromFile(pathToFile, cb) {
     }, errorHandler.bind(null, fileName));
 }
 
+function fileExistPromise(pathToFile) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
+    deferred.resolve(true);
+  }, function(error){
+    if (error.code == FileError.NOT_FOUND_ERR) {
+      deferred.resolve(false);
+    } else {
+      errorHandlerPromise(pathToFile, deferred, error);
+    }
+  });
+  return deferred.promise;
+}
+
 function readFromFilePromise(pathToFile) {
   var deferred = Q.defer();
   window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
@@ -223,6 +237,7 @@ export default {
   downloadFilePromise,
   writeToFilePromise,
   readFromFilePromise,
+  fileExistPromise,
   listDirectoryPromise,
   removeFolderIfExistPromise,
   removeFile

@@ -126,21 +126,27 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
     });
     // var categories = [];
     return Q.all(filtered.map(function(node){
-      console.log(node.toInternalURL());
+      // console.log(node.toInternalURL());
+      console.log(node);
       var category = {};
-      category.uuid = uuidv4();
+      category.uuid = node.name;
       category.cordovaFullPath = node.fullPath;
       category.nativeFullPath = node.nativeURL;
       category.cdvpath = node.toInternalURL();
-      category.originalOrder = getOrderFromPath(node.fullPath);
       category.isCategory = true;
       category.isOffcial = isOfficial;
-      // TODO: verify existance before write to db
-      category.coverPath = category.cdvpath + 'cover.jpg';
 
-      // Read name.txt
-      return FileHelper.readFromFilePromise(node.nativeURL + 'name.txt').then(function(content){
-        category.name = content;
+      category.coverPath = category.cdvpath + 'cover.jpg';
+      return FileHelper.fileExistPromise(category.coverPath).then(function(isExist){
+        if (! isExist) {
+          console.log(category.coverPath + ' does not exist. Set to ""')
+          category.coverPath = '';
+        }
+        return FileHelper.readFromFilePromise(node.nativeURL + 'info.json');
+      }).then(function(content){
+        var info = JSON.parse(content);
+        category.name = info.name;
+        category.originalOrder = parseInt(info.order);
         return category
       });
     }));
@@ -163,11 +169,9 @@ var getCardsInPath = function(category) {
       return node.isDirectory && _.endsWith(node.nativeURL, '.xydcard/');
     });
     return Q.all(cards.map(function(node){
-      // var node = list[i];
       var card = {};
-      card.uuid = uuidv4();
+      card.uuid = node.name.slice(0, -8);
       card.category = category.uuid;
-      card.originalOrder = getOrderFromPath(node.fullPath);
       card.isCategory = false;
       card.isOffcial = category.isOffcial;
       card.cdvpath = node.toInternalURL();
@@ -179,8 +183,11 @@ var getCardsInPath = function(category) {
         });
       }).then(function(){
         // Get card name
-        return FileHelper.readFromFilePromise(node.nativeURL + "name.txt").then(function(data){
-          card.name = data;
+        return FileHelper.readFromFilePromise(node.nativeURL + "info.json").then(function(content){
+          // card.name = data;
+          var info = JSON.parse(content);
+          card.name = info.name;
+          card.originalOrder = parseInt(info.order);
         });
       }).then(function(){
         return card;
@@ -235,8 +242,8 @@ var getOrderFromPath = function(path) {
 //   type: folder,
 //   parent: uuid | root,
 //   cover: path_to_image
-// TODO: order: order // order in parent
-// TODO: grid: 2  // 1 - > 1x1; 2 -> 2x2; 3-> 3x3
+//   order: order // order in parent
+// TODO: grid: not genreate this. if null app should use default setting determined by screen size.
 // }
 // For card
 // {
@@ -244,9 +251,9 @@ var getOrderFromPath = function(path) {
 //   type: card,
 //   content: uuid,
 //   parent: uuid,
-//   animation: no | enlarge | shake
-// TODO: order: order  // order in parent
-// TODO: mute: false
+//   animation: no | enlarge | rotate
+//   order: order  // order in parent
+//   mute: false
 // }
 var generateOfficialClasswares = function() {
   // Official categories should be classware
@@ -259,6 +266,7 @@ var generateOfficialClasswares = function() {
     classware.type = 'folder';
     classware.parent = 'root';
     classware.cover = result.coverPath;
+    classware.order = result.originalOrder;
     classwares.push(classware);
   });
 
@@ -273,6 +281,8 @@ var generateOfficialClasswares = function() {
       card.content = item.uuid;
       card.parent = folder.uuid;
       card.animation = 'enlarge';
+      card.order = item.originalOrder;
+      card.mute = false;
       cards.push(card);
     })
   });
@@ -323,17 +333,24 @@ var removeResourceCollection = function() {
 }
 
 var getClasswareList = function() {
-  var fromDB = getClasswareCollection().find({'parent': 'root'});
+  var fromDB = getClasswareCollection()
+              .chain()
+              .find({'parent': 'root'})
+              .simplesort('order')
+              .data();
   fromDB.push({'name': 'All', 'uuid': 'all'});
   return fromDB;
 }
 
 var getCardsOfClassware = function(uuid) {
   if (uuid == 'all') {
-    return getClasswareCollection().find({'parent': 'root'})
-  } else {
-    return getClasswareCollection().find({'parent': uuid});
+    uuid = 'root'
   }
+  return getClasswareCollection()
+        .chain()
+        .find({'parent': uuid})
+        .simplesort('order')
+        .data()
 }
 
 var getCardByUuid = function(uuid) {

@@ -30,16 +30,19 @@ export default {
       // TODO: do init db here
       if (! db.hasClasswareBuilt()) {
       // if (true) {
-        console.log('building');
+        // FileHelper.removeFolderIfExistPromise(cordova.file.dataDirectory + 'card-assets/').then(function(file){
+        //   console.log('folder deleted');
+        // }).catch(console.log);
         var f7 = this.f7;
         f7.showPreloader("Downloading...");
         // Start fresh
         // TODO: use promise
-        db.removeResourceCollection();
-        db.removeClasswareCollection();
+        db.removeResourceCollection().then(function(){console.log('resource deleted')});
+        db.removeClasswareCollection().then(function(){console.log('classware deleted')});
         var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
         var downloadTempPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`
-        var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip"
+        // var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip"
+        var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-uuid-v1-lite-cn.zip"
         FileHelper.removeFolderIfExistPromise(cardResourceFolder).then(function(){
           var onProgress = function(progressEvent) {
             if (progressEvent.lengthComputable) {
@@ -48,14 +51,14 @@ export default {
               console.log('onProgress');
             }
           }
-          return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+          // return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
         }).then(function(){
           // return unzipDownloaded(downloadTempPath, cardResourceFolder)
           var deferred = Q.defer();
           zip.unzip(downloadTempPath, cordova.file.dataDirectory, function(){
             deferred.resolve();
           }, function(progressEvent){
-            // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
+            console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
           });
           return deferred.promise;
         }).then(function(){
