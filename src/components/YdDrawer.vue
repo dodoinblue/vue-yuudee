@@ -7,7 +7,7 @@
         <!-- Slides -->
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group">
-            <div class="card-group-item" v-for="(card , index) in page" :key="index">
+            <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid">
               <yd-card :classware="card" :edit-mode="editMode"></yd-card>
             </div>
           </div>
@@ -40,11 +40,11 @@ Vue.component('debug', {
 });
 
 export default {
-  props: ['path', 'root', 'editMode', 'uuid', 'row', 'col'],
+  props: ['root', 'editMode', 'uuid', 'row', 'col'],
   components: { YdCard },
   data() {
     return {
-      // cardList: [],
+      cardList: [],
     }
   },
   watch: {
@@ -65,20 +65,24 @@ export default {
     },
   },
   computed: {
-    sortedCards: function() {
-      return sortCards(this.cardList, this.row, this.col);
-    },
     pagedCards: function() {
-      var cardList = db.getCardsOfClassware(this.uuid);
-      return Utils.arrangeCards(cardList, this.row, this.col);
+      return Utils.arrangeCards(this.cardList, this.row, this.col);
     }
   },
   created() {
+    this.cardList = db.getCardsOfClassware(this.uuid);
+
     EventBus.$on('ALL_CARDS_LOADED', () => {
 
     });
-    // this.cardList = db.getCardsOfClassware(this.uuid);
-    // console.log(this.cardList);
+
+    EventBus.$on('DISPLAY_DRAWER_UPDATED', (uuid) => {
+      if (uuid == this.uuid) {
+        this.cardList = db.getCardsOfClassware(this.uuid);
+        console.log('updated list');
+        console.log(this.cardList);
+      }
+    });
   },
   mounted() {
     this.createSwiper();

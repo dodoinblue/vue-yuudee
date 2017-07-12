@@ -357,6 +357,20 @@ var getCardByUuid = function(uuid) {
   return getResourceCollection().findOne({'uuid': uuid});
 }
 
+var updateClasswareItem = function(doc) {
+  getClasswareCollection().update(doc);
+}
+
+var deleteClasswareItem = function(doc) {
+  var collection = getClasswareCollection();
+  var order = doc.order;
+  var parent = doc.parent;
+  collection.remove(doc);
+  collection.findAndUpdate({'order': {'$gt': order}, 'parent': {'$eq': parent}}, function(obj){
+    obj.order = obj.order - 1;
+  })
+}
+
 
 export default {
   initDB,
@@ -367,6 +381,9 @@ export default {
   setRootClasswareUuid,
   getCardsOfClassware,
   getClasswareItemByUuid,
+
+  updateClasswareItem,
+  deleteClasswareItem,
 
   // YdResource methods
   getCardByUuid,

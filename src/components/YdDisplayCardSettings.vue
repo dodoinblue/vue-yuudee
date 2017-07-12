@@ -13,20 +13,18 @@
     <div class="classware-layout">
       <div class="row">Choose animation</div>
       <div class="row">
-        <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.id)">
-          <img class="layout" :class="{'selected': animation.id === selected}" :src="animation.pic">
+        <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.value)">
+          <img class="layout" :class="{'selected': animation.value === selected}" :src="animation.pic">
           <small>{{ animation.name}}</small>
         </div>
       </div>
     </div>
     <div class="classware-delete row">
-      <div class="col col-50">Delete this card</div>
-      <div class="col col-50">
+      <div class="col col-50 delete-text" @click="deleteClasswareItem">Delete this card</div>
+      <div class="col col-50 delete-checkbox">
         <div class="item-input">
-          <label class="label-switch">
-            <input type="checkbox">
-            <div class="checkbox"></div>
-          </label>
+            <input type="checkbox" id="checkbox" v-model="mute">
+            <label for="checkbox">{{ mute ? 'muted' : 'mute' }}</label>
         </div>
       </div>
     </div>
@@ -41,26 +39,31 @@
 
 <script>
 import {EventBus, Events} from '../EventBus'
+import db from '../db'
+import _ from 'lodash'
 
 export default {
   props: ['card'],
   data() {
     return {
-      selected: 1,
+      selected: '',
       animations: [
         {
           id: 0,
           name: 'None',
+          value: 'none',
           pic: 'static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
           name: 'Enlarge',
+          value: 'enlarge',
           pic: 'static/img/animation-enlarge.png'
         },
         {
           id: 2,
           name: 'Rotate',
+          value: 'rotate',
           pic: 'static/img/animation-rotate.png'
         }
       ],
@@ -70,23 +73,44 @@ export default {
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.uuid);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
     },
-    select: function(id) {
-      this.selected = id;
+    select: function(value) {
+      this.selected = value;
+    },
+    deleteClasswareItem: function() {
+      var f7 = new window.Framework7();
+      f7.confirm('Are you sure?', 'Delete Card', () => {
+        db.deleteClasswareItem(this.card);
+        EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent);
+        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+      });
+
     },
     confirm: function() {
-      var f7 = new window.Framework7();
-      f7.addNotification({
-        title: 'Yuudee',
-        message: 'This operation is not supported!',
-        hold: 2000,
-      });
+      var changed = false;
+      var changedObj = {};
+      if (this.card.animation != this.selected) {
+        changed = true;
+        changedObj.animation = this.selected;
+      }
+      if (this.card.mute != this.mute) {
+        changed = true;
+        changedObj.mute = this.mute;
+      }
+      if (changed) {
+        var obj = _.assign(this.card, changedObj);
+        db.updateClasswareItem(obj);
+      }
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card, changed);
     }
   },
   created() {
     // Load data
-    this.cardContent = db.getCardByUuid(this.card.uuid);
+    this.cardContent = db.getCardByUuid(this.card.content);
+    this.selected = this.card.animation;
+    this.mute = this.card.mute;
+    console.log(this.card);
   }
 }
 </script>
@@ -155,6 +179,9 @@ export default {
   width: 74%;
   margin-left: 13%;
   margin-right: 13%;
+}
+
+.classware-delete .delete-text {
   color: red;
 }
 
