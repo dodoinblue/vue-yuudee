@@ -7,10 +7,10 @@
     </div>
     <div class="settings-dialog-title">Edit Category</div>
     <div class="classware-title">
-      <input type=text :placeholder="card.name"></input>
+      <input type=text :placeholder="cardTitle" v-model="cardTitle"></input>
     </div>
 
-    <div class="classware-delete">Delete this courseware</div>
+    <div class="classware-delete" @click="deleteCategory">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
@@ -22,28 +22,74 @@
 
 <script>
 import { EventBus, Events } from '../EventBus'
+import db from '../db'
+import _ from 'lodash'
+
 export default {
   props: ['card'],
   data() {
     return {
+      cardTitle: '',
     }
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.uuid);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
     },
     confirm: function() {
-      // if (card.isOfficial) {
-      //   this.f7.alert("", "", function(){
-
-      //   })
-      // }
+      if (this.card.parent == 'all') {
+        var f7 = new window.Framework7();
+        f7.confirm('Cannot edit in All category', 'Forbiden', function () {
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        });
+      } else if (this.card.type == 'card') {
+        var f7 = new window.Framework7();
+        f7.confirm('Can be modified in Asset library', 'Forbiden', function () {
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        });
+      } else {
+        if (cardTitle != card.name) {
+          var changedObj = {};
+          changedObj.name = cardTitle;
+          var obj = _.assign(this.card, changedObj);
+          console.log(obj);
+          // db.updateClasswareItem(this.card);
+        }
+      }
+    },
+    deleteCategory: function() {
+      if (this.card.parent == 'all') {
+        var f7 = new window.Framework7();
+        f7.confirm('Cannot delete items in All category', 'Forbiden', function () {
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        });
+      } else {
+        var f7 = new window.Framework7();
+        f7.confirm('Are you sure?', 'Delete Whole Category', () => {
+          if (this.card.type == 'folder') {
+            // remove sub content
+            db.deleteAllSubClasswareItem(this.card);
+            // reorder
+            // db.deleteClasswareItem(doc);
+          } else {
+            // remove and reorder
+            // db.deleteClasswareItem(doc);
+          }
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        });
+      }
     }
   },
-  mounted() {
+  created() {
     console.log(this.card);
-    this.f7 = new window.Framework7();
-  }
+    if (this.card.type == 'folder') {
+      this.cardTitle = this.card.name
+    } else {
+      // This item is a collection of asset cards
+      var content = db.getCardByUuid(this.card.content);
+      this.cardTitle = content.name;
+    }
+  },
 }
 </script>
 

@@ -371,6 +371,23 @@ var deleteClasswareItem = function(doc) {
   })
 }
 
+var deleteAllSubClasswareItem = function(doc) {
+  if (doc.type != 'folder') {
+    throw new Error('Card item should not have sub items');
+  }
+  console.log('deleting sub contents');
+  var collection = getClasswareCollection();
+  var subfolders = collection.find({'parent': {'$eq': doc.uuid}, 'type': {'$eq': 'folder'}});
+  for (var i = 0; i < subfolders.length; i++) {
+    console.log('recursively deleting');
+    deleteAllSubClasswareItem(subfolders(i));
+  }
+  // TODO: switch to findAndRemove
+  collection.findAndUpdate({'parent': {'$eq': doc.uuid}}, function(obj) {
+    console.log(obj.uuid);
+  })
+}
+
 
 export default {
   initDB,
@@ -384,6 +401,7 @@ export default {
 
   updateClasswareItem,
   deleteClasswareItem,
+  deleteAllSubClasswareItem,
 
   // YdResource methods
   getCardByUuid,
