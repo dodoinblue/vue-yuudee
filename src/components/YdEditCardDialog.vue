@@ -73,7 +73,7 @@ export default {
     },
     takePicture: function(){
       console.log('take picture');
-      Utils.getPicturePromise({}).then(function(filePath){
+      Utils.takePicturePromise({}).then(function(filePath){
         console.log(filePath);
         return plugins.crop.promise(filePath, {quality: 50});
       }).then((croppedPath) => {
@@ -86,7 +86,18 @@ export default {
       }).catch(console.log);
     },
     choosePicture: function() {
-
+      console.log('choose picture');
+      Utils.choosePicturePromise().then(function(filePath){
+        console.log(filePath);
+        return plugins.crop.promise(filePath, {quality: 50});
+      }).then((croppedPath) => {
+        console.log('cropped: ' + croppedPath);
+        // this.cardImage = croppedPath;
+        return FileHelper.getCdvPath(croppedPath);
+      }).then((internalPath) => {
+        this.cardImage = internalPath;
+        // TODO Cleanup cache folder. or do this when save/cancel
+      }).catch(console.log);
     }
   },
   mounted() {

@@ -56,13 +56,32 @@ export default {
     return sortedCards;
   },
 
-  getPicturePromise: function(options) {
+  takePicturePromise: function(options) {
     var deferred = Q.defer();
-    var camera = navigator.camera;
-    if (!camera) {
+    if (!navigator.camera) {
       deferred.reject('Camera object is not available');
     } else {
-      camera.getPicture(deferred.resolve, deferred.reject, options);
+      navigator.camera.getPicture(deferred.resolve, deferred.reject, options);
+    }
+    return deferred.promise;
+  },
+
+  choosePicturePromise: function() {
+    var deferred = Q.defer();
+    if (!window.imagePicker) {
+      deferred.reject('ImagePicker object is not available');
+    } else {
+      var options = options = {
+        maximumImagesCount: 1,
+        quality: 50,
+      };
+      window.imagePicker.getPictures(function(images){
+        if (images.length != 1) {
+          deferred.reject("Error choosing image.")
+        } else {
+          deferred.resolve(images[0]);
+        }
+      }, deferred.reject, options);
     }
     return deferred.promise;
   }
