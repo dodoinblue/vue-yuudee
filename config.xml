@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.supersuperstar.yuudee.vue" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <hook src="hooks/hookers.js" type="before_prepare" />
-    <hook src="hooks/beforedep.js" type="before_deploy" />
+    <hook src="hooks/hookers.js" type="before_prepare"/>
+    <hook src="hooks/beforedep.js" type="before_deploy"/>
     <name>cdv-yuudee</name>
     <description>
         Yuudee AAC Hybrid
@@ -9,35 +9,35 @@
     <author email="dodoinblue@gmail.com" href="http://supersuperstar.com">
         Charles Liu
     </author>
-    <icon src="static/img/launcher_icon_1024.png" />
-    <content src="index.html" />
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="tel:*" />
-    <allow-intent href="sms:*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
-    <access origin="cdvfile://*" />
-    <access origin="file:///*" />
-    <preference name="orientation" value="portrait" />
+    <icon src="static/img/launcher_icon_1024.png"/>
+    <content src="index.html"/>
+    <access origin="*"/>
+    <allow-intent href="http://*/*"/>
+    <allow-intent href="https://*/*"/>
+    <allow-intent href="tel:*"/>
+    <allow-intent href="sms:*"/>
+    <allow-intent href="mailto:*"/>
+    <allow-intent href="geo:*"/>
+    <access origin="cdvfile://*"/>
+    <access origin="file:///*"/>
+    <preference name="orientation" value="portrait"/>
     <platform name="android">
-        <allow-intent href="market:*" />
+        <allow-intent href="market:*"/>
     </platform>
     <platform name="ios">
-        <allow-intent href="itms:*" />
-        <allow-intent href="itms-apps:*" />
+        <allow-intent href="itms:*"/>
+        <allow-intent href="itms-apps:*"/>
     </platform>
-    <allow-navigation href="*" />
-    <engine name="android" spec="^6.2.3" />
-    <engine name="browser" spec="^4.1.0" />
-    <plugin name="cordova-plugin-file" spec="^4.3.3" />
-    <plugin name="cordova-plugin-file-transfer" spec="^1.6.3" />
-    <plugin name="cordova-plugin-whitelist" spec="^1.3.2" />
-    <plugin name="cordova-plugin-zip" spec="^3.1.0" />
+    <allow-navigation href="*"/>
+    <engine name="android" spec="^6.2.3"/>
+    <engine name="browser" spec="^4.1.0"/>
+    <plugin name="cordova-plugin-file" spec="^4.3.3"/>
+    <plugin name="cordova-plugin-file-transfer" spec="^1.6.3"/>
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.2"/>
+    <plugin name="cordova-plugin-zip" spec="^3.1.0"/>
     <plugin name="cordova-plugin-camera" spec="~2.4.1">
-        <variable name="CAMERA_USAGE_DESCRIPTION" value=" " />
-        <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" " />
+        <variable name="CAMERA_USAGE_DESCRIPTION" value=" "/>
+        <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" "/>
     </plugin>
-    <plugin name="cordova-plugin-crop" spec="~0.3.1" />
+    <plugin name="cordova-plugin-crop" spec="~0.3.1"/>
 </widget>

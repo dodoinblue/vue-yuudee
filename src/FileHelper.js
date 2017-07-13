@@ -233,6 +233,14 @@ function removeFile(pathToFile) {
   return deferred.promise;
 }
 
+function getCdvPath(pathToFile) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
+    deferred.resolve(fileEntry.toInternalURL());
+  }, deferred.reject);
+  return deferred.promise;
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
@@ -240,5 +248,6 @@ export default {
   fileExistPromise,
   listDirectoryPromise,
   removeFolderIfExistPromise,
-  removeFile
+  removeFile,
+  getCdvPath
 }

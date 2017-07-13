@@ -23,8 +23,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="col col-50"><div class="yd-button-light"><i class="fa fa-camera-retro">&nbsp;</i>Camera</div></div>
-          <div class="col col-50"><div class="yd-button-light"><i class="fa fa-file-image-o">&nbsp;</i>Album</div></div>
+          <div class="col col-50"><div class="yd-button-light" @click="takePicture"><i class="fa fa-camera-retro">&nbsp;</i>Camera</div></div>
+          <div class="col col-50"><div class="yd-button-light" @click="choosePicture"><i class="fa fa-file-image-o">&nbsp;</i>Album</div></div>
         </div>
         <div class="row">
           <div class="col-100 light-button">
@@ -44,18 +44,23 @@
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
     </div>
   </div>
+
+
+  <!--All category popover-->
 </div>
 
 </template>
 
 <script>
 import {EventBus, Events} from '../EventBus'
+import Utils from '../utils'
+import FileHelper from '../FileHelper'
 
 export default {
   props: ['mode'],
   data() {
     return {
-      cardImage: "static/img/dummy_content.jpg"
+      cardImage: "static/img/dummy_content.jpg",
     }
   },
   methods: {
@@ -65,6 +70,23 @@ export default {
     confirm: function() {
     },
     setName: function() {
+    },
+    takePicture: function(){
+      console.log('take picture');
+      Utils.getPicturePromise({}).then(function(filePath){
+        console.log(filePath);
+        return plugins.crop.promise(filePath, {quality: 50});
+      }).then((croppedPath) => {
+        console.log('cropped: ' + croppedPath);
+        // this.cardImage = croppedPath;
+        return FileHelper.getCdvPath(croppedPath);
+      }).then((internalPath) => {
+        this.cardImage = internalPath;
+        // TODO Cleanup cache folder. or do this when save/cancel
+      }).catch(console.log);
+    },
+    choosePicture: function() {
+
     }
   },
   mounted() {

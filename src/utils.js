@@ -1,3 +1,5 @@
+import Q from 'q'
+
 export default {
   isCordova: () => {
     console.log(typeof cordova);
@@ -52,5 +54,16 @@ export default {
       sortedCards.push(sortedPage);
     }
     return sortedCards;
+  },
+
+  getPicturePromise: function(options) {
+    var deferred = Q.defer();
+    var camera = navigator.camera;
+    if (!camera) {
+      deferred.reject('Camera object is not available');
+    } else {
+      camera.getPicture(deferred.resolve, deferred.reject, options);
+    }
+    return deferred.promise;
   }
 }
