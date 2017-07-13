@@ -47,12 +47,13 @@
 <script>
 import YdDrawer from '../components/YdDrawer'
 import YdEditCardDialog from '../components/YdEditCardDialog'
+import {EventBus, Events} from '../EventBus'
 
 export default {
   components: { YdDrawer, YdEditCardDialog },
   data() {
     return {
-      // uuid: 'all',
+      rootUuid: 'all',
       gridSize: {column: 2, row: 2},
       editMode: false,
       drawers: [],
@@ -75,6 +76,7 @@ export default {
     newCard: function() {
       this.f7.closeModal(this.popover, false);
       this.popover = null;
+      this.showNewCardDialog = true;
     },
     newCategory: function() {
       this.f7.closeModal(this.popover, false);
@@ -83,6 +85,9 @@ export default {
   },
   created() {
     this.drawers.push('all');
+    EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
+      this.showNewCardDialog = false;
+    });
   },
   mounted() {
     this.f7 = new Framework7();

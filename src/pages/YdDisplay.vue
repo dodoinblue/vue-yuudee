@@ -1,11 +1,12 @@
 <template>
-<div>
-  <div class="row">
+<div id="display">
+
+  <div class="row logo-bar">
     <!-- Yuudee's logo' -->
     <div class="col-33">
     </div>
     <div class="col-33 app-logo">
-      <img src="static/img/yuudee_logo.svg" @click="toogleEditMode">
+      <img src="static/img/yuudee_logo.svg">
     </div>
     <div class="col-33">
     </div>
@@ -64,10 +65,27 @@
   <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
   <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
   <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit"></yd-edit-category-dialog>
+
+  <!--Multi-touch areas-->
+  <div v-if="!editMode">
+    <v-touch v-for="(area, index) in touchAreas"
+            class="touch-area" :class="area.name"
+            v-on:press="pressed(index)"
+            v-on:pressup="pressup(index)"
+            :key="area.name"
+            >
+    </v-touch>
+  </div>
+
 </div>
 </template>
 
 <style scoped>
+#display {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
 .popover-classwares {
   max-height: 50%;
   width: 50%;
@@ -78,10 +96,11 @@
   overflow-y: scroll;
 }
 
-.app-logo {
-  display: flex;
-  justify-content: center;
-  padding-top: 5%;
+.row.logo-bar {
+  position: absolute;
+  top: 4%;
+  left:0px;
+  width: 100%;
 }
 .app-logo img{
   width: 90%;
@@ -116,6 +135,26 @@
   margin-right: 2.5%;
   margin-bottom: 1.5%;
 }
+
+.touch-area {
+  position: absolute;
+  height: 70px;
+  width: 70px;
+}
+
+.touch-area.touch-top-left {
+  top: 0px;
+  left: 0px;
+}
+
+.touch-area.touch-top-right {
+  top: 0px;
+  right: 0px;
+}
+.touch-area.touch-bottom-right {
+  bottom: 0px;
+  right: 0px;
+}
 </style>
 
 <script>
@@ -138,6 +177,11 @@ export default {
       cardInEdit: {},
       showClasswareSettings: false,
       // showCategoryDialog: false
+      touchAreas: [
+        { name: 'touch-top-left', pressed: false},
+        { name: 'touch-top-right', pressed: false},
+        { name: 'touch-bottom-right', pressed: false}
+      ]
     }
   },
   components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
@@ -181,6 +225,21 @@ export default {
     },
     openClasswareSettings: function() {
       this.showClasswareSettings = true;
+    },
+    pressed: function(index) {
+      console.log("pressed " + index);
+      console.log(this.touchAreas);
+      this.touchAreas[index].pressed = true;
+      if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
+        this.editMode = true;
+        this.touchAreas[0].pressed = false;
+        this.touchAreas[1].pressed = false;
+        this.touchAreas[2].pressed = false;
+      }
+    },
+    pressup: function(index) {
+      console.log('pressup ' + index);
+      this.touchAreas[index].pressed = false;
     }
   },
   created() {

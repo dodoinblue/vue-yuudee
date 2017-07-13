@@ -22,6 +22,9 @@ import db from './db.js'
 import YdDisplay from './pages/YdDisplay'
 import YdResource from './pages/YdResource'
 
+import VueTouch from 'vue-touch'
+Vue.use(VueTouch, {name: 'v-touch'})
+
 // Stop native context menu
 window.oncontextmenu = function(event) {
   event.preventDefault();

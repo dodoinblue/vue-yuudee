@@ -124,6 +124,7 @@ export default {
   background-size: cover;
   margin: 0px;
   height: 100%;
+  position: relative;
 }
 .yd-button {
   border-radius: 5px;

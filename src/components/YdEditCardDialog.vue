@@ -28,7 +28,7 @@
         </div>
         <div class="row">
           <div class="col-100 light-button">
-            <img src="static/img/single-line-text-field.png" @click="setName2">
+            <img src="static/img/single-line-text-field.png" @click="setName">
             <span><input type="text"></input></span>
           </div>
         </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import {EventBus} from '../EventBus'
+import {EventBus, Events} from '../EventBus'
 
 export default {
   props: ['mode'],
@@ -60,17 +60,11 @@ export default {
   },
   methods: {
     cancel: function() {
-      EventBus.$emit("CARD_SETTINGS_CLOSE", this.uuid);
+      EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
     },
     confirm: function() {
     },
     setName: function() {
-      var f7 = new window.Framework7();
-      f7.prompt('What is this card\'s name?', 'Set Name', function(){
-        console.log('on ok');
-      }, function(){
-        console.log('on cancel');
-      });
     }
   },
   mounted() {
