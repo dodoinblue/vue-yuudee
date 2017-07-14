@@ -84,5 +84,23 @@ export default {
       }, deferred.reject, options);
     }
     return deferred.promise;
+  },
+
+  recordAudioPromise: function() {
+    var deferred = Q.defer();
+    if (!navigator.device || !navigator.device.capture) {
+      deferred.reject('Audio Capture object is not available');
+    } else {
+      navigator.device.capture.captureAudio(
+        function(audios) {
+          if (audios.length != 1) {
+            deferred.reject("Wrong number of audios returned")
+          } else {
+            deferred.resolve(audios[0]);
+          }
+        }, deferred.reject,  { limit: 1, duration: 10 }
+      );
+    }
+    return deferred.promise;
   }
 }

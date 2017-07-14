@@ -35,9 +35,9 @@
       </div>
     </div>
     <div class="settings-dialog-audio row">
-      <div class="col col-33"><div class="yd-button-light"><i class="fa fa-circle dark-red">&nbsp;</i>Record</div></div>
-      <div class="col col-33"><div class="yd-button-light"><i class="fa fa-play sky-blue">&nbsp;</i>Play</div></div>
-      <div class="col col-33"><div class="yd-button-light"><i class="fa fa-trash-o">&nbsp;</i>Delete</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="recordAudio"><i class="fa fa-circle dark-red">&nbsp;</i>Record</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="playAudio"><i class="fa fa-play sky-blue">&nbsp;</i>Play</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="removeAudio"><i class="fa fa-trash-o">&nbsp;</i>Delete</div></div>
     </div>
     <div class="settings-dialog-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
@@ -55,12 +55,14 @@
 import {EventBus, Events} from '../EventBus'
 import Utils from '../utils'
 import FileHelper from '../FileHelper'
+import uuidv4 from 'uuid/v4'
 
 export default {
   props: ['mode'],
   data() {
     return {
       cardImage: "static/img/dummy_content.jpg",
+      cardAudio: "",
     }
   },
   methods: {
@@ -98,6 +100,31 @@ export default {
         this.cardImage = internalPath;
         // TODO Cleanup cache folder. or do this when save/cancel
       }).catch(console.log);
+    },
+    recordAudio: function() {
+      console.log('recording...');
+      Utils.recordAudioPromise().then(function(audio){
+        // Move to cache folder
+        var extension = FileHelper.getExtensionFromPath(audio.fullPath);
+        var oldFolder = FileHelper.getFolderFromPath(audio.fullPath);
+        var filename = uuidv4();
+        return FileHelper.moveFilePromise(oldFolder, audio.name,
+               cordova.file.cacheDirectory, filename + '.' + extension);
+      }).then((audioEntry) => {
+        this.cardAudio = audioEntry.toInternalURL();
+      }).catch(console.log);
+    },
+    playAudio: function() {
+      console.log('playing audio');
+      FileHelper.getCdvPath(this.cardAudio).then(function(cdvPath){
+        var aud = new Audio();
+        aud.src = cdvPath;
+        aud.play();
+      }).catch(console.log); // Notify when no audio.
+    },
+    removeAudio: function() {
+      console.log('remove audio');
+      this.cardAudio = "";
     }
   },
   mounted() {

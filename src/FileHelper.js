@@ -1,4 +1,5 @@
 import Q from 'q'
+import _ from 'lodash'
 
 var errorHandler = function (fileName, e) {  
   var msg = '';
@@ -241,6 +242,55 @@ function getCdvPath(pathToFile) {
   return deferred.promise;
 }
 
+function getExtensionFromPath(pathToFile) {
+  var pathSegments = pathToFile.split('.');
+  return pathSegments[pathSegments.length - 1];
+}
+
+function getFolderFromPath(pathToFile) {
+  if (_.endsWith(pathToFile, '/')) {
+    return pathToFile
+  }
+  var pathSegments = pathToFile.split('/');
+  return pathSegments.slice(0, pathSegments.length - 1).join('/') + '/'
+}
+
+
+// Borrowed from ng-cordova
+function moveFilePromise(path, fileName, newPath, newFileName) {
+  console.log(`path ${path}, fileName ${fileName}, newPath ${newPath}, newFileName ${newFileName}`);
+  var q = Q.defer();
+
+  newFileName = newFileName || fileName;
+
+  if ((/^\//.test(fileName)) || (/^\//.test(newFileName))) {
+    q.reject('file-name cannot start with \/');
+  }
+
+  try {
+    window.resolveLocalFileSystemURL(path, function (fileSystem) {
+      fileSystem.getFile(fileName, {create: false}, function (fileEntry) {
+        window.resolveLocalFileSystemURL(newPath, function (newFileEntry) {
+          fileEntry.moveTo(newFileEntry, newFileName, function (result) {
+            q.resolve(result);
+          }, function (error) {
+            q.reject(error);
+          });
+        }, function (err) {
+          q.reject(err);
+        });
+      }, function (err) {
+        q.reject(err);
+      });
+    }, function (er) {
+      q.reject(er);
+    });
+  } catch (e) {
+    q.reject(e);
+  }
+  return q.promise;
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
@@ -249,5 +299,8 @@ export default {
   listDirectoryPromise,
   removeFolderIfExistPromise,
   removeFile,
-  getCdvPath
+  getCdvPath,
+  moveFilePromise,
+  getExtensionFromPath,
+  getFolderFromPath
 }
