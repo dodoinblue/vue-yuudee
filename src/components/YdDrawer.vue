@@ -8,7 +8,7 @@
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group">
             <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid">
-              <yd-card :classware="card" :edit-mode="editMode"></yd-card>
+              <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
             </div>
           </div>
         </div>
@@ -40,7 +40,7 @@ Vue.component('debug', {
 });
 
 export default {
-  props: ['root', 'editMode', 'uuid', 'row', 'col'],
+  props: ['root', 'editMode', 'uuid', 'row', 'col', 'from'],
   components: { YdCard },
   data() {
     return {
@@ -56,7 +56,11 @@ export default {
   },
   methods: {
     backClicked: function() {
-      EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
+      if (this.from == "resource") {
+        EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
+      } else {
+        EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
+      }
     },
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];

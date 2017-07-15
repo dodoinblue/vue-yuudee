@@ -69,8 +69,15 @@ var playAnimation = function(context) {
     }, 500);
 
     // Start playing sound
-    // TODO: play all if there are more
-    Utils.playAudioChain(context.card.audios[0]);
+    var p = Utils.playAudioChain(context.card.audios[0]);
+    var numOfAudios = context.card.audios.length;
+    if (numOfAudios > 1) {
+      for (var i = 1; i < numOfAudios; i++) {
+        p = p.then(function(){
+          return Utils.playAudioChain(context.card.audios[i]);
+        });
+      }
+    }
 
     // Swing if set to or wait
     if (context.classware.animation == 'rotate') {
@@ -97,7 +104,7 @@ var playAnimation = function(context) {
 }
 
 export default {
-  props: ['editMode', 'classware'],
+  props: ['editMode', 'classware', 'from'],
   data() {
     return {
       currentImageIndex: 0,
@@ -108,9 +115,13 @@ export default {
   methods: {
     onCardClick: _.throttle(function() {
       if (this.isStack) {
-        EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
+        if (this.from == "resource") {
+          EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
+        } else {
+          EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
+        }
       } else {
-        if (this.editMode) {
+        if (this.editMode || this.from == "resource") {
           return
         }
         playAnimation(this);

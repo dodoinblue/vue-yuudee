@@ -22,7 +22,7 @@
               :edit-mode="editMode"
               :root="isRoot(uuid)"
               :key="uuid"
-              mode="resource">
+              from="resource">
   </yd-drawer>
 
   <!--Dialogs-->
@@ -87,6 +87,12 @@ export default {
     this.drawers.push('all');
     EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
       this.showNewCardDialog = false;
+    });
+    EventBus.$on(Events.RESOURCE_CATEGORY, uuid => {
+      this.drawers.push(uuid);
+    });
+    EventBus.$on(Events.RESOURCE_DRAWER_CLOSE, uuid => {
+      this.drawers.pop();
     });
   },
   mounted() {
