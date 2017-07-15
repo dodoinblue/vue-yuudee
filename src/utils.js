@@ -1,4 +1,5 @@
 import Q from 'q'
+import { TweenLite } from "gsap"
 
 export default {
   isCordova: () => {
@@ -101,6 +102,34 @@ export default {
         }, deferred.reject,  { limit: 1, duration: 10 }
       );
     }
+    return deferred.promise;
+  },
+
+  animationChain: function(element, duration, params) {
+    var deferred = Q.defer();
+    params.onComplete = function() {
+      deferred.resolve();
+    }
+    TweenLite.to(element, 1, params);
+    return deferred.promise;
+  },
+
+  waitForSeconds: function(sec) {
+    var deferred = Q.defer();
+    window.setTimeout(function(){
+      deferred.resolve();
+    }, sec * 1000);
+    return deferred.promise;
+  },
+
+  playAudioChain: function(audioSrc) {
+    var deferred = Q.defer();
+    var aud = new Audio();
+    aud.src=audioSrc;
+    aud.onended = function(){
+      deferred.resolve('audio end: ' + audioSrc);
+    };
+    aud.play();
     return deferred.promise;
   }
 }

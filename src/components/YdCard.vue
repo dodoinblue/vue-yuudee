@@ -1,5 +1,5 @@
 <template>
-<div class="yd-card" @click="onCardClick()">
+<div class="yd-card" :class="{'on-top': onTop}" @click="onCardClick()">
   <div class="card-frame">
     <img :src="card_bg_image">
   </div>
@@ -16,6 +16,7 @@ import { EventBus, Events } from '../EventBus.js'
 import { TweenLite } from "gsap"
 import _ from 'lodash'
 import db from '../db.js'
+import Utils from '../utils'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -23,7 +24,7 @@ import db from '../db.js'
  * rect: element's rect from vm.$el.getBoundingClientRect()
  */
 var calcToCenterAnimParams = function(win, rect) {
-  var scale = win.width / rect.width;
+  var scale = win.width * 0.85 / rect.width;
   var winCenterLeft = win.width / 2;
   var winCenterTop = win.height / 2;
   var cardCenterLeft = rect.left + rect.width / 2;
@@ -39,65 +40,60 @@ var calcToCenterAnimParams = function(win, rect) {
   }
 }
 
-var buildTweenAnimation = function(parameters, element, onComplete, onReverseComplete) {
-  var animationParams = parameters;
-  animationParams.zIndex = 999;
-  animationParams.paused = true;
-  animationParams.onComplete = onComplete;
-  animationParams.onReverseComplete = onReverseComplete;
-
-  return TweenLite.to(element, 1, animationParams);
-}
-
 var isPlaying = false;
+var playAnimation = function(context) {
+  if (isPlaying) return;
+  console.log(context.classware);
 
-var playCard = function(context) {
-  if (isPlaying) {
-    console.log("Card is playing, ignore card click");
-    return
+  var el = context.$el;
+  var oldStyle = {
+    scaleX: 1,
+    scaleY: 1,
+    x: 0,
+    y: 0
   }
-  isPlaying = true;
-
-  // Start slideshow
-  var slideshow = window.setInterval(() => {
-    if (context.currentImageIndex == context.card.images.length - 1) {
-      context.currentImageIndex = 0;
-    } else {
-      context.currentImageIndex ++;
-    }
-  }, 500);
-
-  // Play audio
-  var aud = new Audio();
-  // TODO: chain audios if necessary
-  aud.src=context.card.audios[0];
-  aud.onended = function(){
-    console.log("audio end");
-  };
-  aud.play();
-  console.log(aud);
-
-  var animation;
-
-  // Animation to center and revese
-  // TODO: disable touch if there is an active animation
   var win = {width: window.innerWidth, height: window.innerHeight};
-  var animationParams = calcToCenterAnimParams(win, context.$el.getBoundingClientRect());
-  var onComplete = function() {
-    window.setTimeout(function () {
-      animation.reverse();
-    }, 3000);
-  }
-  var onReverseComplete = function () {
-    animation = null;
-    window.clearInterval(slideshow);
-    context.currentImageIndex = 0;
+  var animationParams = calcToCenterAnimParams(win, el.getBoundingClientRect());
+
+  // Start Playing
+  isPlaying = true;
+  context.onTop = true;
+  Utils.animationChain(el, 1, animationParams).then(function(){
+    // Start slideshow
+    context.slideshow = window.setInterval(() => {
+      if (context.currentImageIndex == context.card.images.length - 1) {
+        context.currentImageIndex = 0;
+      } else {
+        context.currentImageIndex ++;
+      }
+    }, 500);
+
+    // Start playing sound
+    // TODO: play all if there are more
+    Utils.playAudioChain(context.card.audios[0]);
+
+    // Swing if set to or wait
+    if (context.classware.animation == 'rotate') {
+      return Utils.animationChain(el, 0.5, {rotation: 20}).then(function(){
+        return Utils.animationChain(el, 1, {rotation: -20});
+      }).then(function(){
+        return Utils.animationChain(el, 1, {rotation: 20});
+      }).then(function(){
+        return Utils.animationChain(el, 1, {rotation: -20});
+      }).then(function(){
+        return Utils.animationChain(el, 0.5, {rotation: 0});
+      })
+    } else {
+      return Utils.waitForSeconds(3);
+    }
+  }).then(function(){
+    window.clearInterval(context.slideshow);
+    return Utils.animationChain(el, 1, oldStyle)
+  }).then(function(){
     isPlaying = false;
-  };
-  animation = buildTweenAnimation(animationParams, context.$el, onComplete, onReverseComplete);
-  if( animation && ! animation.isActive()) {
-    animation.play();
-  }
+    context.onTop = false;
+    context.slideshow = null;
+  });
 }
 
 export default {
@@ -105,7 +101,8 @@ export default {
   data() {
     return {
       currentImageIndex: 0,
-      card: {}
+      card: {},
+      onTop: false
     }
   },
   methods: {
@@ -116,12 +113,12 @@ export default {
         if (this.editMode) {
           return
         }
-        playCard(this);
+        playAnimation(this);
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
-    }
+    },
   },
   computed: {
     isStack: function() {
@@ -223,5 +220,9 @@ export default {
   top: -5%;
   right: 0%;
   bottom: 80%;
+}
+
+.on-top {
+  z-index: 9999;
 }
 </style>
