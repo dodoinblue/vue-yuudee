@@ -151,8 +151,8 @@ export default {
   margin-left:10%;
   margin-bottom: 4.57%;
   margin-right: 0%;
-  /*position: absolute;*/
   padding-top: 2.72%;
+  overflow: visible;
 }
 
 .drawer-back {
@@ -190,10 +190,12 @@ export default {
 /* Animations */
 .slide-enter-active {
   transition: all .5s ease;
+  overflow: hidden;
 }
 .slide-leave-active {
   /*transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
   transition: all .5s ease;
+  overflow: hidden;
 }
 .slide-enter, .slide-leave-to
 /* .slide-fade-leave-active for <2.1.8 */ {
