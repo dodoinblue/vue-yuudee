@@ -165,6 +165,7 @@ export default {
 
 .drawer.with-background {
   background-image: url("../../static/img/child_incat_woodbg.png");
+  min-height: 65%;
 }
 /*.drawer:after {*/
 /*content: " ";*/
