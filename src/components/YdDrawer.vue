@@ -74,7 +74,12 @@ export default {
     }
   },
   created() {
-    this.cardList = db.getCardsOfClassware(this.uuid);
+    if (this.from == 'resource') {
+      console.log('Loading resource')
+      this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+    } else {
+      this.cardList = db.getCardsOfClassware(this.uuid);
+    }
 
     EventBus.$on('ALL_CARDS_LOADED', () => {
 
@@ -87,6 +92,23 @@ export default {
         console.log(this.cardList);
       }
     });
+
+    if (this.from == 'resource') {
+      EventBus.$on('RESOURCE_NEW_CATEGORY_ADDED', (doc) => {
+        if (this.uuid == 'all') {
+          this.cardList.push(doc);
+        }
+      });
+
+      EventBus.$on('RESOURCE_NEW_CARD_ADDED', (doc) => {
+        console.log(doc);
+        console.log('uuid: ' + this.uuid);
+        if (this.uuid == doc.category) {
+          this.cardList.push(doc);
+          console.log('doc pushed');
+        }
+      });
+    }
   },
   mounted() {
     this.createSwiper();

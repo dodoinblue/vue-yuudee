@@ -51,7 +51,7 @@ export default {
               console.log('onProgress');
             }
           }
-          // return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+          return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
         }).then(function(){
           // return unzipDownloaded(downloadTempPath, cardResourceFolder)
           var deferred = Q.defer();
@@ -90,28 +90,11 @@ export default {
     // Startup checks here...
     EventBus.$on('ROOT_MOUNTED', () => {
       this.startupChecks();
-      window.db = db;
-
-      // console.log(db.getDisplayGridSize());
-      // console.log(db.getClasswareCollection());
     });
-
-    EventBus.$on('NO_OFFICIAL_CARDS', () => {
-      this.downloadOfficalCards();
-    });
-
-    EventBus.$on('OFFICIAL_CARD_DOWNLOADED', () => {
-      this.unzipCardzip();
-    })
-    
   },
   mounted() {
     this.f7 = new Framework7();
     console.log("app mounted")
-    // TODO: move this to proper location
-    setTimeout(function(){
-      EventBus.$emit("RESOURCE_LOADED")
-    }, 500);
   }
 }
 </script>

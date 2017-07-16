@@ -133,7 +133,7 @@ export default {
   },
   computed: {
     isStack: function() {
-      return this.card.type == 'folder'
+      return this.card.type == 'folder' || this.card.isCategory
     },
     card_bg_image: function() {
       if (this.isStack) {
@@ -155,6 +155,8 @@ export default {
   },
   created() {
     if (this.classware.type == 'folder') {
+      this.card = this.classware;
+    } else if (this.from == 'resource') {
       this.card = this.classware;
     } else {
       var content = db.getCardByUuid(this.classware.content);

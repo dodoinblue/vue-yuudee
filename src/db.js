@@ -136,11 +136,11 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
       category.isCategory = true;
       category.isOffcial = isOfficial;
 
-      category.coverPath = category.cdvpath + 'cover.jpg';
-      return FileHelper.fileExistPromise(category.coverPath).then(function(isExist){
+      category.cover = category.cdvpath + 'cover.jpg';
+      return FileHelper.fileExistPromise(category.cover).then(function(isExist){
         if (! isExist) {
-          console.log(category.coverPath + ' does not exist. Set to ""')
-          category.coverPath = '';
+          console.log(category.cover + ' does not exist. Set to ""')
+          category.cover = '';
         }
         return FileHelper.readFromFilePromise(node.nativeURL + 'info.json');
       }).then(function(content){
@@ -265,7 +265,7 @@ var generateOfficialClasswares = function() {
     classware.name = result.name;
     classware.type = 'folder';
     classware.parent = 'root';
-    classware.cover = result.coverPath;
+    classware.cover = result.cover;
     classware.order = result.originalOrder;
     classwares.push(classware);
   });
@@ -388,6 +388,80 @@ var deleteAllSubClasswareItem = function(doc) {
   })
 }
 
+var insertResourceCategory = function(categoryPath, isOfficial) {
+  console.log('inserting db');
+
+  return FileHelper.getDirPromise(categoryPath).then(function(node){
+    var category = {};
+    category.uuid = node.name;
+    category.cordovaFullPath = node.fullPath;
+    category.nativeFullPath = node.nativeURL;
+    category.cdvpath = node.toInternalURL();
+    category.isCategory = true;
+    category.isOffcial = isOfficial;
+    category.cover = category.cdvpath + 'cover.jpg';
+    return FileHelper.fileExistPromise(category.cover).then(function(isExist){
+      if (! isExist) {
+        console.log(category.cover + ' does not exist. Set to ""')
+        category.cover = '';
+      }
+      return FileHelper.readFromFilePromise(node.nativeURL + 'info.json');
+    }).then(function(content){
+      var info = JSON.parse(content);
+      category.name = info.name;
+      // category.originalOrder = parseInt(info.order);
+      return category
+    })
+  }).then(function(category){
+    return getResourceCollection().insert(category);
+  });
+}
+
+var insertResourceCard = function(cardPath, category) {
+  console.log('here')
+  return FileHelper.getDirPromise(cardPath).then(function(node){
+    var card = {};
+    card.uuid = node.name.slice(0, -8);
+    card.category = category.uuid;
+    card.isCategory = false;
+    card.isOffcial = category.isOfficial;
+    card.cdvpath = node.toInternalURL();
+    console.log('inserting card')
+    console.log(card)
+    return getCardImages(node.nativeURL + 'images/').then(function(images){
+      return card.images = images;
+    }).then(function(){
+      return getCardAudios(node.nativeURL + 'audios/').then(function(audios){
+        return card.audios = audios;
+      });
+    }).then(function(){
+      // Get card name
+      return FileHelper.readFromFilePromise(node.nativeURL + "info.json").then(function(content){
+        // card.name = data;
+        var info = JSON.parse(content);
+        card.name = info.name;
+        // card.originalOrder = parseInt(info.order);
+      });
+    }).then(function(){
+      return card;
+    });
+  }).then(function(card){
+    console.log(card);
+    return getResourceCollection().insert(card);
+  });
+}
+
+var getCardsOfRecourceCategory = function(uuid) {
+  if (uuid == 'all') {
+    return getResourceCollection().find({'isCategory': true});
+  } else {
+    return getResourceCollection().find({'category': {'$eq': uuid}});
+  }
+}
+
+var getAllResourceCategories = function() {
+  return getResourceCollection().find({'isCategory': true});
+}
 
 export default {
   initDB,
@@ -405,6 +479,10 @@ export default {
 
   // YdResource methods
   getCardByUuid,
+  getCardsOfRecourceCategory,
+  getAllResourceCategories,
+  insertResourceCategory,
+  insertResourceCard,
 
   // Build database
   generateOfficialClasswares,

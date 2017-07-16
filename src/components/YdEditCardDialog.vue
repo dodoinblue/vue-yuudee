@@ -19,7 +19,7 @@
         <div class="row">
           <div class="col-100 light-button">
             <img src="static/img/choose.png">
-            <span class="dropdown-text">abc</span>
+            <span class="dropdown-text" @click="showCategoryList" ref="catDropdown">{{category.name}}</span>
           </div>
         </div>
         <div class="row">
@@ -28,8 +28,8 @@
         </div>
         <div class="row">
           <div class="col-100 light-button">
-            <img src="static/img/single-line-text-field.png" @click="setName">
-            <span><input type="text"></input></span>
+            <img src="static/img/single-line-text-field.png">
+            <span><input type="text" v-model="cardName"></input></span>
           </div>
         </div>
       </div>
@@ -45,8 +45,17 @@
     </div>
   </div>
 
-
   <!--All category popover-->
+  <div class="popover popover-resource-categories">
+    <div class="popover-angle"></div>
+    <div class="popover-inner">
+      <div class="list-block inset">
+        <ul>
+          <li v-for="cat in categoryList" :key="cat.uuid" @click="chooseCategory(cat)"> <a href="#" class="list-button item-link">{{ cat.name }}</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
 
 </template>
@@ -56,6 +65,7 @@ import {EventBus, Events} from '../EventBus'
 import Utils from '../utils'
 import FileHelper from '../FileHelper'
 import uuidv4 from 'uuid/v4'
+import db from '../db'
 
 export default {
   props: ['mode'],
@@ -63,15 +73,95 @@ export default {
     return {
       cardImage: "static/img/dummy_content.jpg",
       cardAudio: "",
+      uuid: "",
+      cardName: "",
+      category: {},
+      categoryList: [],
     }
   },
   methods: {
+    chooseCategory: function (cat) {
+      this.category = cat;
+      console.log(cat);
+      this.f7.closeModal(this.popover, false);
+    },
+    showCategoryList: function(){
+      console.log('show category');
+      this.f7 = new window.Framework7();
+      this.popover = this.f7.popover('.popover-resource-categories', this.$refs.catDropdown);
+    },
     cancel: function() {
       EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
     },
     confirm: function() {
-    },
-    setName: function() {
+      if (this.cardName == "" || ! this.category.uuid) {
+        var f7 = new window.Framework7();
+        f7.alert('Please choose name and category before save', 'Missing info');
+        return
+      }
+
+      // Final location
+      var userResourceRoot;
+      var userResourceParentFolder;
+      if (cordova.platformId == 'ios') {
+        userResourceParentFolder = cordova.file.dataDirectory;
+      } else {
+        userResourceParentFolder = cordova.file.externalApplicationStorageDirectory;
+      }
+      userResourceRoot = userResourceParentFolder + 'UserAssets/';
+
+      // create card folder in cache folder first
+      FileHelper.createDirPromise(cordova.file.cacheDirectory, this.uuid, false).then(() => {
+        // Copy audio if exist
+        console.log('saving audio');
+        return FileHelper.fileExistPromise(this.cardAudio).then((exist) => {
+          if (exist) {
+            var ext = FileHelper.getExtensionFromPath(this.cardAudio);
+            return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'audios', false).then(() => {
+              return FileHelper.copyFilePromise(this.cardAudio, cordova.file.cacheDirectory + this.uuid + '/audios', '01.' + ext);
+            })
+          }
+        }).catch(function(error){
+          console.log("error saving audio: " + error);
+        })
+      }).then((fileentry) => {
+        console.log(fileentry);
+        // Do the same for image
+        console.log('saving images: ' + this.cardImage)
+        if (this.cardImage == "static/img/dummy_content.jpg") {
+          return
+        }
+        return FileHelper.fileExistPromise(this.cardImage).then((exist) => {
+          if (exist) {
+            var ext = FileHelper.getExtensionFromPath(this.cardImage);
+            return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'images', false).then(() => {
+              return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + this.uuid + '/images', '01.' + ext);
+            })
+          }
+        }).catch(function(error){
+          console.log("error saving image: " + error);
+        })
+      }).then(() => {
+        // Save info
+        var info = {};
+        info.name = this.cardName;
+        return FileHelper.writeJsonToFilePromise(info, cordova.file.cacheDirectory + this.uuid, 'info.json')
+      }).then(() => {
+        console.log('moving...');
+        // Move folder to final location
+        // Assume root folder exist since it asks for a category.
+        // TODO: check userasset folder at startup
+        // TODO: create a "other" category at startup.
+        return FileHelper.moveDirPromise(cordova.file.cacheDirectory, this.uuid, userResourceRoot + this.category.uuid, this.uuid);
+      }).then((dirEntry) => {
+        console.log(dirEntry);
+        console.log('card saving done');
+        // Sync db
+        return db.insertResourceCard(dirEntry.nativeURL, this.category);
+      }).then(function(doc){
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_ADDED, doc);
+      }).catch(console.log);
     },
     takePicture: function(){
       console.log('take picture');
@@ -132,6 +222,8 @@ export default {
   },
   created() {
     console.log('Created');
+    this.uuid = uuidv4();
+    this.categoryList = db.getAllResourceCategories();
   }
 }
 </script>
@@ -260,6 +352,10 @@ img.selected {
   position: relative;
 }
 
+.light-button .dropdown-text {
+  font-size: 14px;
+}
+
 .light-button span {
   position: absolute;
   height: 100%;
@@ -311,5 +407,13 @@ img.selected {
 .sky-blue {
   color: skyblue;
 }
+.popover-resource-categories {
+  max-height: 50%;
+  width: 50%;
+}
 
+.popover-inner {
+  height: 100%;
+  overflow-y: scroll;
+}
 </style>

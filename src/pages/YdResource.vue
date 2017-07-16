@@ -27,6 +27,7 @@
 
   <!--Dialogs-->
   <yd-edit-card-dialog v-if="showNewCardDialog"></yd-edit-card-dialog>
+  <yd-res-new-category v-if="showNewCategoryDialog"></yd-res-new-category>
 
   <!--Popover-->
   <div class="popover popover-new-card">
@@ -47,17 +48,19 @@
 <script>
 import YdDrawer from '../components/YdDrawer'
 import YdEditCardDialog from '../components/YdEditCardDialog'
+import YdResNewCategory from '../components/YdResNewCategory'
 import {EventBus, Events} from '../EventBus'
 
 export default {
-  components: { YdDrawer, YdEditCardDialog },
+  components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
   data() {
     return {
       rootUuid: 'all',
       gridSize: {column: 2, row: 2},
       editMode: false,
       drawers: [],
-      showNewCardDialog: false
+      showNewCardDialog: false,
+      showNewCategoryDialog: false
     }
   },
   methods: {
@@ -68,9 +71,6 @@ export default {
       return this.rootUuid == uuid;
     },
     showNewPopover: function() {
-      console.log('showing');
-      console.log(this.f7);
-      console.log(this.$refs.newButton);
       this.popover = this.f7.popover('.popover-new-card', this.$refs.newButton);
     },
     newCard: function() {
@@ -80,6 +80,7 @@ export default {
     },
     newCategory: function() {
       this.f7.closeModal(this.popover, false);
+      this.showNewCategoryDialog = true;
       this.popover = null;
     }
   },
@@ -87,6 +88,7 @@ export default {
     this.drawers.push('all');
     EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
       this.showNewCardDialog = false;
+      this.showNewCategoryDialog = false;
     });
     EventBus.$on(Events.RESOURCE_CATEGORY, uuid => {
       this.drawers.push(uuid);

@@ -62,6 +62,28 @@ function fileExistPromise(pathToFile) {
   return deferred.promise;
 }
 
+function dirExistPromise(pathToDir) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToDir, function (dirEntry) {
+    deferred.resolve(true);
+  }, function(error){
+    if (error.code == FileError.NOT_FOUND_ERR) {
+      deferred.resolve(false);
+    } else {
+      errorHandlerPromise(pathToDir, deferred, error);
+    }
+  });
+  return deferred.promise;
+}
+
+function getDirPromise(pathToDir) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathToDir, function (dirEntry) {
+    deferred.resolve(dirEntry);
+  }, errorHandlerPromise.bind(null, pathToDir, deferred));
+  return deferred.promise;
+}
+
 function readFromFilePromise(pathToFile) {
   var deferred = Q.defer();
   window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
@@ -291,16 +313,146 @@ function moveFilePromise(path, fileName, newPath, newFileName) {
   return q.promise;
 }
 
+// Borrowed from ng-cordova
+function createDirPromise(path, dirName, replaceBool) {
+  var q = Q.defer();
+
+  if ((/^\//.test(dirName))) {
+    q.reject('directory cannot start with \/');
+  }
+
+  replaceBool = replaceBool ? false : true;
+
+  var options = {
+    create: true,
+    exclusive: replaceBool
+  };
+
+  try {
+    window.resolveLocalFileSystemURL(path, function (fileSystem) {
+      fileSystem.getDirectory(dirName, options, function (result) {
+        q.resolve(result);
+      }, function (error) {
+        error.message = $cordovaFileError[error.code];
+        q.reject(error);
+      });
+    }, function (err) {
+      errorHandlerPromise(`${path}/${dirName}`, q, err);
+    });
+  } catch (e) {
+    errorHandlerPromise(`${path}/${dirName}`, q, e);
+  }
+  return q.promise;
+}
+
+function moveDirPromise(path, dirName, newPath, newDirName) {
+  console.log(`${path}, 
+  ${dirName}, 
+  ${newPath}, 
+  ${newDirName}`)
+  var q = Q.defer();
+
+  newDirName = newDirName || dirName;
+
+  if (/^\//.test(dirName) || (/^\//.test(newDirName))) {
+    q.reject('file-name cannot start with \/');
+  }
+
+  try {
+    window.resolveLocalFileSystemURL(path, function (fileSystem) {
+      fileSystem.getDirectory(dirName, {create: false}, function (dirEntry) {
+        window.resolveLocalFileSystemURL(newPath, function (newDirEntry) {
+          dirEntry.moveTo(newDirEntry, newDirName, function (result) {
+            q.resolve(result);
+          }, function (error) {
+            q.reject(error);
+          });
+        }, function (erro) {
+          q.reject(erro);
+        });
+      }, function (err) {
+        q.reject(err);
+      });
+    }, function (er) {
+      q.reject(er);
+    });
+  } catch (e) {
+    q.reject(e);
+  }
+  return q.promise;
+}
+
+function copyFilePromise (srcPath, targetDir, targetName) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(srcPath, function (fileEntry) {
+    window.resolveLocalFileSystemURL(targetDir, function (newFolderEntry) {
+      if (! targetName) {
+        targetName = fileEntry.name;
+      }
+      console.log(`srcPath ${srcPath}, targetDir ${targetDir}, targetName ${targetName}`);
+      fileEntry.copyTo(newFolderEntry, targetName, deferred.resolve, errorHandlerPromise.bind(null, srcPath, deferred));
+    }, errorHandlerPromise.bind(null, srcPath, deferred));
+  }, errorHandlerPromise.bind(null, srcPath, deferred));
+
+  return deferred.promise;
+}
+
+function moveFileBySrcPromise (srcPath, targetDir, targetName) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(srcPath, function (fileEntry) {
+    window.resolveLocalFileSystemURL(targetDir, function (newFolderEntry) {
+      if (! targetName) {
+        targetName = fileEntry.name;
+      }
+      console.log(`srcPath ${srcPath}, targetDir ${targetDir}, targetName ${targetName}`);
+      fileEntry.moveTo(newFolderEntry, targetName, deferred.resolve, errorHandlerPromise.bind(null, srcPath, deferred));
+    }, errorHandlerPromise.bind(null, srcPath, deferred));
+  }, errorHandlerPromise.bind(null, srcPath, deferred));
+
+  return deferred.promise;
+}
+
+function writeJsonToFilePromise (jsonObj, targetDir, fileName) {
+  var deferred = Q.defer();
+
+  window.resolveLocalFileSystemURL(targetDir, function(folderEntry) {
+    folderEntry.getFile(fileName, {create:true}, function(fileEntry) {
+      fileEntry.createWriter(function(fileWriter) {
+        console.log(fileWriter);
+
+        fileWriter.onwriteend = function(event){
+          console.log('onwrite end');
+          deferred.resolve();
+        };      
+        fileWriter.write(JSON.stringify(jsonObj));
+      }, deferred.reject);
+      
+    }, errorHandlerPromise.bind(null, targetDir, deferred));
+  }, errorHandlerPromise.bind(null, targetDir, deferred));
+
+  return deferred.promise;
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
   readFromFilePromise,
   fileExistPromise,
+  dirExistPromise,
+  getDirPromise,
   listDirectoryPromise,
   removeFolderIfExistPromise,
   removeFile,
   getCdvPath,
   moveFilePromise,
+  moveFileBySrcPromise,
+  createDirPromise,
+  moveDirPromise,
+  copyFilePromise,
+  writeJsonToFilePromise,
+
+
+  // Utils
   getExtensionFromPath,
-  getFolderFromPath
+  getFolderFromPath,
 }

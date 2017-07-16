@@ -227,8 +227,6 @@ export default {
       this.showClasswareSettings = true;
     },
     pressed: function(index) {
-      console.log("pressed " + index);
-      console.log(this.touchAreas);
       this.touchAreas[index].pressed = true;
       if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
         this.editMode = true;
@@ -238,7 +236,6 @@ export default {
       }
     },
     pressup: function(index) {
-      console.log('pressup ' + index);
       this.touchAreas[index].pressed = false;
     }
   },
