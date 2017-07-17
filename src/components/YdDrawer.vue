@@ -3,7 +3,7 @@
   <div class="drawer" :class="{'with-background': !root}">
     <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
     <div class="swiper-container drawer-content">
-      <div class="swiper-wrapper">
+      <div class="swiper-wrapper drawer-wrapper">
         <!-- Slides -->
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group">
@@ -169,7 +169,7 @@ export default {
   left:-10%;
   top:20%;
   right: 0;
-  z-index: 100;
+  /*z-index: 100;*/
 }
 
 .drawer.with-background {
@@ -189,6 +189,11 @@ export default {
   margin-right: 0%;
   padding-top: 2.72%;
   overflow: visible;
+  z-index: 0;
+}
+
+.drawer-wrapper {
+  z-index: 0;
 }
 
 .drawer-back {

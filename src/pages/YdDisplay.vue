@@ -62,10 +62,12 @@
   </div>
 
   <!--Dialogs-->
-  <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
-  <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
-  <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
-
+  <transition name="slide">
+    <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
+    <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
+    <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
+  </transition>
+  <div class="dark-overlay" v-if="isOverlay"></div>
   <!--Multi-touch areas-->
   <div v-if="!editMode">
     <v-touch v-for="(area, index) in touchAreas"
@@ -155,6 +157,36 @@
   bottom: 0px;
   right: 0px;
 }
+
+.dark-overlay {
+  position:fixed;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  top:0;
+  left:0;
+  background: #aaaaaa;
+  opacity: 0.5;
+  z-index: 110;
+}
+
+/* Animations */
+.slide-enter-active {
+  transition: all 0.2s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+.slide-leave-active {
+  transition: all 0.2s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+.slide-enter, .slide-leave-to
+/* .slide-fade-leave-active for <2.1.8 */ {
+  transform: translateY(100%);
+  z-index: 1;;
+}
 </style>
 
 <script>
@@ -205,6 +237,9 @@ export default {
         return true
       }
       return false
+    },
+    isOverlay: function() {
+      return this.showCardSettings || this.showCategorySettings || this.showClasswareSettings
     }
   },
   methods: {

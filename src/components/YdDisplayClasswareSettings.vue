@@ -102,8 +102,7 @@ export default {
   margin: 0px;
   top:0;
   left:0;
-  background: #aaaaaa;
-  opacity: 0.5;
+  background: transparent;
   z-index: 200;
 }
 .settings-dialog {
