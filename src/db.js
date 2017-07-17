@@ -35,7 +35,7 @@ var initDB = function() {
     autoload: true,
     autoloadCallback: autoloadCallback,
     autosave: true,
-    autosaveInterval: 1000, // 1 second
+    autosaveInterval: 200, // ms
   }
   
   var dbFSAdapter = new LokiCordovaFSAdapter({"prefix": DB_PREFIX});
@@ -386,13 +386,14 @@ var deleteAllSubClasswareItem = function(doc) {
   var collection = getClasswareCollection();
   var subfolders = collection.find({'parent': {'$eq': doc.uuid}, 'type': {'$eq': 'folder'}});
   for (var i = 0; i < subfolders.length; i++) {
-    console.log('recursively deleting');
+    console.log('recursively deleting: ' + i);
     deleteAllSubClasswareItem(subfolders(i));
   }
   // TODO: switch to findAndRemove
-  collection.findAndUpdate({'parent': {'$eq': doc.uuid}}, function(obj) {
-    console.log(obj.uuid);
-  })
+  // collection.findAndUpdate({'parent': {'$eq': doc.uuid}}, function(obj) {
+  //   console.log(obj.uuid);
+  // })
+  collection.findAndRemove({'parent': {'$eq': doc.uuid}});
 }
 
 var insertResourceCategory = function(categoryPath, isOfficial) {

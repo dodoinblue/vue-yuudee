@@ -51,7 +51,7 @@ export default {
       }
 
       // Editing existing
-      if (this.card.parent == 'all') {
+      if (this.card.parent == 'root') {
         var f7 = new window.Framework7();
         f7.confirm('Cannot edit in All category', 'Forbiden', function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
@@ -72,7 +72,8 @@ export default {
       }
     },
     deleteCategory: function() {
-      if (this.card.parent == 'all') {
+      console.log(this.card.parent);
+      if (this.card.parent == 'root') {
         var f7 = new window.Framework7();
         f7.confirm('Cannot delete items in All category', 'Forbiden', function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
@@ -84,12 +85,13 @@ export default {
             // remove sub content
             db.deleteAllSubClasswareItem(this.card);
             // reorder
-            // db.deleteClasswareItem(doc);
+            db.deleteClasswareItem(this.card);
           } else {
             // remove and reorder
-            // db.deleteClasswareItem(doc);
+            db.deleteClasswareItem(this.card);
           }
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+          EventBus.$emit(Events.DISPLAY_CATEGORY_DELETED, this.card);
         });
       }
     }
@@ -124,7 +126,7 @@ export default {
 }
 .settings-dialog {
   position: relative;
-  top: 30%;
+  margin-top: 40%;
   left: 10%;
   width:80%;
   height:60%;

@@ -7,7 +7,7 @@
     </div>
     <div class="settings-dialog-title">Edit Classware</div>
     <div class="classware-title">
-      <input type="text" :placeholder="classwareInfo.name"></input>
+      <input type="text" :placeholder="classwareInfo.name" :disabled="classwareId == 'all'"></input>
     </div>
     <div class="classware-layout">
       <div class="row">Choose layout</div>
@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <div class="classware-delete">Delete this courseware</div>
+    <div class="classware-delete" @click="deleteClassware">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
@@ -54,6 +54,22 @@ export default {
   methods: {
     cancel: function() {
       EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE);
+    },
+    deleteClassware: function() {
+      if (this.classwareId == 'all') {
+        this.f7.alert('Cannot delete All', 'Forbiden');
+      } else {
+        this.f7.confirm('Are you sure?', 'Delete Whole Category', () => {
+          if (this.classwareInfo.type == 'folder') {
+            // remove sub content
+            db.deleteAllSubClasswareItem(this.classwareInfo);
+            // reorder
+            db.deleteClasswareItem(this.classwareInfo);
+          }
+          EventBus.$emit(Events.DISPLAY_CURRENT_CATEGORY_DELETED, this.classwareInfo);
+          EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
+        });
+      }
     },
     select: function(size) {
       this.selectedGridSize = size;
@@ -92,7 +108,7 @@ export default {
 }
 .settings-dialog {
     position: relative;
-    top: 20%;
+    margin-top: 30%;
     left: 10%;
     width:80%;
     height:60%;

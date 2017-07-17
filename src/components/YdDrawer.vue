@@ -108,6 +108,15 @@ export default {
           console.log(this.cardList);
         }
       });
+      EventBus.$on('DISPLAY_CATEGORY_DELETED', (item) => {
+        console.log('deleting, current drawer id: ' + this.uuid);
+        if (item.parent == 'root' && this.uuid == 'all' || item.parent == this.uuid) {
+          window.setTimeout(() => {
+            // Wait for database update and then reload... Haven't found a callback for this...
+            this.cardList = db.getCardsOfClassware(this.uuid);
+          }, 500);
+        }
+      });
     }
   },
   mounted() {

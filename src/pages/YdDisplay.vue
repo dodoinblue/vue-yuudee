@@ -187,7 +187,12 @@ export default {
   components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
   computed: {
     classwareName: function() {
-      return db.getClasswareItemByUuid(this.rootUuid).name;
+      // TODO: check root classware existance before displaying
+      var classwareObj = db.getClasswareItemByUuid(this.rootUuid);
+      if (!classwareObj) {
+        return "Error"
+      }
+      return classwareObj.name;
     },
     showCardSettings: function() {
       if (this.cardInEdit && this.cardInEdit.type == 'card') {
@@ -263,6 +268,14 @@ export default {
       this.rootUuid = doc.uuid;
       this.drawers.push(doc.uuid);
       db.setRootClasswareUuid(doc.uuid);
+    })
+    EventBus.$on(Events.DISPLAY_CURRENT_CATEGORY_DELETED, (doc) => {
+      window.setTimeout(() => {
+        this.drawers = [];
+        this.rootUuid = 'all';
+        this.drawers.push('all');
+        db.setRootClasswareUuid('all');
+      }, 500);
     })
 
     // Load root classware uuid
