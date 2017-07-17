@@ -73,5 +73,6 @@ document.addEventListener("deviceready", function(){
   db.initDB().then(function(){
     initApp();
   });
+  StatusBar.hide();
 }, false);
 

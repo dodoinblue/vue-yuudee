@@ -48,4 +48,5 @@
         <variable name="MICROPHONE_USAGE_DESCRIPTION" value=" "/>
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" "/>
     </plugin>
+    <plugin name="cordova-plugin-statusbar" spec="https://github.com/apache/cordova-plugin-statusbar.git"/>
 </widget>
