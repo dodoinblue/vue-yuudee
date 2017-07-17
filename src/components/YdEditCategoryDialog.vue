@@ -7,10 +7,11 @@
     </div>
     <div class="settings-dialog-title">Edit Category</div>
     <div class="classware-title">
-      <input type=text :placeholder="cardTitle" v-model="cardTitle"></input>
+      <input v-if="newCategory" type=text placeholder="Category name" v-model="cardTitle"></input>
+      <input v-else type=text :placeholder="cardTitle" v-model="cardTitle"></input>
     </div>
 
-    <div class="classware-delete" @click="deleteCategory">Delete this courseware</div>
+    <div class="classware-delete" @click="deleteCategory" v-if="!newCategory">Delete this courseware</div>
     <div class="classware-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
       <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
@@ -26,7 +27,7 @@ import db from '../db'
 import _ from 'lodash'
 
 export default {
-  props: ['card'],
+  props: ['card', 'newCategory'],
   data() {
     return {
       cardTitle: '',
@@ -37,6 +38,19 @@ export default {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
     },
     confirm: function() {
+      if (this.cardTitle == '') {
+        var f7 = new window.Framework7();
+        f7.alert("Category title is required", "Missing info");
+        return
+      }
+      if(this.newCategory) {
+        var doc = db.insertRootClassware(this.cardTitle);
+        EventBus.$emit(Events.DISPLAY_NEW_ROOT_CLASSWARE, doc);
+        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, doc);
+        return
+      }
+
+      // Editing existing
       if (this.card.parent == 'all') {
         var f7 = new window.Framework7();
         f7.confirm('Cannot edit in All category', 'Forbiden', function () {
@@ -81,7 +95,9 @@ export default {
     }
   },
   created() {
-    console.log(this.card);
+    if (this.newCategory) {
+      return
+    }
     if (this.card.type == 'folder') {
       this.cardTitle = this.card.name
     } else {

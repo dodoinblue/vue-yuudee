@@ -85,14 +85,6 @@ export default {
 
     });
 
-    EventBus.$on('DISPLAY_DRAWER_UPDATED', (uuid) => {
-      if (uuid == this.uuid) {
-        this.cardList = db.getCardsOfClassware(this.uuid);
-        console.log('updated list');
-        console.log(this.cardList);
-      }
-    });
-
     if (this.from == 'resource') {
       EventBus.$on('RESOURCE_NEW_CATEGORY_ADDED', (doc) => {
         if (this.uuid == 'all') {
@@ -106,6 +98,14 @@ export default {
         if (this.uuid == doc.category) {
           this.cardList.push(doc);
           console.log('doc pushed');
+        }
+      });
+    } else {
+      EventBus.$on('DISPLAY_DRAWER_UPDATED', (uuid) => {
+        if (uuid == this.uuid) {
+          this.cardList = db.getCardsOfClassware(this.uuid);
+          console.log('updated list');
+          console.log(this.cardList);
         }
       });
     }

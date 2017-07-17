@@ -64,7 +64,7 @@
   <!--Dialogs-->
   <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
   <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
-  <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit"></yd-edit-category-dialog>
+  <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
 
   <!--Multi-touch areas-->
   <div v-if="!editMode">
@@ -176,7 +176,7 @@ export default {
       gridSize: {},
       cardInEdit: {},
       showClasswareSettings: false,
-      // showCategoryDialog: false
+      showNewClasswareCategorySettings: false,
       touchAreas: [
         { name: 'touch-top-left', pressed: false},
         { name: 'touch-top-right', pressed: false},
@@ -196,7 +196,7 @@ export default {
       return false
     },
     showCategorySettings: function() {
-      if (this.cardInEdit && this.cardInEdit.type == 'folder') {
+      if (this.cardInEdit && this.cardInEdit.type == 'folder' || this.showNewClasswareCategorySettings) {
         return true
       }
       return false
@@ -207,7 +207,7 @@ export default {
       return this.rootUuid == uuid;
     },
     newClick: function() {
-
+      this.showNewClasswareCategorySettings = true;
     },
     toogleEditMode: function() {
       this.editMode = ! this.editMode;
@@ -251,11 +251,19 @@ export default {
     })
     EventBus.$on(Events.DISPLAY_CARD_SETTINGS_CLOSE, uuid => {
       this.cardInEdit = {};
+      this.showNewClasswareCategorySettings = false;
     });
     EventBus.$on(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, () => {
       // TODO: Close drawers or warn if root is not the same with top classware
       this.showClasswareSettings = false;
     });
+    EventBus.$on(Events.DISPLAY_NEW_ROOT_CLASSWARE, (doc) => {
+      this.classwares.push(doc);
+      this.drawers = [];
+      this.rootUuid = doc.uuid;
+      this.drawers.push(doc.uuid);
+      db.setRootClasswareUuid(doc.uuid);
+    })
 
     // Load root classware uuid
     this.classwares = db.getClasswareList();

@@ -464,6 +464,24 @@ var getAllResourceCategories = function() {
   return getResourceCollection().find({'isCategory': true});
 }
 
+var insertRootClassware = function(name) {
+    var classware = {}
+    classware.uuid = uuidv4();
+    classware.name = name;
+    classware.type = 'folder';
+    classware.parent = 'root';
+    classware.cover = "";
+    // classware.order = ;
+    var fromDB = getClasswareCollection()
+              .chain()
+              .find({'parent': 'root'})
+              .simplesort('order')
+              .data();
+    var largestOrder = fromDB[fromDB.length - 1].order;
+    classware.order = largestOrder + 1;
+    return getClasswareCollection().insert(classware);
+}
+
 export default {
   initDB,
 
@@ -477,6 +495,7 @@ export default {
   updateClasswareItem,
   deleteClasswareItem,
   deleteAllSubClasswareItem,
+  insertRootClassware,
 
   // YdResource methods
   getCardByUuid,
