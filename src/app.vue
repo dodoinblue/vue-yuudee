@@ -16,15 +16,6 @@ import FileHelper from './FileHelper.js'
 import Q from 'q'
 
 export default {
-  // components: {
-  //   'yd-display': (resolve) => {
-  //     EventBus.$on("RESOURCE_LOADED", function(){
-  //       console.log("resolving yd-display component");
-  //       console.log("========!!!!!!!!!!!!!=============");
-  //       resolve(YdDisplay);
-  //     })
-  //   },
-  // },
   methods: {
     startupChecks: function() {
       // No need to chain this part. Next step is either downloading or user navigate to resource
@@ -32,6 +23,12 @@ export default {
       FileHelper.getDirPromise(FileHelper.getUserAssetFolder()).catch(function(error){
         console.log("User Asset folder is not available, creating..");
         return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserAssets', false)
+      }).then(function(){
+        return FileHelper.getDirPromise(FileHelper.getUserAssetFolder() + '/Other').catch(function(error){
+          return FileHelper.createDirPromise(FileHelper.getUserAssetFolder(), 'Other', false).then(function(){
+            return FileHelper.writeJsonToFilePromise({name: 'Other'}, FileHelper.getUserAssetFolder() + '/Other', 'info.json');
+          });
+        })
       }).then(function(){
         return FileHelper.getDirPromise(FileHelper.getUserCoverFolder()).catch(function(error){
           console.log("User Cover folder is not available, creating..");
