@@ -35,7 +35,12 @@ window.oncontextmenu = function(event) {
 var routes = [
   { path: '/display',
     name: 'YdDisplay',
-    component: YdDisplay },
+    component: (resolve) => {
+      EventBus.$on("RESOURCE_LOADED", function(){
+        resolve(YdDisplay);
+      })
+    }
+  },
   {
     path: '/resource',
     name: 'YdResource',

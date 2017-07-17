@@ -16,55 +16,71 @@ import FileHelper from './FileHelper.js'
 import Q from 'q'
 
 export default {
-  components: {
-    'yd-display': (resolve) => {
-      console.log("resolving yd-display component");
-      EventBus.$on("RESOURCE_LOADED", function(){
-        resolve(YdDisplay);
-      })
-    },
-  },
+  // components: {
+  //   'yd-display': (resolve) => {
+  //     EventBus.$on("RESOURCE_LOADED", function(){
+  //       console.log("resolving yd-display component");
+  //       console.log("========!!!!!!!!!!!!!=============");
+  //       resolve(YdDisplay);
+  //     })
+  //   },
+  // },
   methods: {
     startupChecks: function() {
+      // No need to chain this part. Next step is either downloading or user navigate to resource
+      // page to create new category/ card, which all will take much longer time than this.
+      FileHelper.getDirPromise(FileHelper.getUserAssetFolder()).catch(function(error){
+        console.log("User Asset folder is not available, creating..");
+        return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserAssets', false)
+      }).then(function(){
+        return FileHelper.getDirPromise(FileHelper.getUserCoverFolder()).catch(function(error){
+          console.log("User Cover folder is not available, creating..");
+          return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserCovers', false)
+        })
+      }).then(function(){
+        console.log("User folders created");
+      }).catch(console.log);
+
       // Check if classwareCollection has been built
-      // TODO: do init db here
+      var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
+      var downloadTempPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`
+      var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-uuid-v1-lite-cn.zip"
       if (! db.hasClasswareBuilt()) {
       // if (true) {
-        // FileHelper.removeFolderIfExistPromise(cordova.file.dataDirectory + 'card-assets/').then(function(file){
-        //   console.log('folder deleted');
-        // }).catch(console.log);
         var f7 = this.f7;
         f7.showPreloader("Downloading...");
         // Start fresh
-        // TODO: use promise
-        db.removeResourceCollection().then(function(){console.log('resource deleted')});
-        db.removeClasswareCollection().then(function(){console.log('classware deleted')});
-        var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
-        var downloadTempPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`
-        // var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-lite.zip"
-        var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-uuid-v1-lite-cn.zip"
-        FileHelper.removeFolderIfExistPromise(cardResourceFolder).then(function(){
-          var onProgress = function(progressEvent) {
-            if (progressEvent.lengthComputable) {
-              console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
-            } else {
-              console.log('onProgress');
-            }
-          }
-          return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+        db.removeResourceCollection().then(function(){
+          console.log('resource deleted');
+          return db.removeClasswareCollection();
         }).then(function(){
-          // return unzipDownloaded(downloadTempPath, cardResourceFolder)
+          console.log('classware deleted');
+
+          return FileHelper.removeFolderIfExistPromise(cardResourceFolder).then(function(){
+            var onProgress = function(progressEvent) {
+              if (progressEvent.lengthComputable) {
+                // console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
+              } else {
+                console.log('onProgress');
+              }
+            }
+            return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
+          })
+        }).then(function(){
           var deferred = Q.defer();
           zip.unzip(downloadTempPath, cordova.file.dataDirectory, function(){
             deferred.resolve();
           }, function(progressEvent){
-            console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
+            // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
           });
           return deferred.promise;
         }).then(function(){
           return db.buildOfficialResourceCollection();
         }).then(function(){
           return db.generateOfficialClasswares();
+        }).then(() => {
+          // Wait for db save.
+          return Utils.waitForSeconds(1.5);
         }).then(function(){
           // TODO: load external user cards
           // return db.removeResourceCollection('USER_RESOURCE_PATH');
@@ -78,15 +94,12 @@ export default {
           console.log(error);
         })
       } else {
-        // Load configuration
-        // Load classware
         // Done
         EventBus.$emit("RESOURCE_LOADED");
       }
     },
   },
   created() {
-    console.log("app created")
     // Startup checks here...
     EventBus.$on('ROOT_MOUNTED', () => {
       this.startupChecks();
@@ -94,7 +107,6 @@ export default {
   },
   mounted() {
     this.f7 = new Framework7();
-    console.log("app mounted")
   }
 }
 </script>

@@ -57,14 +57,23 @@ var getCollection = function(collectionName, uniqueField) {
 }
 
 var getSettingsCollection = function() {
+  // if (settingsCollection != null) {
+  //   return settingsCollection
+  // }
   return getCollection(SETTINGS_COLLECTION, 'name');
 }
 
 var getResourceCollection = function() {
+  // if (resourceCollection != null) {
+  //   return resourceCollection
+  // }
   return getCollection(RESOURCE_COLLECTION, 'uuid');
 }
 
 var getClasswareCollection = function() {
+  // if (classwareCollection != null) {
+  //   return classwareCollection;
+  // }
   return getCollection(CLASSWARE_COLLECTION, 'uuid');
 }
 
@@ -126,8 +135,6 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
     });
     // var categories = [];
     return Q.all(filtered.map(function(node){
-      // console.log(node.toInternalURL());
-      console.log(node);
       var category = {};
       category.uuid = node.name;
       category.cordovaFullPath = node.fullPath;
@@ -389,8 +396,6 @@ var deleteAllSubClasswareItem = function(doc) {
 }
 
 var insertResourceCategory = function(categoryPath, isOfficial) {
-  console.log('inserting db');
-
   return FileHelper.getDirPromise(categoryPath).then(function(node){
     var category = {};
     category.uuid = node.name;
@@ -418,7 +423,6 @@ var insertResourceCategory = function(categoryPath, isOfficial) {
 }
 
 var insertResourceCard = function(cardPath, category) {
-  console.log('here')
   return FileHelper.getDirPromise(cardPath).then(function(node){
     var card = {};
     card.uuid = node.name.slice(0, -8);
@@ -426,8 +430,6 @@ var insertResourceCard = function(cardPath, category) {
     card.isCategory = false;
     card.isOffcial = category.isOfficial;
     card.cdvpath = node.toInternalURL();
-    console.log('inserting card')
-    console.log(card)
     return getCardImages(node.nativeURL + 'images/').then(function(images){
       return card.images = images;
     }).then(function(){
@@ -446,7 +448,6 @@ var insertResourceCard = function(cardPath, category) {
       return card;
     });
   }).then(function(card){
-    console.log(card);
     return getResourceCollection().insert(card);
   });
 }
@@ -485,7 +486,7 @@ export default {
   insertResourceCard,
 
   // Build database
-  generateOfficialClasswares,
+  // generateOfficialClasswares,
   buildResourceCollection,
   buildOfficialResourceCollection,
   generateOfficialClasswares,
@@ -495,5 +496,8 @@ export default {
 
   hasClasswareBuilt,
   getClasswareList,
+
+  getClasswareCollection,
+  getResourceCollection,
 
 }

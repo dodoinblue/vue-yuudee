@@ -267,6 +267,6 @@ export default {
   },
   mounted() {
     this.f7 = new Framework7();
-  }
+  },
 }
 </script>

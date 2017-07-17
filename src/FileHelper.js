@@ -433,6 +433,24 @@ function writeJsonToFilePromise (jsonObj, targetDir, fileName) {
   return deferred.promise;
 }
 
+function getUserFolderParent() {
+  var userResourceParentFolder;
+  if (cordova.platformId == 'ios') {
+    userResourceParentFolder = cordova.file.dataDirectory;
+  } else {
+    userResourceParentFolder = cordova.file.externalApplicationStorageDirectory;
+  }
+  return userResourceParentFolder;
+}
+
+function getUserAssetFolder() {
+  return getUserFolderParent() + 'UserAssets/'
+}
+
+function getUserCoverFolder() {
+  return getUserFolderParent() + 'UserCovers/'
+}
+
 export default {
   downloadFilePromise,
   writeToFilePromise,
@@ -451,8 +469,12 @@ export default {
   copyFilePromise,
   writeJsonToFilePromise,
 
-
   // Utils
   getExtensionFromPath,
   getFolderFromPath,
+
+  // Constants Getter
+  getUserFolderParent,
+  getUserAssetFolder,
+  getUserCoverFolder
 }
