@@ -70,7 +70,19 @@ export default {
   },
   computed: {
     pagedCards: function() {
-      return Utils.arrangeCards(this.cardList, this.row, this.col);
+      console.log('im here');
+      if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
+        // Append empty cards in edit mode
+        var pageSize = this.row * this.col;
+        var numberToAppend = this.cardList.length % pageSize + pageSize;
+        var appendList = []
+        for (var i = 0; i < numberToAppend; i++) {
+          appendList.push({empty: true})
+        }
+        return Utils.arrangeCards(this.cardList.concat(appendList), this.row, this.col);
+      } else {
+        return Utils.arrangeCards(this.cardList, this.row, this.col);
+      }
     }
   },
   created() {

@@ -1,13 +1,20 @@
 <template>
 <div class="yd-card" :class="{'on-top': onTop}" @click="onCardClick()">
-  <div class="card-frame">
-    <img :src="card_bg_image">
-  </div>
-  <div class="card-content">
-    <img :src="content_image">
-  </div>
-  <div class="card-text"><div>{{card.name}}</div></div>
-  <div class="card-edit-button" v-if="editMode" @click.stop="onCardEditClick"></div>
+  <template v-if="!classware.empty">
+    <div class="card-frame" >
+      <img :src="card_bg_image">
+    </div>
+    <div class="card-content">
+      <img :src="content_image">
+    </div>
+    <div class="card-text"><div>{{card.name}}</div></div>
+    <div class="card-edit-button" v-if="editMode" @click.stop="onCardEditClick"></div>
+  </template>
+  <template v-else>
+    <div class="card-frame with-margin">
+      <img src="static/img/blank_card.png">
+    </div>
+  </template>
 </div>
 </template>
 
@@ -104,6 +111,7 @@ var playAnimation = function(context) {
 }
 
 export default {
+  // TODO: classware is the passed in variable. not card.. need to come up with better naming.
   props: ['editMode', 'classware', 'from'],
   data() {
     return {
@@ -114,6 +122,9 @@ export default {
   },
   methods: {
     onCardClick: _.throttle(function() {
+      if (this.classware.empty) {
+        return
+      }
       if (this.isStack) {
         if (this.from == "resource") {
           EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
@@ -186,6 +197,10 @@ export default {
   width: 100%;
   -moz-border-radius: 5px;
   border-radius: 5px;
+}
+
+.card-frame.with-margin {
+  margin: 7%;
 }
 
 /*

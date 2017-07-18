@@ -140,8 +140,9 @@
 
 .touch-area {
   position: absolute;
-  height: 70px;
-  width: 70px;
+  height: 15%;
+  width: 25%;
+  /*background: black;*/
 }
 
 .touch-area.touch-top-left {
