@@ -6,8 +6,8 @@
       <div class="swiper-wrapper drawer-wrapper">
         <!-- Slides -->
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
-          <div class="card-group">
-            <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid">
+          <div class="card-group" :id="'card-group-' + index">
+            <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
               <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
             </div>
           </div>
@@ -133,37 +133,34 @@ export default {
   },
   mounted() {
     this.createSwiper();
-    // window.swiper = this.mySwiper;
 
     // // Draggable - Sortable
-    // var that = this;
-    // // TODO: Use id, not class
-    // var el = this.$el.getElementsByClassName('card-group')[0];
-    // var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
-    // var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
+    var that = this;
+    // TODO: Use id, not class
+    var el = this.$el.querySelector("#card-group-0");
+    if (this.editMode && this.uuid != 'all') {
+      Sortable.create(el, {
+        fallbackOnBody: true,
+        animation: 150,
 
-    // this.sortable = Sortable.create(el, {
-    //   group: 'cards',
-    //   sort: true,
-    //   delay: 500,
-    //   animation: 100,
-    //   draggable: "x.card-group-item", /* remove x to enable swipe */
-    //   dragClass: "dragging-card",
-    //   ghostClass: "ghost-card",
-    //   disabled: false,
-    //   preventOnFilter: true,
-    //   fallbackOnBody: true,
-    //   scrollFn: function(offsetX, offsetY, originalEvent) { 
-    //     if (offsetX < 0) {
-    //       delayedScrollPrev();
-    //     } else if (offsetX > 0){
-    //       console.log("calling");
-    //       delayedScrollNext();
-    //     }
-    //   },
-    //   scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
-	  //   scrollSpeed: 10,
-    // });
+        store: {
+          get: function (sortable) {
+            // var order = localStorage.getItem(sortable.options.group.name);
+            return [];
+          },
+          set: function (sortable) {
+            var order = sortable.toArray();
+            console.log(order);
+            // localStorage.setItem(sortable.options.group.name, order.join('|'));
+          }
+        },
+
+        setData: function (/** DataTransfer */dataTransfer, /** HTMLElement*/dragEl) {
+          // dataTransfer.setData('Text', dragEl.textContent); // `dataTransfer` object of HTML5 DragEvent
+          console.log('setData')
+        },
+      });
+    }
   }
 }
 </script>
