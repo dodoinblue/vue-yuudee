@@ -30,6 +30,7 @@
 <script>
 import { EventBus, Events } from '../EventBus'
 import db from '../db.js'
+import Utils from '../utils'
 
 export default {
   props: ['classwareId'],
@@ -88,7 +89,7 @@ export default {
     }
   },
   mounted() {
-    this.f7 = new window.Framework7();
+    this.f7 = Utils.getF7();
   }
 }
 </script>

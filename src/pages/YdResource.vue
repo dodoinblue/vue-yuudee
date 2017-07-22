@@ -50,6 +50,7 @@ import YdDrawer from '../components/YdDrawer'
 import YdEditCardDialog from '../components/YdEditCardDialog'
 import YdResNewCategory from '../components/YdResNewCategory'
 import {EventBus, Events} from '../EventBus'
+import Uitls from '../utils'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
@@ -98,7 +99,7 @@ export default {
     });
   },
   mounted() {
-    this.f7 = new Framework7();
+    this.f7 = Utils.getF7();
   }
 }
 </script>

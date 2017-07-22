@@ -107,7 +107,7 @@ export default {
     });
   },
   mounted() {
-    this.f7 = new Framework7();
+    this.f7 = Utils.getF7();
   }
 }
 </script>

@@ -41,6 +41,7 @@
 import {EventBus, Events} from '../EventBus'
 import db from '../db'
 import _ from 'lodash'
+import Utils from '../utils'
 
 export default {
   props: ['card'],
@@ -79,7 +80,7 @@ export default {
       this.selected = value;
     },
     deleteClasswareItem: function() {
-      var f7 = new window.Framework7();
+      var f7 = Utils.getF7();
       f7.confirm('Are you sure?', 'Delete Card', () => {
         db.deleteClasswareItem(this.card);
         EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent);

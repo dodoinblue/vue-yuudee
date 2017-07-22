@@ -195,6 +195,7 @@ import YdCard from '../components/YdCard.vue'
 import YdDrawer from '../components/YdDrawer.vue'
 import { EventBus, Events } from '../EventBus.js'
 import db from '../db.js'
+import Utils from '../utils'
 import YdDisplayClasswareSettings from '../components/YdDisplayClasswareSettings'
 import YdDisplayCardSettings from '../components/YdDisplayCardSettings'
 import YdEditCategoryDialog from '../components/YdEditCategoryDialog'
@@ -323,7 +324,7 @@ export default {
     this.gridSize = db.getDisplayGridSize();
   },
   mounted() {
-    this.f7 = new Framework7();
+    this.f7 = Utils.getF7();
   },
 }
 </script>

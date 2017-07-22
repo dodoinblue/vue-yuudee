@@ -60,7 +60,7 @@ export default {
     },
     confirm: function() {
       if (this.cardName == "") {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.alert('Please choose a name before save', 'Missing info');
         return
       }

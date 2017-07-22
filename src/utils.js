@@ -1,7 +1,17 @@
 import Q from 'q'
 import { TweenLite } from "gsap"
+import 'framework7'
+
+var f7 = null;
 
 export default {
+  getF7: function(){
+    if (!f7) {
+      f7 = new Framework7({statusbarOverlay: false})
+    }
+    return f7
+  },
+
   isCordova: () => {
     console.log(typeof cordova);
     return typeof cordova != 'undefined';

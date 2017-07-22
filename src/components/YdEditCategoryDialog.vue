@@ -25,6 +25,7 @@
 import { EventBus, Events } from '../EventBus'
 import db from '../db'
 import _ from 'lodash'
+import Utils from '../utils'
 
 export default {
   props: ['card', 'newCategory'],
@@ -39,7 +40,7 @@ export default {
     },
     confirm: function() {
       if (this.cardTitle == '') {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.alert("Category title is required", "Missing info");
         return
       }
@@ -52,12 +53,12 @@ export default {
 
       // Editing existing
       if (this.card.parent == 'root') {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.confirm('Cannot edit in All category', 'Forbiden', function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
       } else if (this.card.type == 'card') {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.confirm('Can be modified in Asset library', 'Forbiden', function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
@@ -74,12 +75,12 @@ export default {
     deleteCategory: function() {
       console.log(this.card.parent);
       if (this.card.parent == 'root') {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.confirm('Cannot delete items in All category', 'Forbiden', function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
       } else {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.confirm('Are you sure?', 'Delete Whole Category', () => {
           if (this.card.type == 'folder') {
             // remove sub content

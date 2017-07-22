@@ -87,7 +87,7 @@ export default {
     },
     showCategoryList: function(){
       console.log('show category');
-      this.f7 = new window.Framework7();
+      this.f7 = Utils.getF7();
       this.popover = this.f7.popover('.popover-resource-categories', this.$refs.catDropdown);
     },
     cancel: function() {
@@ -95,7 +95,7 @@ export default {
     },
     confirm: function() {
       if (this.cardName == "" || ! this.category.uuid) {
-        var f7 = new window.Framework7();
+        var f7 = Utils.getF7();
         f7.alert('Please choose name and category before save', 'Missing info');
         return
       }

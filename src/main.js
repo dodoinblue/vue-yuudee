@@ -4,9 +4,6 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-// Import F7, F7-Vue
-import 'framework7'
-
 // Import F7 iOS Theme Styles
 import 'framework7/dist/css/framework7.ios.min.css'
 import 'framework7/dist/css/framework7.ios.colors.min.css'
