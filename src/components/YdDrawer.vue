@@ -76,7 +76,6 @@ export default {
   },
   computed: {
     pagedCards: function() {
-      console.log('im here');
       if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
         // Append empty cards in edit mode
         var pageSize = this.row * this.col;
@@ -145,13 +144,80 @@ export default {
     // TODO: Use id, not class
     // console.log(this.$refs.group)
     var els = this.$el.getElementsByClassName('card-group');
-    var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
-    var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
+
+    var sortables = []
+
+    var logElementsByDataId = function(elements) {
+      var tmp = []
+      for(var i = 0; i < elements.length; i++) {
+        tmp.push(elements[i].attributes['data-id'].value)
+      }
+      console.log(tmp)
+    }
+
+    var processScroll = function(fromGroupId, toGroupId) {
+      if (toGroupId >= sortables.length || toGroupId < 0) {
+        console.log('Warning: Scroll will not happen since it is at the boundary')
+        return
+      }
+      console.log('from ' + fromGroupId + ': ' + sortables[fromGroupId].toArray())
+      console.log('to ' + toGroupId + ' :' + sortables[toGroupId].toArray())
+
+      console.log('dragged: ' + that.draggedItem.attributes['data-id'].value)
+      console.log(els[fromGroupId].childNodes[0].attributes['data-id'].value)
+      var fromElGroupFiltered = _.filter(els[fromGroupId].childNodes, function(o){
+        var dataAttr = o.attributes['data-id']
+        if (!dataAttr) {
+          return true
+        } else {
+          return dataAttr !== that.draggedItem.attributes['data-id']
+        }
+      })
+      var toElGroupFiltered = _.filter(els[toGroupId].childNodes, function(o){
+        var dataAttr = o.attributes['data-id']
+        if (!dataAttr) {
+          return true
+        } else {
+          return dataAttr.value !== that.draggedItem.attributes['data-id']
+        }
+      })
+      console.log('========filtered======')
+      console.log(fromElGroupFiltered)
+      console.log(toElGroupFiltered)
+      logElementsByDataId(fromElGroupFiltered)
+      logElementsByDataId(toElGroupFiltered)
+
+      if (toGroupId < fromGroupId) {
+        console.log('toGroupId < fromGroupId')
+        let oldNode = els[toGroupId].removeChild(toElGroupFiltered[toElGroupFiltered.length -1])
+        console.log('removed: ' + oldNode.attributes['data-id'].value)
+        els[fromGroupId].insertBefore(oldNode, fromElGroupFiltered[0])
+        logElementsByDataId(els[fromGroupId].childNodes)
+      } else {
+        console.log('else')
+        let oldNode = els[toGroupId].removeChild(toElGroupFiltered[0])
+        console.log('removed: ' + oldNode.attributes['data-id'].value)
+        els[fromGroupId].appendChild(oldNode)
+        logElementsByDataId(els[fromGroupId].childNodes)
+      }
+    }
+
+    var delayedScrollNext = _.throttle((from, to) => {
+      console.log('before scroll to next: ' + this.mySwiper.activeIndex)
+      processScroll(from, to)
+      this.mySwiper.slideNext()
+      console.log('after scroll to next: ' + this.mySwiper.activeIndex)
+    }, 1000, { 'trailing': false });
+    var delayedScrollPrev = _.throttle((from, to) => {
+      processScroll(from, to)
+      this.mySwiper.slidePrev()
+    }, 1000, { 'trailing': false });
+
 
     for(var i=0; i< els.length; i++) {
       var el = els[i]
       console.log('group: ' + el.id)
-      Sortable.create(el, {
+      var sorta = Sortable.create(el, {
         group: 'cards',
         sort: true,
         delay: 500,
@@ -163,11 +229,15 @@ export default {
         preventOnFilter: true,
         fallbackOnBody: true,
         scrollFn: function(offsetX, offsetY, originalEvent) {
-          if (offsetX < 0) {
-            delayedScrollPrev();
-          } else if (offsetX > 0){
-            console.log("calling");
-            delayedScrollNext();
+          console.log(this.el.id + ': scrollFn X: ' + originalEvent.clientX + ' Y: ' + originalEvent.clientY)
+          if (originalEvent.clientX < 30) {
+            console.log(this.el.id + ": calling prev");
+            var from = parseInt(this.el.id.slice(11))
+            delayedScrollPrev(from, from - 1);
+          } else if (originalEvent.clientX > window.innerWidth - 30){
+            console.log(this.el.id + ": calling next");
+            var from = parseInt(this.el.id.slice(11))
+            delayedScrollNext(from, from + 1);
           }
         },
         scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
@@ -178,19 +248,32 @@ export default {
           },
           set: function (sortable) {
             var order = sortable.toArray();
-            console.log(el.id + ' ' + order);
+            console.log(sortable.el.id + ": " + order);
           }
         },
-        onMove: function() {
-          console.log('onmove')
+        onMove: function(event, originalEvent) {
+          console.log(this.el.id + ': onmove X: ' + originalEvent.clientX + ' Y: ' + originalEvent.clientY)
         },
         onAdd: function() {
-          console.log('onAdd')
-          console.log(this)
+          console.log(this.el.id + ': onAdd')
+        },
+        onRemove: function() {
+          console.log(this.el.id + ': onRemove')
+        },
+        onStart: function(evt) {
+          console.log(this.el.id + ': onStart ')
+          that.draggedItem = evt.item
+        },
+        onEnd: function() {
+          console.log(this.el.id + ': onEnd')
+          that.draggedItem = null
+          for (var j = 0; j < els.length; j++) {
+            logElementsByDataId(els[j].childNodes)
+          }
         }
       });
+      sortables.push(sorta)
     }
-
   }
 }
 </script>
