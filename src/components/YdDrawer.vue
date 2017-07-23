@@ -3,20 +3,20 @@
   <div class="drawer" :class="{'with-background': !root}">
     <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
     <div class="swiper-container drawer-content">
-      <div class="swiper-wrapper drawer-wrapper card-group" ref="group">
+      <div class="swiper-wrapper drawer-wrapper">
 
         <!-- Slides -->
-        <!--<div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
-          <div class="card-group" :id="'card-group-' + index">
+        <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
+          <div class="card-group" :ref="'group' + index" :id="'card-group-' + index">
             <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
               <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
             </div>
           </div>
-        </div>-->
-
-        <div class="swiper-slide card-group-item" v-for="card in cardList" :key="card.uuid" :data-id="card.uuid">
-          <yd-card :classware="card" :edit-mode="editMode" :key="card.path" :from="from"></yd-card>
         </div>
+
+        <!--<div class="swiper-slide card-group-item" v-for="card in cardList" :key="card.uuid" :data-id="card.uuid">
+          <yd-card :classware="card" :edit-mode="editMode" :key="card.path" :from="from"></yd-card>
+        </div>-->
 
       </div>
     </div>
@@ -29,7 +29,7 @@ import YdCard from './YdCard.vue'
 import Vue from 'vue'
 import { EventBus, Events } from '../EventBus.js'
 import Swiper from 'swiper'
-import Sortable from 'sortablejs'
+import Sortable from '/Users/charles/repository/yuudee/Sortable'
 import _ from 'lodash'
 import Utils from '../utils.js'
 import db from '../db.js'
@@ -71,15 +71,7 @@ export default {
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
       // Swiper
-      this.mySwiper = new Swiper (swiperContainerElement, {
-      // Optional parameters
-      direction: 'horizontal',
-      slidesPerView: 2,
-      slidesPerColumn: 2,
-      slidesPerGroup: 4,
-      slidesPerColumnFill: 'row', /* column conflicts with sortable */
-      spaceBetween: 0
-    });
+      this.mySwiper = new Swiper (swiperContainerElement);
     },
   },
   computed: {
@@ -151,44 +143,54 @@ export default {
     // // Draggable - Sortable
     var that = this;
     // TODO: Use id, not class
-    console.log(this.$refs.group)
-    var el = this.$el.getElementsByClassName('card-group')[0];
+    // console.log(this.$refs.group)
+    var els = this.$el.getElementsByClassName('card-group');
     var delayedScrollNext = _.throttle(this.mySwiper.slideNext, 1000, { 'trailing': false });
     var delayedScrollPrev = _.throttle(this.mySwiper.slidePrev, 1000, { 'trailing': false });
 
-    this.sortable = Sortable.create(el, {
-      group: 'cards',
-      sort: true,
-      delay: 500,
-      animation: 100,
-      draggable: ".card-group-item",
-      dragClass: "dragging-card",
-      ghostClass: "ghost-card",
-      disabled: false,
-      preventOnFilter: true,
-      fallbackOnBody: true,
-      scrollFn: function(offsetX, offsetY, originalEvent) {
-        if (offsetX < 0) {
-          delayedScrollPrev();
-        } else if (offsetX > 0){
-          console.log("calling");
-          delayedScrollNext();
-        }
-      },
-      scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
-	    scrollSpeed: 10,
-      store: {
-        get: function (sortable) {
-          // var order = localStorage.getItem(sortable.options.group.name);
-          return [];
+    for(var i=0; i< els.length; i++) {
+      var el = els[i]
+      console.log('group: ' + el.id)
+      Sortable.create(el, {
+        group: 'cards',
+        sort: true,
+        delay: 500,
+        animation: 100,
+        draggable: ".card-group-item",
+        dragClass: "dragging-card",
+        ghostClass: "ghost-card",
+        disabled: false,
+        preventOnFilter: true,
+        fallbackOnBody: true,
+        scrollFn: function(offsetX, offsetY, originalEvent) {
+          if (offsetX < 0) {
+            delayedScrollPrev();
+          } else if (offsetX > 0){
+            console.log("calling");
+            delayedScrollNext();
+          }
         },
-        set: function (sortable) {
-          var order = sortable.toArray();
-          console.log(order);
-          // localStorage.setItem(sortable.options.group.name, order.join('|'));
+        scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
+        scrollSpeed: 10,
+        store: {
+          get: function (sortable) {
+            return [];
+          },
+          set: function (sortable) {
+            var order = sortable.toArray();
+            console.log(el.id + ' ' + order);
+          }
+        },
+        onMove: function() {
+          console.log('onmove')
+        },
+        onAdd: function() {
+          console.log('onAdd')
+          console.log(this)
         }
-      },
-    });
+      });
+    }
+
   }
 }
 </script>

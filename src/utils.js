@@ -141,5 +141,47 @@ export default {
     };
     aud.play();
     return deferred.promise;
+  },
+
+  // For dragging
+  getNumberOfCardsInPage: function(groupEl) {
+    let elChildren = groupEl.getElementsByClassName('card-group-item')
+    let count = 0;
+    for (var i = 0; i< elChildren.length; i ++) {
+      // let result = elChildren[i].querySelector('[draggable="false"]')
+      let child = elChildren[i]
+      var drag = child.attributes.getNamedItem('draggable')
+      if (drag && drag.value == 'false') {
+        console.log('found!!!!!')
+        count++
+        break;
+      }
+    }
+    console.log(`${elChildren.length} - ${count};`);
+    return elChildren.length - count;
+  },
+
+  getFirstNonGhostNode: function(groupEl) {
+    let elChildren = groupEl.getElementsByClassName('card-group-item')
+    let firstChild = groupEl.firstChild
+    let drag = firstChild.attributes.getNamedItem('draggable')
+    if (drag && drag.value == 'false') {
+      console.log('first child is a ghost')
+      return elChildren[1]
+    } else {
+      return groupEl.firstChild
+    }
+  },
+    
+  getLastNonGhostNode: function(groupEl) {
+    let elChildren = groupEl.getElementsByClassName('card-group-item')
+    let lastChild = groupEl.lastChild
+    let drag = lastChild.attributes.getNamedItem('draggable')
+    if (drag && drag.value == 'false') {
+      console.log('last child is a ghost')
+      return elChildren[elChildren.length - 2]
+    } else {
+      return groupEl.lastChild
+    }
   }
 }
