@@ -50,7 +50,7 @@ import YdDrawer from '../components/YdDrawer'
 import YdEditCardDialog from '../components/YdEditCardDialog'
 import YdResNewCategory from '../components/YdResNewCategory'
 import {EventBus, Events} from '../EventBus'
-import Uitls from '../utils'
+import Utils from '../utils'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
