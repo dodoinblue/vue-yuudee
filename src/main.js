@@ -41,7 +41,14 @@ var routes = [
   {
     path: '/resource',
     name: 'YdResource',
-    component: YdResource
+    component: YdResource,
+    props: { mode: 'show' }
+  },
+  {
+    path: '/resource/pick',
+    name: 'YdResource',
+    component: YdResource,
+    props: { mode: 'pick' }
   },
   {
     path: '/',

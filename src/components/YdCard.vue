@@ -8,10 +8,11 @@
       <img :src="content_image">
     </div>
     <div class="card-text"><div>{{card.name}}</div></div>
-    <div class="card-edit-button" v-if="editMode" @click.stop="onCardEditClick"></div>
+    <div class="card-edit-button" v-if="editMode && from !== 'resource'" @click.stop="onCardEditClick"></div>
+    <div :class="picked ? 'card-box-checked' : 'card-box-unchecked'" v-if="editMode && from === 'resource'" @click.stop="onCardPicked"></div>
   </template>
   <template v-else>
-    <div class="card-frame with-margin">
+    <div class="card-frame with-margin" @click="selectFromResource">
       <img src="static/img/blank_card.png">
     </div>
   </template>
@@ -117,7 +118,8 @@ export default {
     return {
       currentImageIndex: 0,
       card: {},
-      onTop: false
+      onTop: false,
+      picked: false
     }
   },
   methods: {
@@ -141,6 +143,12 @@ export default {
     onCardEditClick: function() {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
     },
+    selectFromResource: function() {
+      this.$router.push('resource/pick');
+    },
+    onCardPicked: function() {
+      this.picked = !this.picked
+    }
   },
   computed: {
     isStack: function() {
@@ -165,6 +173,7 @@ export default {
     },
   },
   created() {
+    console.log(`card !!!! from: ${this.from} editMode: ${this.editMode}`)
     if (this.classware.type == 'folder') {
       this.card = this.classware;
     } else if (this.from == 'resource') {
@@ -244,6 +253,24 @@ export default {
 .yd-card .card-edit-button {
   max-width: 30%;
   content: url("../../static/img/edit.png");
+  position: absolute;
+  top: -5%;
+  right: 0%;
+  bottom: 80%;
+}
+
+.yd-card .card-box-unchecked {
+  max-width: 30%;
+  content: url("../../static/img/box.png");
+  position: absolute;
+  top: -5%;
+  right: 0%;
+  bottom: 80%;
+}
+
+.yd-card .card-box-checked {
+  max-width: 30%;
+  content: url("../../static/img/checkedbox.png");
   position: absolute;
   top: -5%;
   right: 0%;

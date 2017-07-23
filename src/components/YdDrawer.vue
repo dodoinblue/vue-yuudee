@@ -91,6 +91,7 @@ export default {
     }
   },
   created() {
+    console.log(`drawer ### from: ${this.from} editMode: ${this.editMode}`)
     if (this.from == 'resource') {
       console.log('Loading resource')
       this.cardList = db.getCardsOfRecourceCategory(this.uuid);

@@ -54,15 +54,20 @@ import Utils from '../utils'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
+  props: ['mode'],
   data() {
     return {
       rootUuid: 'all',
       gridSize: {column: 2, row: 2},
-      editMode: false,
       drawers: [],
       showNewCardDialog: false,
       showNewCategoryDialog: false
     }
+  },
+  computed: {
+    editMode: function() { // share this with pick mode. if in resource, this setting means pick mode TODO: a better name
+      return this.mode === 'pick'
+    },
   },
   methods: {
     back: function() {
@@ -100,6 +105,7 @@ export default {
   },
   mounted() {
     this.f7 = Utils.getF7();
+    console.log('mode: ' + this.mode);
   }
 }
 </script>
