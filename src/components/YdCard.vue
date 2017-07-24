@@ -25,6 +25,7 @@ import { TweenLite } from "gsap"
 import _ from 'lodash'
 import db from '../db.js'
 import Utils from '../utils'
+import PickedCards from '../PickedCards'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -129,7 +130,11 @@ export default {
       }
       if (this.isStack) {
         if (this.from == "resource") {
-          EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
+          if (this.editMode && PickedCards.hasItem()) {
+            Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
+          } else {
+            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
+          }
         } else {
           EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
         }
@@ -144,10 +149,19 @@ export default {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
     },
     selectFromResource: function() {
-      this.$router.push('resource/pick');
+      console.log(this.$el)
+      this.$router.push('resource/pick?request=' + this.classware.tempId);
     },
     onCardPicked: function() {
-      this.picked = !this.picked
+      // this.picked = !this.picked
+      console.log('picked clicked')
+      if (this.picked) {
+        PickedCards.removeCard(this.card.uuid)
+        this.picked = false
+      } else {
+        PickedCards.addCard(this.card.uuid)
+        this.picked = true
+      }
     }
   },
   computed: {
@@ -173,7 +187,8 @@ export default {
     },
   },
   created() {
-    console.log(`card !!!! from: ${this.from} editMode: ${this.editMode}`)
+    // console.log(`card !!!! from: ${this.from} editMode: ${this.editMode}`)
+    console.log(new Error().stack)
     if (this.classware.type == 'folder') {
       this.card = this.classware;
     } else if (this.from == 'resource') {

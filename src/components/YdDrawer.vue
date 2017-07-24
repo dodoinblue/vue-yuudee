@@ -33,6 +33,8 @@ import Sortable from '/Users/charles/repository/yuudee/Sortable'
 import _ from 'lodash'
 import Utils from '../utils.js'
 import db from '../db.js'
+import PickedCards from '../PickedCards'
+import uuidv4 from 'uuid/v4'
 
 Vue.component('debug', {
   template: "<!-- debug -->",
@@ -63,7 +65,11 @@ export default {
   methods: {
     backClicked: function() {
       if (this.from == "resource") {
-        EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
+        if (this.editMode && PickedCards.hasItem()) {
+            Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
+          } else {
+            EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
+          }
       } else {
         EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
       }
@@ -82,7 +88,7 @@ export default {
         var numberToAppend = this.cardList.length % pageSize + pageSize;
         var appendList = []
         for (var i = 0; i < numberToAppend; i++) {
-          appendList.push({empty: true})
+          appendList.push({empty: true, appendOrder: i, tempId: uuidv4()})
         }
         return Utils.arrangeCards(this.cardList.concat(appendList), this.row, this.col);
       } else {
@@ -135,6 +141,12 @@ export default {
           }, 500);
         }
       });
+      EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, (object) => {
+        console.log('requested: ' + object.requested)
+        console.log('list: ' + object.list)
+        // TODO: find the order of requested location. replacing empty cards starting from that location.
+        //
+      })
     }
   },
   mounted() {

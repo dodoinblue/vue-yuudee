@@ -10,7 +10,7 @@
         Library
       </div>
       <div class="col col-25">
-        <div class="yd-button" ref="newButton" @click="showNewPopover">New</div>
+        <div class="yd-button" ref="newButton" v-if="!editMode" @click="showNewPopover">New</div>
       </div>
     </div>
   </div>
@@ -24,6 +24,16 @@
               :key="uuid"
               from="resource">
   </yd-drawer>
+
+  <div class="footer-row row" v-if="editMode">
+    <div class="col col-33">
+    </div>
+    <div class="col col-33">
+      <a href='#' class="button button-fill color-blue button-raised" @click="selectionDone">Done</a>
+    </div>
+    <div class="col col-33">
+    </div>
+  </div>
 
   <!--Dialogs-->
   <yd-edit-card-dialog v-if="showNewCardDialog"></yd-edit-card-dialog>
@@ -51,6 +61,7 @@ import YdEditCardDialog from '../components/YdEditCardDialog'
 import YdResNewCategory from '../components/YdResNewCategory'
 import {EventBus, Events} from '../EventBus'
 import Utils from '../utils'
+import PickedCards from 'PickedCards'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
@@ -88,6 +99,10 @@ export default {
       this.f7.closeModal(this.popover, false);
       this.showNewCategoryDialog = true;
       this.popover = null;
+    },
+    selectionDone: function() {
+      console.log('Finally picked: ' + PickedCards.getList());
+      EventBus.$emit(Events.ADD_CARDS_FROM_RESOURCE, {list: PickedCards.getList(), requested: this.$route.query.request})
     }
   },
   created() {
@@ -105,7 +120,7 @@ export default {
   },
   mounted() {
     this.f7 = Utils.getF7();
-    console.log('mode: ' + this.mode);
+    console.log('query: ' + this.$route.query.request)
   }
 }
 </script>
@@ -146,5 +161,15 @@ div.title {
 .popover-inner {
   height: 100%;
   overflow-y: scroll;
+}
+
+.footer-row {
+  position: absolute;
+  bottom: 10%;
+  left: 0px;
+  right: 0px;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+  margin-bottom: 1.5%;
 }
 </style>
