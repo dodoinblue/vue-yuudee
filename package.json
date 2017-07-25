@@ -52,7 +52,7 @@
     "loki-cordova-fs-adapter": "^1.0.2",
     "lokijs": "^1.5.0",
     "q": "^1.5.0",
-    "sortablejs": "^1.6.0",
+    "sortablejs": "git+https://github.com/dodoinblue/Sortable.git#for-yuudee",
     "swiper": "^3.4.2",
     "uuid": "^3.1.0",
     "vue": "^2.2.4",
