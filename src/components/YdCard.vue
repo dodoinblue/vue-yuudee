@@ -131,7 +131,8 @@ export default {
       if (this.isStack) {
         if (this.from == "resource") {
           if (this.editMode && PickedCards.hasItem()) {
-            Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
+            // Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
+            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
           } else {
             EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
           }
@@ -150,7 +151,9 @@ export default {
     },
     selectFromResource: function() {
       console.log(this.$el)
-      this.$router.push('resource/pick?request=' + this.classware.tempId);
+      this.$router.push('resource/pick?request=' + this.classware.tempId
+                        + '&drawerId=' + this.classware.drawerId
+                        + '&order=' + this.classware.order);
     },
     onCardPicked: function() {
       // this.picked = !this.picked
@@ -187,8 +190,6 @@ export default {
     },
   },
   created() {
-    // console.log(`card !!!! from: ${this.from} editMode: ${this.editMode}`)
-    console.log(new Error().stack)
     if (this.classware.type == 'folder') {
       this.card = this.classware;
     } else if (this.from == 'resource') {

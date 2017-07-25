@@ -102,7 +102,14 @@ export default {
     },
     selectionDone: function() {
       console.log('Finally picked: ' + PickedCards.getList());
-      EventBus.$emit(Events.ADD_CARDS_FROM_RESOURCE, {list: PickedCards.getList(), requested: this.$route.query.request})
+      EventBus.$emit(Events.ADD_CARDS_FROM_RESOURCE, {
+        list: PickedCards.getList(),
+        requested: this.$route.query.request,
+        drawerId: this.$route.query.drawerId,
+        order: parseInt(this.$route.query.order)
+      })
+      PickedCards.clearList()
+      this.$router.back();
     }
   },
   created() {
