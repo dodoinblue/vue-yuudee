@@ -151,7 +151,7 @@ export default {
     },
     selectFromResource: function() {
       console.log(this.$el)
-      this.$router.push('resource/pick?request=' + this.classware.tempId
+      this.$router.push('resource/pick?request=' + this.classware.uuid
                         + '&drawerId=' + this.classware.drawerId
                         + '&order=' + this.classware.order);
     },
