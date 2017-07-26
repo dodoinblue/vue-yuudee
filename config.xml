@@ -23,6 +23,8 @@
     <preference name="orientation" value="portrait"/>
     <preference name="DisallowOverscroll" value="true"/>
     <preference name="Fullscreen" value="true"/>
+    <!--ios only, with plugin cordova-plugin-ios-longpress-fix-->
+    <preference name="Suppress3DTouch" value="true"/>
     <platform name="android">
         <allow-intent href="market:*"/>
     </platform>
@@ -51,4 +53,5 @@
         <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" "/>
     </plugin>
     <plugin name="cordova-plugin-statusbar" spec="https://github.com/apache/cordova-plugin-statusbar.git"/>
+    <plugin name="cordova-plugin-ios-longpress-fix" spec="~1.1.0"/>
 </widget>
