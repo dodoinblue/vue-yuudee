@@ -96,6 +96,10 @@ export default {
       }
     }
   },
+  updated() {
+    console.log('updated')
+    this.mySwiper.update(true)
+  },
   created() {
     console.log(`drawer ### from: ${this.from} editMode: ${this.editMode}`)
     if (this.from == 'resource') {
