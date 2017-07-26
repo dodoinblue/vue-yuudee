@@ -21,6 +21,8 @@
     <access origin="cdvfile://*"/>
     <access origin="file:///*"/>
     <preference name="orientation" value="portrait"/>
+    <preference name="DisallowOverscroll" value="true"/>
+    <preference name="Fullscreen" value="true"/>
     <platform name="android">
         <allow-intent href="market:*"/>
     </platform>
