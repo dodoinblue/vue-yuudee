@@ -153,4 +153,11 @@ export default {
 /* .slide-fade-leave-active for <2.1.8 */ {
   transform: translateX(-100%);
 }
+html {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
 </style>
