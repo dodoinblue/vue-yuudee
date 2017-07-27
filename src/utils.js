@@ -137,9 +137,25 @@ export default {
     var aud = new Audio();
     aud.src=audioSrc;
     aud.onended = function(){
+      console.log('play audio done')
       deferred.resolve('audio end: ' + audioSrc);
     };
-    aud.play();
+    aud.play().catch(console.log);
+    return deferred.promise;
+  },
+
+  mediaPluginPlayAudio: function(audioSrc) {
+    var deferred = Q.defer();
+    var media = new Media(audioSrc, function(){
+      this.stop()
+      this.release()
+      deferred.resolve
+    }, function(){
+      this.stop()
+      this.release()
+      deferred.reject
+    });
+    media.play()
     return deferred.promise;
   },
 
