@@ -228,7 +228,8 @@ export default {
       if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
         // Append empty cards in edit mode
         var pageSize = this.row * this.col;
-        var numberToAppend = this.cardList.length % pageSize + pageSize;
+        var lastPageSize = this.cardList.length % pageSize
+        var numberToAppend = lastPageSize > 0 ? pageSize - lastPageSize + pageSize : pageSize;
         var appendList = []
         for (var i = 0; i < numberToAppend; i++) {
           appendList.push({empty: true, order: i + this.cardList.length, uuid: uuidv4(), drawerId: this.uuid})
