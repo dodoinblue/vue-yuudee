@@ -12,7 +12,7 @@
     <div :class="picked ? 'card-box-checked' : 'card-box-unchecked'" v-if="editMode && from === 'resource'" @click.stop="onCardPicked"></div>
   </template>
   <template v-else>
-    <div class="card-frame with-margin" @click="selectFromResource">
+    <div class="card-frame with-margin" :class="{'hidden': !editMode}" @click="selectFromResource">
       <img src="static/img/blank_card.png">
     </div>
   </template>
@@ -296,5 +296,9 @@ export default {
 
 .on-top {
   z-index: 9999;
+}
+
+.hidden {
+  visibility: hidden
 }
 </style>
