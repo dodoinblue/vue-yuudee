@@ -32,7 +32,7 @@
         <div class="yd-button" ref="classwarePopover" @click="openClasswarePopover">{{classwareName}}</div>
       </div>
       <div class="col col-25">
-        <div class="yd-button"><router-link to="/resource">素材库</router-link></div>
+        <div class="yd-button" @click="goToResource">素材库</div>
       </div>
     </div>
   </div>
@@ -256,6 +256,9 @@ export default {
     },
     openClasswarePopover: function() {
       this.popover = this.f7.popover('.popover-classwares', this.$refs.classwarePopover);
+    },
+    goToResource: function() {
+      this.$router.push('/resource');
     },
     onChooseRootClassware: function(uuid) {
       this.f7.closeModal(this.popover, false)
