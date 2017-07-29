@@ -79,8 +79,11 @@ var playAnimation = function(context) {
 
     // Start playing sound
     var playAudioFn = Utils.mediaPluginPlayAudio
-    var p = playAudioFn(context.card.audios[0]);
-    var numOfAudios = context.card.audios.length;
+    var numOfAudios = context.card.audios.length
+    var p
+    if (numOfAudios > 0) {
+      p = playAudioFn(context.card.audios[0])
+    }
     if (numOfAudios > 1) {
       for (var i = 1; i < numOfAudios; i++) {
         p = p.then(function(){

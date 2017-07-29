@@ -150,19 +150,11 @@ function writeToFilePromise(folder, fileName, data) {
 }
 
 function downloadFile(url, cdvDirectory, path) {
-  // var url = "http://cdn.wall-pix.net/albums/art-space/00030109.jpg";
-  // var targetPath = cordova.file.externalRootDirectory + "/Download/testImage.png";
   var targetPath = cdvDirectory + path;
   var trustHosts = true;
   var options = {};
   var ft = new FileTransfer();
-  // ft.onprogress = function(progressEvent) {
-  //   if (progressEvent.lengthComputable) {
-  //       loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-  //   } else {
-  //       loadingStatus.increment();
-  //   }
-  // };
+
   ft.download(
     url,
     targetPath,
@@ -280,7 +272,6 @@ function getFolderFromPath(pathToFile) {
 
 // Borrowed from ng-cordova
 function moveFilePromise(path, fileName, newPath, newFileName) {
-  console.log(`path ${path}, fileName ${fileName}, newPath ${newPath}, newFileName ${newFileName}`);
   var q = Q.defer();
 
   newFileName = newFileName || fileName;
@@ -346,10 +337,6 @@ function createDirPromise(path, dirName, replaceBool) {
 }
 
 function moveDirPromise(path, dirName, newPath, newDirName) {
-  console.log(`${path}, 
-  ${dirName}, 
-  ${newPath}, 
-  ${newDirName}`)
   var q = Q.defer();
 
   newDirName = newDirName || dirName;
@@ -389,7 +376,6 @@ function copyFilePromise (srcPath, targetDir, targetName) {
       if (! targetName) {
         targetName = fileEntry.name;
       }
-      console.log(`srcPath ${srcPath}, targetDir ${targetDir}, targetName ${targetName}`);
       fileEntry.copyTo(newFolderEntry, targetName, deferred.resolve, errorHandlerPromise.bind(null, srcPath, deferred));
     }, errorHandlerPromise.bind(null, srcPath, deferred));
   }, errorHandlerPromise.bind(null, srcPath, deferred));
@@ -404,7 +390,6 @@ function moveFileBySrcPromise (srcPath, targetDir, targetName) {
       if (! targetName) {
         targetName = fileEntry.name;
       }
-      console.log(`srcPath ${srcPath}, targetDir ${targetDir}, targetName ${targetName}`);
       fileEntry.moveTo(newFolderEntry, targetName, deferred.resolve, errorHandlerPromise.bind(null, srcPath, deferred));
     }, errorHandlerPromise.bind(null, srcPath, deferred));
   }, errorHandlerPromise.bind(null, srcPath, deferred));
@@ -418,10 +403,8 @@ function writeJsonToFilePromise (jsonObj, targetDir, fileName) {
   window.resolveLocalFileSystemURL(targetDir, function(folderEntry) {
     folderEntry.getFile(fileName, {create:true}, function(fileEntry) {
       fileEntry.createWriter(function(fileWriter) {
-        console.log(fileWriter);
 
         fileWriter.onwriteend = function(event){
-          console.log('onwrite end');
           deferred.resolve();
         };      
         fileWriter.write(JSON.stringify(jsonObj));

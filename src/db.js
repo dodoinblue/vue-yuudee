@@ -415,7 +415,7 @@ var insertResourceCategory = function(categoryPath, isOfficial) {
     }).then(function(content){
       var info = JSON.parse(content);
       category.name = info.name;
-      // category.originalOrder = parseInt(info.order);
+      category.originalOrder = parseInt(info.order);
       return category
     })
   }).then(function(category){
@@ -436,14 +436,18 @@ var insertResourceCard = function(cardPath, category) {
     }).then(function(){
       return getCardAudios(node.nativeURL + 'audios/').then(function(audios){
         return card.audios = audios;
-      });
+      }).catch((error) => {
+        // It is possible that no audio is provided. return empty array
+        console.log("error processing audio to db: " + error.code)
+        return card.audios = []
+      })
     }).then(function(){
       // Get card name
       return FileHelper.readFromFilePromise(node.nativeURL + "info.json").then(function(content){
         // card.name = data;
         var info = JSON.parse(content);
         card.name = info.name;
-        // card.originalOrder = parseInt(info.order);
+        card.originalOrder = parseInt(info.order);
       });
     }).then(function(){
       return card;
@@ -455,14 +459,25 @@ var insertResourceCard = function(cardPath, category) {
 
 var getCardsOfRecourceCategory = function(uuid) {
   if (uuid == 'all') {
-    return getResourceCollection().find({'isCategory': true});
+    return getResourceCollection()
+           .chain()
+           .find({'isCategory': true})
+           .simplesort('originalOrder')
+           .data();
   } else {
-    return getResourceCollection().find({'category': {'$eq': uuid}});
+    return getResourceCollection()
+           .chain()
+           .find({'category': {'$eq': uuid}})
+           .simplesort('originalOrder')
+           .data();
   }
 }
 
 var getAllResourceCategories = function() {
-  return getResourceCollection().find({'isCategory': true});
+  return getResourceCollection().chain()
+         .find({'isCategory': true})
+         .simplesort('originalOrder')
+         .data();
 }
 
 var insertRootClassware = function(name) {

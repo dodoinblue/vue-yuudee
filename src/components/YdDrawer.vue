@@ -244,31 +244,32 @@ export default {
     this.mySwiper.update(true)
   },
   created() {
-    console.log(`drawer ### from: ${this.from} editMode: ${this.editMode}`)
     if (this.from == 'resource') {
-      console.log('Loading resource')
       this.cardList = db.getCardsOfRecourceCategory(this.uuid);
     } else {
       this.cardList = db.getCardsOfClassware(this.uuid);
     }
 
-    EventBus.$on('ALL_CARDS_LOADED', () => {
-
-    });
-
     if (this.from == 'resource') {
       EventBus.$on('RESOURCE_NEW_CATEGORY_ADDED', (doc) => {
         if (this.uuid == 'all') {
-          this.cardList.push(doc);
+          // this.cardList.push(doc);
+          // Reload cardList and then move swiper to last page
+          // TODO: wait 200ms for db update... need to find actual event for this..
+          window.setTimeout(() => {
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+          }, 200)
         }
       });
 
       EventBus.$on('RESOURCE_NEW_CARD_ADDED', (doc) => {
-        console.log(doc);
-        console.log('uuid: ' + this.uuid);
         if (this.uuid == doc.category) {
           this.cardList.push(doc);
-          console.log('doc pushed');
+          // Reload cardList and then move swiper to last page
+          // TODO: wait 200ms for db update... need to find actual event for this..
+          window.setTimeout(() => {
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+          }, 200)
         }
       });
     } else {

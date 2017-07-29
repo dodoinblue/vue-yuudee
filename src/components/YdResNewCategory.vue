@@ -82,12 +82,13 @@ export default {
         }
         return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + cat_path, 'cover.jpg')
       }).then(function(){
-        // console.log("list root folder");
-        // return FileHelper.listDirectoryPromise(userResourceRoot + cat_path);
-      }).then(() => {
-        console.log("write info.json");
+        // Get next order number
+        return db.getAllResourceCategories().length + 1
+      }).then((order) => {
+        console.log("write info.json with order: " + order);
         return FileHelper.writeJsonToFilePromise({
           name: this.cardName,
+          originalOrder: order,
         }, cordova.file.cacheDirectory + cat_path, 'info.json');
       }).then(() => {
         FileHelper.readFromFilePromise(cordova.file.cacheDirectory + cat_path + '/info.json').then(console.log);
@@ -96,7 +97,6 @@ export default {
           return FileHelper.createDirPromise(userResourceParentFolder, 'UserAssets/', false);
         })
       }).then(function(){
-        console.log("inserting db");
         return FileHelper.moveDirPromise(cordova.file.cacheDirectory, cat_path, userResourceRoot, cat_path);
       }).then(() => {
         return db.insertResourceCategory(userResourceRoot + cat_path, false);
@@ -105,46 +105,6 @@ export default {
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CATEGORY_ADDED, doc);
       }).catch(console.log)
-
-      // Check if userResRoot available
-      // FileHelper.dirExistPromise(userResourceRoot).then(function(exist){
-      //   console.log("check root folder exist");
-      //   if (!exist) {
-      //     return FileHelper.createDirPromise(userResourceParentFolder, 'UserAssets/', false)
-      //   }
-      // }).then(function(){
-      //   console.log("create category folder");
-      //   // create category folder
-      //   return FileHelper.createDirPromise(userResourceRoot, cat_path, false);
-      // }).then(() => {
-      //   console.log("copy cover image");
-      //   return FileHelper.copyFilePromise(this.cardImage, userResourceRoot + cat_path, 'cover.jpg')
-      // }).then(function(){
-      //   console.log("list root folder");
-      //   return FileHelper.listDirectoryPromise(userResourceRoot + cat_path);
-      // }).then((list) => {
-      //   console.log("write info.json");
-      //   var nextOrder = list.length + 1;
-      //   return FileHelper.writeJsonToFilePromise({
-      //     name: this.cardName,
-      //     originalOrder: nextOrder
-      //   }, userResourceRoot + cat_path, 'info.json');
-      // }).then(() => {
-      //   FileHelper.readFromFilePromise(userResourceRoot + cat_path + '/info.json').then(console.log);
-      //   console.log("insert record to db");
-      //   return db.insertResourceCategory(userResourceRoot + cat_path, false);
-      //   // Remove temp contents
-      // }).then(function(){
-      //   console.log("done. emit event");
-      //   EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      // }).catch(function(error){
-      //   console.log(error);
-      //   // TODO: save to cache folder and then move to correct location.
-      // })
-      // copy cover to folder/cover.jpg
-      // generate info.json to folder
-      // add entry to db
-      // remove content in cache folder
     },
     choosePicture: function() {
       console.log('choose picture');

@@ -82,11 +82,9 @@ export default {
   methods: {
     chooseCategory: function (cat) {
       this.category = cat;
-      console.log(cat);
       this.f7.closeModal(this.popover, false);
     },
     showCategoryList: function(){
-      console.log('show category');
       this.f7 = Utils.getF7();
       this.popover = this.f7.popover('.popover-resource-categories', this.$refs.catDropdown);
     },
@@ -94,9 +92,9 @@ export default {
       EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
     },
     confirm: function() {
-      if (this.cardName == "" || ! this.category.uuid) {
+      if (this.cardName == "" || ! this.category.uuid || this.cardImage == "static/img/dummy_content.jpg") {
         var f7 = Utils.getF7();
-        f7.alert('Please choose name and category before save', 'Missing info');
+        f7.alert('Please choose name, category and image before save', 'Missing info');
         return
       }
 
@@ -121,16 +119,12 @@ export default {
               return FileHelper.copyFilePromise(this.cardAudio, cordova.file.cacheDirectory + this.uuid + '/audios', '01.' + ext);
             })
           }
-        }).catch(function(error){
-          console.log("error saving audio: " + error);
+        }).catch((error) => {
+          console.log("error saving audio: " + error.code);
         })
-      }).then((fileentry) => {
-        console.log(fileentry);
+      }).then(() => {
         // Do the same for image
         console.log('saving images: ' + this.cardImage)
-        if (this.cardImage == "static/img/dummy_content.jpg") {
-          return
-        }
         return FileHelper.fileExistPromise(this.cardImage).then((exist) => {
           if (exist) {
             var ext = FileHelper.getExtensionFromPath(this.cardImage);
@@ -138,13 +132,16 @@ export default {
               return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + this.uuid + '/images', '01.' + ext);
             })
           }
-        }).catch(function(error){
-          console.log("error saving image: " + error);
         })
+        // Not catching exception. Should never exception here since it is checked at the begining
       }).then(() => {
+        return db.getCardsOfRecourceCategory(this.category.uuid).length + 1
+      }).then((order) => {
         // Save info
         var info = {};
         info.name = this.cardName;
+        info.originalOrder = order
+        console.log('writing card info.json with order: ' + order)
         return FileHelper.writeJsonToFilePromise(info, cordova.file.cacheDirectory + this.uuid, 'info.json')
       }).then(() => {
         console.log('moving...');
@@ -155,10 +152,10 @@ export default {
         return FileHelper.moveDirPromise(cordova.file.cacheDirectory, this.uuid, userResourceRoot + this.category.uuid, this.uuid);
       }).then((dirEntry) => {
         console.log(dirEntry);
-        console.log('card saving done');
         // Sync db
         return db.insertResourceCard(dirEntry.nativeURL, this.category);
       }).then(function(doc){
+        console.log('card saving done');
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CARD_ADDED, doc);
       }).catch(console.log);
@@ -192,7 +189,6 @@ export default {
       }).catch(console.log);
     },
     recordAudio: function() {
-      console.log('recording...');
       Utils.recordAudioPromise().then(function(audio){
         // Move to cache folder
         var extension = FileHelper.getExtensionFromPath(audio.fullPath);
@@ -205,23 +201,15 @@ export default {
       }).catch(console.log);
     },
     playAudio: function() {
-      console.log('playing audio');
       FileHelper.getCdvPath(this.cardAudio).then(function(cdvPath){
-        var aud = new Audio();
-        aud.src = cdvPath;
-        aud.play();
+        Utils.mediaPluginPlayAudio(cdvPath)
       }).catch(console.log); // Notify when no audio.
     },
     removeAudio: function() {
-      console.log('remove audio');
       this.cardAudio = "";
     }
   },
-  mounted() {
-    console.log('mounted');
-  },
   created() {
-    console.log('Created');
     this.uuid = uuidv4();
     this.categoryList = db.getAllResourceCategories();
   }
