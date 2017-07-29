@@ -3,7 +3,7 @@
 <div id="app">
 
   <transition name="slidein" mode="out-in">
-    <keep-alive>
+    <keep-alive exclude="YdResource">
       <router-view></router-view>
     </keep-alive>
   </transition>

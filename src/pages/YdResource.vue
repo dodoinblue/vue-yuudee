@@ -65,6 +65,7 @@ import PickedCards from 'PickedCards'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
+  name: 'YdResource',
   props: ['mode'],
   data() {
     return {
