@@ -253,7 +253,7 @@ export default {
 
 .settings-dialog {
   position: absolute;
-  top: 20%;
+  margin-top: 30%;
   left: 0%;
   width: 100%;
   z-index: 300;

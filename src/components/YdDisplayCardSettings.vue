@@ -130,7 +130,7 @@ export default {
 }
 .settings-dialog {
   position: relative;
-  top: 20%;
+  margin-top: 30%;
   left: 10%;
   width:80%;
   height:60%;
