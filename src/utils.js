@@ -199,5 +199,9 @@ export default {
     } else {
       return groupEl.lastChild
     }
+  },
+
+  emptyPromise: function(){
+    return Q()
   }
 }

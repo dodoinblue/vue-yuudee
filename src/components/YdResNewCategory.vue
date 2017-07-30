@@ -14,6 +14,8 @@
         <div class="card-content">
           <img :src="cardImage">
         </div>
+        <div class="card-text"><div>{{cardName}}</div></div>
+        <div class="card-edit-button" v-if="isEditing" @click="deleteCard"></div>
       </div>
       <div class="col col-50">
         <div class="row choose-cover">
@@ -46,11 +48,16 @@ import uuidv4 from 'uuid/v4'
 import db from '../db'
 
 export default {
-  props: ['mode'],
+  props: ['mode', 'cardInEdit'],
   data() {
     return {
       cardImage: "static/img/dummy_content.jpg",
       cardName: "",
+    }
+  },
+  computed: {
+    isEditing: function() {
+      return ! _.isEmpty(this.cardInEdit)
     }
   },
   methods: {
@@ -58,10 +65,38 @@ export default {
       EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
       // remove content in cache folder
     },
+    updateCard: function() {
+      var p = Utils.emptyPromise()
+      if (this.cardImage !== this.cardInEdit.cover) {
+        // Update image
+        p = p.then(() => {
+          return FileHelper.copyFilePromise(this.cardImage, this.cardInEdit.cdvpath, 'cover.jpg')
+        }).then(() => {
+          // Write to db in case there wasn't cover present
+          return db.getResourceCollection().update(_.assign(this.cardInEdit, {cover: this.cardInEdit.cdvpath + 'cover.jpg'}))
+        })
+      }
+      if (this.cardName !== this.cardInEdit.name) {
+        // Update name
+        p = p.then(() => {
+          return db.getResourceCollection().update(_.assign(this.cardInEdit, {name: this.cardName}))
+        })
+      }
+      p = p.then(function() {
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+      }).catch(console.log)
+    },
+    deleteCard: function() {
+      console.log("deleting card")
+    },
     confirm: function() {
       if (this.cardName == "") {
         var f7 = Utils.getF7();
         f7.alert('Please choose a name before save', 'Missing info');
+        return
+      }
+      if (!_.isEmpty(this.cardInEdit)) {
+        this.updateCard()
         return
       }
       var cat_path = uuidv4();
@@ -85,7 +120,6 @@ export default {
         // Get next order number
         return db.getAllResourceCategories().length + 1
       }).then((order) => {
-        console.log("write info.json with order: " + order);
         return FileHelper.writeJsonToFilePromise({
           name: this.cardName,
           originalOrder: order,
@@ -101,18 +135,14 @@ export default {
       }).then(() => {
         return db.insertResourceCategory(userResourceRoot + cat_path, false);
       }).then((doc) => {
-        console.log("done. emit event");
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CATEGORY_ADDED, doc);
       }).catch(console.log)
     },
     choosePicture: function() {
-      console.log('choose picture');
       Utils.choosePicturePromise().then(function(filePath){
-        console.log(filePath);
         return plugins.crop.promise(filePath, {quality: 50});
       }).then((croppedPath) => {
-        console.log('cropped: ' + croppedPath);
         // this.cardImage = croppedPath;
         return FileHelper.getCdvPath(croppedPath);
       }).then((internalPath) => {
@@ -121,11 +151,9 @@ export default {
       }).catch(console.log);
     },
   },
-  mounted() {
-    console.log('mounted');
-  },
   created() {
-    console.log('Created');
+    this.cardImage = this.cardInEdit.cover
+    this.cardName = this.cardInEdit.name
   }
 }
 </script>
@@ -256,6 +284,33 @@ img.selected {
   top: 7.3%;
   right: 12%;
   bottom: 33.9%
+}
+
+.yd-card .card-text {
+  max-width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 66%;
+  left: 12.18%;
+  right: 12.82%;
+  height: 20%;
+  font-size: 12px;
+  color: rgb(80,45,17);
+}
+
+.card-text div {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.yd-card .card-edit-button {
+  max-width: 30%;
+  content: url("../../static/img/trash.png");
+  position: absolute;
+  top: -5%;
+  right: 0%;
+  bottom: 80%;
 }
 
 .light-button {

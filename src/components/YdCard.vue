@@ -9,6 +9,7 @@
     </div>
     <div class="card-text"><div>{{card.name}}</div></div>
     <div class="card-edit-button" v-if="editMode && from !== 'resource'" @click.stop="onCardEditClick"></div>
+    <div class="card-edit-button" v-if="from === 'resource' && !card.isOffcial" @click.stop="editResCard"></div>
     <div :class="picked ? 'card-box-checked' : 'card-box-unchecked'" v-if="editMode && from === 'resource'" @click.stop="onCardPicked"></div>
   </template>
   <template v-else>
@@ -26,6 +27,7 @@ import _ from 'lodash'
 import db from '../db.js'
 import Utils from '../utils'
 import PickedCards from '../PickedCards'
+// import YdEditCardDialog from './YdEditCardDialog'
 
 /*
  * Calculate the parameters to animate a card to the center of screen.
@@ -119,6 +121,7 @@ var playAnimation = function(context) {
 export default {
   // TODO: classware is the passed in variable. not card.. need to come up with better naming.
   props: ['editMode', 'classware', 'from'],
+  // components: { YdEditCardDialog },
   data() {
     return {
       currentImageIndex: 0,
@@ -148,6 +151,13 @@ export default {
           return
         }
         playAnimation(this);
+      }
+    }, 500, {trailing: false}),
+    editResCard: _.throttle(function(){
+      if (this.card.isCategory) {
+        EventBus.$emit(Events.EDIT_RESOURCE_CATEGORY, this.card)
+      } else {
+        EventBus.$emit(Events.EDIT_RESOURCE_CARD, this.card)
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {

@@ -36,8 +36,8 @@
   </div>
 
   <!--Dialogs-->
-  <yd-edit-card-dialog v-if="showNewCardDialog"></yd-edit-card-dialog>
-  <yd-res-new-category v-if="showNewCategoryDialog"></yd-res-new-category>
+  <yd-edit-card-dialog v-if="showNewCardDialog" :cardInEdit="cardInEdit"></yd-edit-card-dialog>
+  <yd-res-new-category v-if="showNewCategoryDialog" :cardInEdit="cardInEdit"></yd-res-new-category>
 
   <!--Popover-->
   <div class="popover popover-new-card">
@@ -73,7 +73,8 @@ export default {
       gridSize: {column: 2, row: 2},
       drawers: [],
       showNewCardDialog: false,
-      showNewCategoryDialog: false
+      showNewCategoryDialog: false,
+      cardInEdit: {}
     }
   },
   computed: {
@@ -118,12 +119,23 @@ export default {
     EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
       this.showNewCardDialog = false;
       this.showNewCategoryDialog = false;
+      this.cardInEdit = {}
     });
     EventBus.$on(Events.RESOURCE_CATEGORY, uuid => {
       this.drawers.push(uuid);
     });
     EventBus.$on(Events.RESOURCE_DRAWER_CLOSE, uuid => {
       this.drawers.pop();
+    });
+    EventBus.$on(Events.EDIT_RESOURCE_CATEGORY, card => {
+      // this.drawers.pop();
+      this.cardInEdit = card
+      this.showNewCategoryDialog = true
+    });
+    EventBus.$on(Events.EDIT_RESOURCE_CARD, card => {
+      // this.drawers.pop();
+      this.cardInEdit = card
+      this.showNewCardDialog = true
     });
   },
   mounted() {
