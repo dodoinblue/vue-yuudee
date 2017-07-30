@@ -232,7 +232,7 @@ export default {
         var numberToAppend = lastPageSize > 0 ? pageSize - lastPageSize + pageSize : pageSize;
         var appendList = []
         for (var i = 0; i < numberToAppend; i++) {
-          appendList.push({empty: true, order: i + this.cardList.length, uuid: uuidv4(), drawerId: this.uuid})
+          appendList.push({empty: true, order: i + this.cardList.length, uuid: uuidv4(), parent: this.uuid})
         }
         return Utils.arrangeCards(this.cardList.concat(appendList), this.row, this.col);
       } else {
@@ -249,9 +249,10 @@ export default {
     } else {
       this.cardList = db.getCardsOfClassware(this.uuid);
     }
+    console.log(this.cardList)
 
     if (this.from == 'resource') {
-      EventBus.$on('RESOURCE_NEW_CATEGORY_ADDED', (doc) => {
+      EventBus.$on(Events.RESOURCE_NEW_CATEGORY_ADDED, (doc) => {
         if (this.uuid == 'all') {
           // this.cardList.push(doc);
           // Reload cardList and then move swiper to last page
@@ -262,7 +263,7 @@ export default {
         }
       });
 
-      EventBus.$on('RESOURCE_NEW_CARD_ADDED', (doc) => {
+      EventBus.$on(Events.RESOURCE_NEW_CARD_ADDED, (doc) => {
         if (this.uuid == doc.category) {
           this.cardList.push(doc);
           // Reload cardList and then move swiper to last page
@@ -273,28 +274,30 @@ export default {
         }
       });
     } else {
-      EventBus.$on('DISPLAY_DRAWER_UPDATED', (uuid) => {
+      EventBus.$on(Events.DISPLAY_DRAWER_UPDATED, (uuid) => {
         if (uuid == this.uuid) {
           this.cardList = db.getCardsOfClassware(this.uuid);
           console.log('updated list');
           console.log(this.cardList);
         }
       });
-      EventBus.$on('DISPLAY_CATEGORY_DELETED', (item) => {
+
+      EventBus.$on(Events.DISPLAY_CATEGORY_DELETED, (item) => {
         console.log('deleting, current drawer id: ' + this.uuid);
         if (item.parent == 'root' && this.uuid == 'all' || item.parent == this.uuid) {
           window.setTimeout(() => {
             // Wait for database update and then reload... Haven't found a callback for this...
             this.cardList = db.getCardsOfClassware(this.uuid);
-          }, 500);
+          }, 200);
         }
       });
+
       EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, (object) => {
         console.log('drawerId: ' + object.drawerId)
         if (this.uuid !== object.drawerId) {
           return
         }
-        console.log('list: ' + object.list)
+        console.log('adding cards: ' + object.list)
         // TODO: find the order of requested location. replacing empty cards starting from that location.
         let added = []
         for (let i = 0; i < object.list.length; i ++) {
@@ -308,28 +311,54 @@ export default {
           newClasswareItem.mute = false
           added.push(newClasswareItem)
         }
-        console.log(added)
+        // if (object.order == this.cardList.length) {
+        //   console.log('safe to add to the end of list')
+        //   db.getClasswareCollection().insert(added)
+        // } else 
         if (object.order >= this.cardList.length) {
-          console.log('safe to add to the end of list')
+          // Fill in placeholder cards
+          console.log(`filling gap between ${this.cardList.length} and ${object.order}`)
+          for (let i = this.cardList.length; i < object.order; i++) {
+            let placeholder = {}
+            placeholder.uuid = uuidv4()
+            placeholder.type = 'placeholder'
+            // TODO: get rid of empty. use placeholder type instead
+            placeholder.empty = true
+            placeholder.parent = object.drawerId
+            placeholder.order = i
+            added.push(placeholder)
+          }
+          console.log('Processed: ' + JSON.stringify(added))
           db.getClasswareCollection().insert(added)
         } else {
+          console.log('requesting position in the middle of the list')
           let emptySlots = db.getClasswareCollection().chain().where((item) => {
             return item.parent === object.drawerId 
                    && item.order >= object.order
+                   && item.order < object.order + object.list.length
                    && item.type == 'placeholder'
           }).simplesort('order').data()
+          console.log('emptySlots')
+          console.log(emptySlots)
           for (let i = 0; i < emptySlots.length; i++) {
             // use new card's info to override everything except for order
             let o = emptySlots[i].order
-            let updatedDoc = _.assign(emptySlots[i], added.pop)
+            let updatedDoc = _.assign(emptySlots[i], added.pop())
+            console.log('im here')
             updatedDoc.order = o
+            // TODO: get rid of this
+            updatedDoc.empty = false
             console.log(updatedDoc)
-            // db.getClasswareCollection().update(updatedDoc)
+            db.getClasswareCollection().update(updatedDoc)
           }
           if (added.length > 0) {
             console.log('remaining inserts')
+            // reset order
+            for (let i = 0; i < added.length; i++) {
+              added[i].order = this.cardList.length + i
+            }
             console.log(added)
-            // db.getClasswareCollection().insert(added)
+            db.getClasswareCollection().insert(added)
           }
         }
 
