@@ -1,6 +1,6 @@
 <template>
 <div class="yd-card" :class="{'on-top': onTop}" @click="onCardClick()">
-  <template v-if="!classware.empty">
+  <template v-if="classware.type !== 'placeholder'">
     <div class="card-frame" >
       <img :src="card_bg_image">
     </div>
@@ -129,7 +129,7 @@ export default {
   },
   methods: {
     onCardClick: _.throttle(function() {
-      if (this.classware.empty) {
+      if (this.classware.type === 'placeholder') {
         return
       }
       if (this.isStack) {

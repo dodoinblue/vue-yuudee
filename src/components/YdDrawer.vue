@@ -226,13 +226,13 @@ export default {
   computed: {
     pagedCards: function() {
       if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
-        // Append empty cards in edit mode
+        // Append placeholder cards in edit mode
         var pageSize = this.row * this.col;
         var lastPageSize = this.cardList.length % pageSize
         var numberToAppend = lastPageSize > 0 ? pageSize - lastPageSize + pageSize : pageSize;
         var appendList = []
         for (var i = 0; i < numberToAppend; i++) {
-          appendList.push({empty: true, order: i + this.cardList.length, uuid: uuidv4(), parent: this.uuid})
+          appendList.push({type: 'placeholder', order: i + this.cardList.length, uuid: uuidv4(), parent: this.uuid})
         }
         return Utils.arrangeCards(this.cardList.concat(appendList), this.row, this.col);
       } else {
@@ -298,7 +298,6 @@ export default {
           return
         }
         console.log('adding cards: ' + object.list)
-        // TODO: find the order of requested location. replacing empty cards starting from that location.
         let added = []
         for (let i = 0; i < object.list.length; i ++) {
           let newClasswareItem = {}
@@ -311,10 +310,6 @@ export default {
           newClasswareItem.mute = false
           added.push(newClasswareItem)
         }
-        // if (object.order == this.cardList.length) {
-        //   console.log('safe to add to the end of list')
-        //   db.getClasswareCollection().insert(added)
-        // } else 
         if (object.order >= this.cardList.length) {
           // Fill in placeholder cards
           console.log(`filling gap between ${this.cardList.length} and ${object.order}`)
@@ -322,8 +317,6 @@ export default {
             let placeholder = {}
             placeholder.uuid = uuidv4()
             placeholder.type = 'placeholder'
-            // TODO: get rid of empty. use placeholder type instead
-            placeholder.empty = true
             placeholder.parent = object.drawerId
             placeholder.order = i
             added.push(placeholder)
@@ -346,8 +339,6 @@ export default {
             let updatedDoc = _.assign(emptySlots[i], added.pop())
             console.log('im here')
             updatedDoc.order = o
-            // TODO: get rid of this
-            updatedDoc.empty = false
             console.log(updatedDoc)
             db.getClasswareCollection().update(updatedDoc)
           }
