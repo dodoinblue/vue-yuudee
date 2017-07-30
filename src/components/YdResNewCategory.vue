@@ -88,6 +88,10 @@ export default {
     },
     deleteCard: function() {
       console.log("deleting card")
+      db.deleteResourceCategory(this.cardInEdit).then(() => {
+        EventBus.$emit(Events.RESOURCE_ITEM_DELETED, 'all')
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+      }).catch(console.log)
     },
     confirm: function() {
       if (this.cardName == "") {

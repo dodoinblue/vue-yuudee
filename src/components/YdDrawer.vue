@@ -249,7 +249,7 @@ export default {
     } else {
       this.cardList = db.getCardsOfClassware(this.uuid);
     }
-    console.log(this.cardList)
+    // console.log(this.cardList)
 
     if (this.from == 'resource') {
       EventBus.$on(Events.RESOURCE_NEW_CATEGORY_ADDED, (doc) => {
@@ -265,7 +265,7 @@ export default {
 
       EventBus.$on(Events.RESOURCE_NEW_CARD_ADDED, (doc) => {
         if (this.uuid == doc.category) {
-          this.cardList.push(doc);
+          // this.cardList.push(doc);
           // Reload cardList and then move swiper to last page
           // TODO: wait 200ms for db update... need to find actual event for this..
           window.setTimeout(() => {
@@ -273,6 +273,16 @@ export default {
           }, 200)
         }
       });
+
+      EventBus.$on(Events.RESOURCE_ITEM_DELETED, (uuid) => {
+        if (this.uuid == uuid) {
+          // Reload cardList and then move swiper to last page
+          // TODO: wait 200ms for db update... need to find actual event for this..
+          window.setTimeout(() => {
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+          }, 200)
+        }
+      })
     } else {
       EventBus.$on(Events.DISPLAY_DRAWER_UPDATED, (uuid) => {
         if (uuid == this.uuid) {

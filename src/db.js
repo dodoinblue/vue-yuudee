@@ -483,6 +483,22 @@ var insertResourceCard = function(cardPath, category) {
   });
 }
 
+var deleteResourceCategory = function(doc) {
+  if (!doc.isCategory) {
+    console.log("Mismatch. Should be a category")
+    return Q.reject('Not a category')
+  }
+  // Step 1, delete from resource collection
+  // Resource does not allow more than 2 layer. No need to do it resursively
+  getResourceCollection().findAndRemove({
+    'category': {'$eq': doc.uuid}
+  })
+  getResourceCollection().remove(doc)
+
+  // Step 2, remove folder from fs
+  return FileHelper.removeFolderIfExistPromise(doc.cdvpath)
+}
+
 var getCardsOfRecourceCategory = function(uuid) {
   if (uuid == 'all') {
     return getResourceCollection()
@@ -545,6 +561,7 @@ export default {
   getAllResourceCategories,
   insertResourceCategory,
   insertResourceCard,
+  deleteResourceCategory,
 
   // Build database
   // generateOfficialClasswares,
