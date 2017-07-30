@@ -372,10 +372,36 @@ var deleteClasswareItem = function(doc) {
   var collection = getClasswareCollection();
   var order = doc.order;
   var parent = doc.parent;
-  collection.remove(doc);
-  collection.findAndUpdate({'order': {'$gt': order}, 'parent': {'$eq': parent}}, function(obj){
-    obj.order = obj.order - 1;
-  })
+
+  // Update to place holder type
+  doc.uuid = uuidv4()
+  doc.type = 'placeholder'
+  delete doc.content
+  delete doc.mute
+  delete doc.animation
+  var updated = collection.update(doc)
+
+  // Now compare the order of the last non-placeholder card and
+  // the order of the last all cards
+  var allCards = collection.chain().find({
+    'parent': {'$eq': parent}
+  }).simplesort('order').data()
+
+  var allNonPlaceholders = collection.chain().find({
+    'parent': {'$eq': parent},
+    'type': {'$ne': 'placeholder'}
+  }).simplesort('order').data()
+
+  var lastOfAll = allCards[allCards.length - 1].order
+  var lastOfNonPlaceholder = allNonPlaceholders[allNonPlaceholders.length - 1].order
+
+  if (lastOfNonPlaceholder < lastOfAll) {
+    console.log(`Removing trailing placeholder cards. pos: ${lastOfNonPlaceholder} to pos: ${lastOfAll}`)
+    collection.findAndRemove({
+      'parent': {'$eq': parent},
+      'order': {'$gt': lastOfNonPlaceholder, '$lte': lastOfAll},
+    })
+  }
 }
 
 var deleteAllSubClasswareItem = function(doc) {

@@ -111,7 +111,6 @@ export default {
     this.cardContent = db.getCardByUuid(this.card.content);
     this.selected = this.card.animation;
     this.mute = this.card.mute;
-    console.log(this.card);
   }
 }
 </script>
