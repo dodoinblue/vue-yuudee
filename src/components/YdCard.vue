@@ -179,6 +179,16 @@ export default {
         PickedCards.addCard(this.card.uuid)
         this.picked = true
       }
+    },
+    initContent: function() {
+      if (this.classware.type == 'folder') {
+        this.card = this.classware;
+      } else if (this.from == 'resource') {
+        this.card = this.classware;
+      } else {
+        var content = db.getCardByUuid(this.classware.content);
+        this.card = content;
+      }
     }
   },
   computed: {
@@ -204,14 +214,22 @@ export default {
     },
   },
   created() {
-    if (this.classware.type == 'folder') {
-      this.card = this.classware;
-    } else if (this.from == 'resource') {
-      this.card = this.classware;
-    } else {
-      var content = db.getCardByUuid(this.classware.content);
-      this.card = content;
-    }
+    this.initContent()
+    EventBus.$on(Events.RESOURCE_CARD_UPDATED, (doc) => {
+      console.log('event received: ' + doc.uuid + " this: " + this.classware.uuid)
+      if (doc.uuid === this.classware.uuid) {
+        console.log('doc.uuid === this.classware.uuid')
+        window.setTimeout(() => {
+          console.log('reload')
+          this.classware = doc
+          this.card = doc
+        }, 200)
+      } else if (doc.uuid === this.classware.content) {
+        console.log('doc.uuid === this.classware.content')
+        this.card = doc
+      }
+    })
+    console.log('inited!!!!!!!! card')
   }
 }
 </script>

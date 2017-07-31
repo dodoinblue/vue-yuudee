@@ -84,6 +84,14 @@ function getDirPromise(pathToDir) {
   return deferred.promise;
 }
 
+function getFilePromise(pathTofile) {
+  var deferred = Q.defer();
+  window.resolveLocalFileSystemURL(pathTofile, function (fileEntry) {
+    deferred.resolve(fileEntry);
+  }, errorHandlerPromise.bind(null, pathTofile, deferred));
+  return deferred.promise;
+}
+
 function readFromFilePromise(pathToFile) {
   var deferred = Q.defer();
   window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
@@ -244,7 +252,7 @@ function removeFile(pathToFile) {
   var deferred = Q.defer();
   window.resolveLocalFileSystemURL(pathToFile, function (fileEntry) {
     fileEntry.remove(deferred.resolve, deferred.reject);
-  });
+  }, errorHandlerPromise.bind(null, pathToFile, deferred));
   return deferred.promise;
 }
 
@@ -441,6 +449,7 @@ export default {
   fileExistPromise,
   dirExistPromise,
   getDirPromise,
+  getFilePromise,
   listDirectoryPromise,
   removeFolderIfExistPromise,
   removeFile,
