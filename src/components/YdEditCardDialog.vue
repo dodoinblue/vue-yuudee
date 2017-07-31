@@ -149,10 +149,12 @@ export default {
         }).then((dirEntry) => {
           // Update db
           db.getResourceCollection().remove(this.cardInEdit)
-          db.insertResourceCard(dirEntry.cdvpath, this.category)
+          // TODO: new order...
+          db.insertResourceCard(dirEntry.nativeURL, this.category)
         }).then(() => {
           // Remove from old category
           EventBus.$emit(Events.RESOURCE_ITEM_DELETED, this.cardInEdit.category)
+          EventBus.$emit(Events.RESOURCE_NEW_CARD_ADDED, this.category)
         })
       } else {
         p.then(() => {
