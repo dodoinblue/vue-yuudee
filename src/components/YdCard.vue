@@ -54,7 +54,6 @@ var calcToCenterAnimParams = function(win, rect) {
 var isPlaying = false;
 var playAnimation = function(context) {
   if (isPlaying) return;
-  console.log(context.classware);
 
   var el = context.$el;
   var oldStyle = {
@@ -69,7 +68,15 @@ var playAnimation = function(context) {
   // Start Playing
   isPlaying = true;
   context.onTop = true;
-  Utils.animationChain(el, 1, animationParams).then(function(){
+  var playPromise = Utils.emptyPromise()
+
+  if (context.classware.animation != 'none') {
+    playPromise = playPromise.then(() => {
+      return Utils.animationChain(el, 1, animationParams)
+    })
+  }
+
+  playPromise = playPromise.then(() => {
     // Start slideshow
     context.slideshow = window.setInterval(() => {
       if (context.currentImageIndex == context.card.images.length - 1) {
@@ -80,17 +87,19 @@ var playAnimation = function(context) {
     }, 500);
 
     // Start playing sound
-    var playAudioFn = Utils.mediaPluginPlayAudio
-    var numOfAudios = context.card.audios.length
-    var p
-    if (numOfAudios > 0) {
-      p = playAudioFn(context.card.audios[0])
-    }
-    if (numOfAudios > 1) {
-      for (var i = 1; i < numOfAudios; i++) {
-        p = p.then(function(){
-          return playAudioFn(context.card.audios[i]);
-        });
+    if (!context.classware.mute) {
+      var playAudioFn = Utils.mediaPluginPlayAudio
+      var numOfAudios = context.card.audios.length
+      var p
+      if (numOfAudios > 0) {
+        p = playAudioFn(context.card.audios[0])
+      }
+      if (numOfAudios > 1) {
+        for (var i = 1; i < numOfAudios; i++) {
+          p = p.then(function(){
+            return playAudioFn(context.card.audios[i]);
+          });
+        }
       }
     }
 
@@ -105,17 +114,26 @@ var playAnimation = function(context) {
       }).then(function(){
         return Utils.animationChain(el, 0.5, {rotation: 0});
       })
-    } else {
+    } else if (context.classware.animation == 'enlarge') {
       return Utils.waitForSeconds(3);
+    } else {
+      return Utils.waitForSeconds(4);
     }
-  }).then(function(){
+  })
+
+  if (context.classware.animation != 'none') {
+    playPromise = playPromise.then(() => {
+      return Utils.animationChain(el, 1, oldStyle)
+    })
+  }
+
+  playPromise = playPromise.then(() => {
     window.clearInterval(context.slideshow);
-    return Utils.animationChain(el, 1, oldStyle)
-  }).then(function(){
     isPlaying = false;
     context.onTop = false;
     context.slideshow = null;
-  });
+    context.currentImageIndex = 0;
+  })
 }
 
 export default {
@@ -164,14 +182,11 @@ export default {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
     },
     selectFromResource: function() {
-      console.log(this.$el)
       this.$router.push('resource/pick?request=' + this.classware.uuid
                         + '&drawerId=' + this.classware.parent
                         + '&order=' + this.classware.order);
     },
     onCardPicked: function() {
-      // this.picked = !this.picked
-      console.log('picked clicked')
       if (this.picked) {
         PickedCards.removeCard(this.card.uuid)
         this.picked = false
@@ -229,7 +244,7 @@ export default {
         this.card = doc
       }
     })
-    console.log('inited!!!!!!!! card')
+    console.log('card initiated')
   }
 }
 </script>
