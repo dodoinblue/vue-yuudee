@@ -205,12 +205,12 @@ export default {
           },
           onStart: function(evt) {
             console.log(this.el.id + ': onStart ')
-            that.mySwiper.lockSwipes()
+            that.mySwiper.disableTouchControl()
             that.draggedItem = evt.item
           },
           onEnd: function() {
             console.log(this.el.id + ': onEnd')
-            that.mySwiper.unlockSwipes()
+            that.mySwiper.enableTouchControl()
             that.draggedItem = null
             for (var j = 0; j < els.length; j++) {
               logElementsByDataId(els[j].childNodes)
