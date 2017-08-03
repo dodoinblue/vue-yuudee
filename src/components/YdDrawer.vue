@@ -57,8 +57,9 @@ export default {
   },
   watch: {
     editMode: function(val, oldVal) {
+      console.log('!!!!!!!!!setting draggable disabled: ' + this.draggableDisabled)
       for (let i = 0; i < this.sortables.length; i++) {
-        this.sortables[i].option("disabled", !val)
+        this.sortables[i].option("disabled", this.draggableDisabled)
       }
     },
   },
@@ -95,6 +96,7 @@ export default {
             tmp.push(`element ${i} does not have data-id`)
           }
         }
+        return tmp
         console.log(tmp)
       }
 
@@ -157,6 +159,7 @@ export default {
         this.mySwiper.slidePrev()
       }, 1000, { 'trailing': false });
 
+      console.log('~~~~~~~~~setting draggable disabled: ' + this.draggableDisabled)
       for(var i=0; i< els.length; i++) {
         var el = els[i]
         console.log('group: ' + el.id)
@@ -168,7 +171,7 @@ export default {
           draggable: ".card-group-item",
           dragClass: "dragging-card",
           ghostClass: "ghost-card",
-          disabled: true,
+          disabled: that.draggableDisabled,
           preventOnFilter: true,
           fallbackOnBody: true,
           scrollFn: function(offsetX, offsetY, originalEvent) {
@@ -212,9 +215,69 @@ export default {
             console.log(this.el.id + ': onEnd')
             that.mySwiper.enableTouchControl()
             that.draggedItem = null
+            var dataIdByGroup = []
             for (var j = 0; j < els.length; j++) {
-              logElementsByDataId(els[j].childNodes)
+              dataIdByGroup.push(logElementsByDataId(els[j].childNodes))
             }
+            // TODO: Extract to a method
+            // Step 1: Flatten result array as reference. This includes dynamically added placeholders
+            var flattened = _.flatten(dataIdByGroup)
+            // Step 2: Sort cardList with refence array
+            var sortByRef = function(target, refs) {
+              var result = []
+              for (let i = 0; i < refs.length; i ++) {
+                let ref = refs[i]
+                let f = _.find(target, function(o){
+                  return o.uuid === ref
+                })
+                if (f) {
+                  result.push(f)
+                } else {
+                  throw new Error(`uuid : ${ref} not found in target list`)
+                }
+              }
+              return result
+            }
+            // that.appendedCards.forEach(function(e){console.log(e.uuid)})
+            var afterDragging = sortByRef(that.appendedCards, flattened)
+            // console.log(afterDragging)
+            var nonPlaceholder
+            // Step 3: Remove trailing placeholder cards and update db
+            var trailingPlaceholder = true
+            for (let i = afterDragging.length -1; i >= 0; i-- ) {
+              if (trailingPlaceholder && afterDragging[i].type === 'placeholder') {
+                console.log(`${i}th card is a placeholder`)
+                let docToRemove = db.getClasswareItemByUuid(afterDragging[i].uuid)
+                if (docToRemove) {
+                  console.log('removing trailing placeholder cards from db')
+                  db.getClasswareCollection().remove(docToRemove)
+                } else {
+                  console.log('ignore trailing placeholder...')
+                }
+                continue
+              } else {
+                trailingPlaceholder = false
+                var originalOrder = afterDragging[i].order
+                let docToReorder = db.getClasswareItemByUuid(afterDragging[i].uuid)
+                if (docToReorder) {
+                  docToReorder.order = i
+                  db.getClasswareCollection().update(docToReorder)
+                  console.log(`Updating order. Original: ${originalOrder}, after: ${i}`)
+                } else {
+                  afterDragging[i].order = i
+                  db.getClasswareCollection().insert(afterDragging[i])
+                  console.log("original doc")
+                  // console.log(afterDragging[i])
+                  console.log(`inserting new placehoder card ${afterDragging[i].uuid} at pos: ${i}`)
+                }
+
+              }
+            }
+            // Sort done. Update cardlist
+            window.setTimeout(() => {
+              that.cardList = db.getCardsOfClassware(that.uuid);
+              console.log("+++++++ cardList updated")
+            }, 200)
           }
         });
         sortables.push(sorta)
@@ -224,7 +287,7 @@ export default {
 
   },
   computed: {
-    pagedCards: function() {
+    appendedCards: function() {
       if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
         // Append placeholder cards in edit mode
         var pageSize = this.row * this.col;
@@ -234,13 +297,20 @@ export default {
         for (var i = 0; i < numberToAppend; i++) {
           appendList.push({type: 'placeholder', order: i + this.cardList.length, uuid: uuidv4(), parent: this.uuid})
         }
-        return Utils.arrangeCards(this.cardList.concat(appendList), this.row, this.col);
+        return this.cardList.concat(appendList);
       } else {
-        return Utils.arrangeCards(this.cardList, this.row, this.col);
+        return this.cardList;
       }
+    },
+    pagedCards: function() {
+      return Utils.arrangeCards(this.appendedCards, this.row, this.col);
+    },
+    draggableDisabled: function() {
+      return !this.editMode || this.uuid === 'all' || this.from === 'resource'
     }
   },
   updated() {
+    console.log('updating swipper')
     this.mySwiper.update(true)
   },
   created() {
