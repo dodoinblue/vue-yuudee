@@ -303,19 +303,22 @@ export default {
       this.showClasswareSettings = false;
     });
     EventBus.$on(Events.DISPLAY_NEW_ROOT_CLASSWARE, (doc) => {
-      this.classwares.push(doc);
-      this.drawers = [];
-      this.rootUuid = doc.uuid;
-      this.drawers.push(doc.uuid);
-      db.setRootClasswareUuid(doc.uuid);
+      window.setTimeout(() => {
+        this.classwares = db.getClasswareList()
+        this.drawers = []
+        this.rootUuid = doc.uuid
+        this.drawers.push(doc.uuid)
+        db.setRootClasswareUuid(doc.uuid)
+      }, 250);
     })
     EventBus.$on(Events.DISPLAY_CURRENT_CATEGORY_DELETED, (doc) => {
       window.setTimeout(() => {
+        this.classwares = db.getClasswareList()
         this.drawers = [];
         this.rootUuid = 'all';
         this.drawers.push('all');
         db.setRootClasswareUuid('all');
-      }, 500);
+      }, 250);
     })
 
     // Load root classware uuid
