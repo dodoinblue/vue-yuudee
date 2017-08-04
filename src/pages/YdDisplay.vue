@@ -6,7 +6,7 @@
     <div class="col-33">
     </div>
     <div class="col-33 app-logo">
-      <img src="static/img/yuudee_logo.svg">
+      <img v-if="!editMode" src="static/img/yuudee_logo.svg">
     </div>
     <div class="col-33">
     </div>
