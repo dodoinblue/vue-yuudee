@@ -145,7 +145,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 div.title {
   text-align: center;
   font-size: 22px;

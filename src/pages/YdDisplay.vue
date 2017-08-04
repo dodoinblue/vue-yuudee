@@ -89,7 +89,7 @@
   position: absolute;
 }
 .popover-classwares {
-  max-height: 50%;
+  height: 50%;
   width: 50%;
 }
 

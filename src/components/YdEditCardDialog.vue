@@ -517,7 +517,7 @@ img.selected {
   color: skyblue;
 }
 .popover-resource-categories {
-  max-height: 50%;
+  height: 50%;
   width: 50%;
 }
 
