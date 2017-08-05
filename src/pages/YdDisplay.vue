@@ -62,7 +62,7 @@
   </div>
 
   <!--Dialogs-->
-  <transition name="slide">
+  <transition name="slideup">
     <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
     <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
     <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
@@ -173,17 +173,17 @@
 }
 
 /* Animations */
-.slide-enter-active {
+.slideup-enter-active {
   transition: all 0.2s ease;
   overflow: hidden;
   z-index: 1;
 }
-.slide-leave-active {
+.slideup-leave-active {
   transition: all 0.2s ease;
   overflow: hidden;
   z-index: 1;
 }
-.slide-enter, .slide-leave-to
+.slideup-enter, .slideup-leave-to
 /* .slide-fade-leave-active for <2.1.8 */ {
   transform: translateY(100%);
   z-index: 1;;

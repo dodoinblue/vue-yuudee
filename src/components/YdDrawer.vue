@@ -523,15 +523,11 @@ export default {
 /* Animations */
 .slide-enter-active {
   transition: all .5s ease;
-  overflow: hidden;
 }
 .slide-leave-active {
-  /*transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);*/
   transition: all .5s ease;
-  overflow: hidden;
 }
-.slide-enter, .slide-leave-to
-/* .slide-fade-leave-active for <2.1.8 */ {
+.slide-enter, .slide-leave-to {
   transform: translateX(100%);
 }
 </style>
