@@ -161,6 +161,7 @@ div.title {
   margin-left: 2.5%;
   margin-right: 2.5%;
   margin-top: 1.5%;
+  z-index: 5;
 }
 
 .grid-display {

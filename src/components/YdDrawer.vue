@@ -1,7 +1,8 @@
 <template>
 <transition name="slide">
+<div class="drawer-all">
+  <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
   <div class="drawer" :class="{'with-background': !root}">
-    <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
     <div class="swiper-container drawer-content">
       <div class="swiper-wrapper drawer-wrapper">
 
@@ -21,6 +22,7 @@
       </div>
     </div>
   </div>
+</div>
 </transition>
 </template>
 
@@ -463,6 +465,13 @@ export default {
 
 <style scoped>
 /* Drawer Layer */
+.drawer-all {
+  position: absolute;
+  top:0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+}
 .drawer {
   max-width: 885px; /* actual img width */
   max-height: 810px; /* actual img height */
@@ -504,9 +513,9 @@ export default {
 .drawer-back {
   position: absolute;
   content: url("../../static/img/child_incat_backbutton.png");
-  height: 16.33%;
-  top: -13.61%;
-  left: 14.88%;
+  height: 10%;
+  top: 12%;
+  left: 7%;
 }
 
 .card-group {
@@ -536,9 +545,11 @@ export default {
 /* Animations */
 .slide-enter-active {
   transition: all .5s ease;
+  overflow: hidden;
 }
 .slide-leave-active {
   transition: all .5s ease;
+  overflow: hidden;
 }
 .slide-enter, .slide-leave-to {
   transform: translateX(100%);
