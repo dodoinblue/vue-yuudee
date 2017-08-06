@@ -1,6 +1,7 @@
 // Import Vue
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store'
 
 Vue.use(Router)
 
@@ -63,6 +64,7 @@ var initApp = function() {
   var app = new Vue({
     el: '#app',
     router,
+    store,
     render: h => h(App),
     mounted() {
       // It appears that components can be mounted/created earlier than root app.

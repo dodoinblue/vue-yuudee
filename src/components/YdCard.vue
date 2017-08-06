@@ -51,9 +51,10 @@ var calcToCenterAnimParams = function(win, rect) {
   }
 }
 
-var isPlaying = false;
 var playAnimation = function(context) {
-  if (isPlaying) return;
+  if (context.$store.state.isCardPlaying) {
+    return
+  }
 
   var el = context.$el;
   var oldStyle = {
@@ -66,7 +67,7 @@ var playAnimation = function(context) {
   var animationParams = calcToCenterAnimParams(win, el.getBoundingClientRect());
 
   // Start Playing
-  isPlaying = true;
+  context.$store.commit("cardPlayStart")
   context.onTop = true;
   var playPromise = Utils.emptyPromise()
 
@@ -129,7 +130,7 @@ var playAnimation = function(context) {
 
   playPromise = playPromise.then(() => {
     window.clearInterval(context.slideshow);
-    isPlaying = false;
+    context.$store.commit("cardPlayStop")
     context.onTop = false;
     context.slideshow = null;
     context.currentImageIndex = 0;
