@@ -62,6 +62,16 @@ export default {
         this.sortables[i].option("disabled", this.draggableDisabled)
       }
     },
+    isCardPlaying: function(val, oldVal) {
+      if (!this.mySwiper) {
+        return
+      }
+      if (val) {
+        this.mySwiper.lockSwipes()
+      } else {
+        this.mySwiper.unlockSwipes()
+      }
+    },
   },
   methods: {
     backClicked: function() {
@@ -287,6 +297,9 @@ export default {
 
   },
   computed: {
+    isCardPlaying: function() {
+      return this.$store.state.isCardPlaying
+    },
     appendedCards: function() {
       if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
         // Append placeholder cards in edit mode
