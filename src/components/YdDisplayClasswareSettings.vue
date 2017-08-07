@@ -76,6 +76,17 @@ export default {
       this.selectedGridSize = size;
     },
     confirm: function() {
+      if (this.classwareInfo.row != this.selectedGridSize) {
+        if (this.classwareId == 'all') {
+          db.setDefaultGridSize(this.selectedGridSize, this.selectedGridSize)
+        } else {
+          this.classwareInfo.col = this.selectedGridSize
+          this.classwareInfo.row = this.selectedGridSize
+          db.updateClasswareItem(this.classwareInfo)
+        }
+      }
+      EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.classwareId);
+      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
     }
   },
   created() {
@@ -86,6 +97,11 @@ export default {
       }
     } else  {
       this.classwareInfo = db.getClasswareItemByUuid(this.classwareId);
+      if (this.classwareInfo.row) {
+        this.selectedGridSize = this.classwareInfo.row
+      } else {
+        this.selectedGridSize = db.getDefaultGridSize().row
+      }
     }
   },
   mounted() {

@@ -9,7 +9,7 @@
         <!-- Slides -->
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group" :ref="'group' + index" :id="'card-group-' + index">
-            <div class="card-group-item" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
+            <div :class="'card-group-item-' + row" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
               <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
             </div>
           </div>
@@ -50,11 +50,13 @@ Vue.component('debug', {
 });
 
 export default {
-  props: ['root', 'editMode', 'uuid', 'row', 'col', 'from'],
+  props: ['root', 'editMode', 'uuid', 'from'],
   components: { YdCard },
   data() {
     return {
       cardList: [],
+      row: 2,
+      col: 2,
     }
   },
   watch: {
@@ -295,8 +297,35 @@ export default {
         sortables.push(sorta)
       }
       this.sortables = sortables
+    },
+    initList: function() {
+      var grid = db.getDefaultGridSize();
+      console.log('default grid: ' + grid.col + " row: " + grid.row)
+      if (this.from == 'resource') {
+        this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+        this.col = grid.col
+        this.row = grid.row
+      } else {
+        this.cardList = db.getCardsOfClassware(this.uuid);
+        if (this.uuid == 'all') {
+          this.col = grid.col
+          this.row = grid.row
+        } else {
+          var classware = db.getClasswareItemByUuid(this.uuid)
+          console.log(classware)
+          var col = classware.col
+          var row = classware.row
+          if (!col || ! row) {
+            console.log('set to default')
+            this.col = grid.col
+            this.row = grid.row
+          } else {
+            this.col = col
+            this.row = row
+          }
+        }
+      }
     }
-
   },
   computed: {
     isCardPlaying: function() {
@@ -329,11 +358,7 @@ export default {
     this.mySwiper.update(true)
   },
   created() {
-    if (this.from == 'resource') {
-      this.cardList = db.getCardsOfRecourceCategory(this.uuid);
-    } else {
-      this.cardList = db.getCardsOfClassware(this.uuid);
-    }
+    this.initList()
     // console.log(this.cardList)
 
     if (this.from == 'resource') {
@@ -371,9 +396,10 @@ export default {
     } else {
       EventBus.$on(Events.DISPLAY_DRAWER_UPDATED, (uuid) => {
         if (uuid == this.uuid) {
-          this.cardList = db.getCardsOfClassware(this.uuid);
+          // this.cardList = db.getCardsOfClassware(this.uuid);
+          this.initList()
           console.log('updated list');
-          console.log(this.cardList);
+          // console.log(this.cardList);
         }
       });
 
@@ -528,12 +554,21 @@ export default {
   flex-wrap: wrap;
   justify-content: flex-start;
 }
-.card-group-item {
+.card-group-item-1 {
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+.card-group-item-2 {
   width:50%;
   margin: 0px;
   padding: 0px;
 }
-
+.card-group-item-3 {
+  width:33%;
+  margin: 0px;
+  padding: 0px;
+}
 .ghost-card {
   background-color: black;
 }

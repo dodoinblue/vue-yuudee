@@ -84,15 +84,24 @@ var hasClasswareBuilt = function() {
   return ! _.isEmpty(result);
 }
 
-var getDisplayGridSize = function() {
-  var result = getSettingsCollection().findOne({'name': 'displayGridSize'});
+// Only for displaying all category, and use as default value
+var getDefaultGridSize = function() {
+  var result = getSettingsCollection().findOne({'name': 'gridSize'});
   if (result == null) {
-    result = getSettingsCollection().insert({'name': 'displayGridSize', 'row': 2, 'column': 2});
+    var size = window.innerWidth >= 480 ? 3 : 2
+    result = getSettingsCollection().insert({'name': 'gridSize', 'row': size, 'col': size});
   }
   return {
     'row': result.row,
-    'column': result.column
+    'col': result.col
   };
+}
+
+var setDefaultGridSize = function(row, col) {
+  var doc = getSettingsCollection().findOne({'name': 'gridSize'});
+  doc.row = row
+  doc.col = col
+  getSettingsCollection().update(doc)
 }
 
 var getRootClasswareUuid = function() {
@@ -544,7 +553,8 @@ export default {
   initDB,
 
   // YdDisplay methods
-  getDisplayGridSize,
+  getDefaultGridSize,
+  setDefaultGridSize,
   getRootClasswareUuid,
   setRootClasswareUuid,
   getCardsOfClassware,

@@ -285,6 +285,7 @@ export default {
     }
   },
   created() {
+    window.db = db
     EventBus.$on(Events.DISPLAY_DRAWER_CLOSE, uuid => {
       this.drawers.pop();
     });
@@ -327,7 +328,7 @@ export default {
     this.drawers.push(this.rootUuid);
 
     // TODO: Grid size should be classware specific
-    this.gridSize = db.getDisplayGridSize();
+    // this.gridSize = db.getDisplayGridSize();
 
     // Back button
     this.backCount = 0
@@ -352,7 +353,8 @@ export default {
             this.editMode = false
           } else if (this.backCount > 0) {
             console.log('exit')
-            navigator.app.exitApp()
+            // navigator.app.exitApp()
+            this.$router.back()
           } else {
             console.log('press again')
             this.backCount++
