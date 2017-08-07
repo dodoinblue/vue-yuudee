@@ -137,6 +137,19 @@ export default {
       this.cardInEdit = card
       this.showNewCardDialog = true
     });
+    EventBus.$on(Events.RESOURCE_BACK_PRESSED, () => {
+      if (this.showNewCardDialog) {
+        this.showNewCardDialog = false
+      } else if (this.showNewCategoryDialog) {
+        this.showNewCategoryDialog = fasle
+      } else if (!_.isEmpty(this.cardInEdit)) {
+        this.cardInEdit = {}
+      } else if (this.drawers.length > 1) {
+        this.drawers.pop()
+      } else {
+        this.$router.back()
+      }
+    })
   },
   mounted() {
     this.f7 = Utils.getF7();

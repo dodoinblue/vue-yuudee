@@ -328,6 +328,53 @@ export default {
 
     // TODO: Grid size should be classware specific
     this.gridSize = db.getDisplayGridSize();
+
+    // Back button
+    this.backCount = 0
+    document.addEventListener("backbutton", () => {
+      switch (this.$route.path) {
+        case "/display":
+          console.log('/display')
+          if (this.showClasswareSettings) {
+            console.log("showClasswareSettings")
+            this.showClasswareSettings = false
+          } else if (this.showNewClasswareCategorySettings) {
+            console.log("showNewClasswareCategorySettings")
+            this.showNewClasswareCategorySettings = false
+          } else if (!_.isEmpty(this.cardInEdit)) {
+            console.log("cardInEdit")
+            this.cardInEdit = {}
+          } else if (this.drawers.length > 1) {
+            console.log('drawers.length > 1')
+            this.drawers.pop()
+          } else if (this.editMode) {
+            console.log("editMode")
+            this.editMode = false
+          } else if (this.backCount > 0) {
+            console.log('exit')
+            navigator.app.exitApp()
+          } else {
+            console.log('press again')
+            this.backCount++
+            this.f7.addNotification({
+              title: 'Notice',
+              message: 'Press back button again to exit',
+              hold: 2000
+            });
+            window.setTimeout(() => {
+              this.backCount = 0
+            }, 2000)
+          }
+          break
+        case "/resource":
+          console.log('/resource')
+          EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
+          break
+        default:
+          console.log(this.$route.path)
+      }
+    }, false);
+
   },
   mounted() {
     this.f7 = Utils.getF7();
