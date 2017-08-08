@@ -5,22 +5,22 @@
     <div class="settings-frame">
       <img src="static/img/parent_settingspop_bg.png">
     </div>
-    <div class="settings-dialog-title">Edit Classware</div>
+    <div class="settings-dialog-title">{{ $t('message.edit_courseware_title') }}</div>
     <div class="classware-title">
       <input type="text" :placeholder="classwareInfo.name" :disabled="classwareId == 'all'"></input>
     </div>
     <div class="classware-layout">
-      <div class="row">Choose layout</div>
+      <div class="row">{{ $t('message.choose_layout') }}</div>
       <div class="row">
         <div v-for="setting in gridSettings" class="col col-50" :key="setting.id" @click="select(setting.size)">
           <img class="layout" :class="{'selected': setting.size == selectedGridSize}" :src="setting.pic">
         </div>
       </div>
     </div>
-    <div class="classware-delete" @click="deleteClassware">Delete this courseware</div>
+    <div class="classware-delete" @click="deleteClassware">{{ $t('message.delete_courseware') }}</div>
     <div class="classware-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">{{ $t('message.confirm') }}</a></div>
     </div>
   </div>
 </div>

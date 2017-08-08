@@ -5,7 +5,7 @@
     <div class="settings-frame">
       <img src="static/img/edit-dialog-small-background.png">
     </div>
-    <div class="settings-dialog-title">New Category</div>
+    <div class="settings-dialog-title">{{ $t('message.new_category') }}</div>
     <div class="settings-dialog-content row">
       <div class="col col-50 yd-card">
         <div class="card-frame">
@@ -19,20 +19,20 @@
       </div>
       <div class="col col-50">
         <div class="row choose-cover">
-          <div class="col col-100"><div class="yd-button-light" @click="choosePicture"><i class="fa fa-file-image-o">&nbsp;</i>Choose cover</div></div>
+          <div class="col col-100"><div class="yd-button-light" @click="choosePicture"><i class="fa fa-file-image-o">&nbsp;</i>{{ $t('message.choose_cover') }}</div></div>
         </div>
         <div class="row category-name">
           <div class="col-100 light-button">
             <img src="static/img/single-line-text-field.png">
-            <span><input type="text" placeholder="category name" v-model="cardName"></input></span>
+            <span><input type="text" :placeholder="$t('message.category_name')" v-model="cardName"></input></span>
           </div>
         </div>
       </div>
     </div>
 
     <div class="settings-dialog-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">{{ $t('message.confirm') }}</a></div>
     </div>
   </div>
   <!--All category popover-->

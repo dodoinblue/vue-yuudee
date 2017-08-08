@@ -5,7 +5,7 @@
     <div class="settings-frame">
       <img src="static/img/edit-dialog-big-background.png">
     </div>
-    <div class="settings-dialog-title">Edit Card</div>
+    <div class="settings-dialog-title">{{ $t('message.edit_card') }}</div>
     <div class="settings-dialog-content row">
       <div class="col col-50 yd-card">
         <div class="card-frame">
@@ -25,8 +25,8 @@
           </div>
         </div>
         <div class="row">
-          <div class="col col-50"><div class="yd-button-light" @click="takePicture"><i class="fa fa-camera-retro">&nbsp;</i>Camera</div></div>
-          <div class="col col-50"><div class="yd-button-light" @click="choosePicture"><i class="fa fa-file-image-o">&nbsp;</i>Album</div></div>
+          <div class="col col-50"><div class="yd-button-light" @click="takePicture"><i class="fa fa-camera-retro">&nbsp;</i>{{ $t('message.camera') }}</div></div>
+          <div class="col col-50"><div class="yd-button-light" @click="choosePicture"><i class="fa fa-file-image-o">&nbsp;</i>{{ $t('message.album') }}</div></div>
         </div>
         <div class="row">
           <div class="col-100 light-button">
@@ -37,13 +37,13 @@
       </div>
     </div>
     <div class="settings-dialog-audio row">
-      <div class="col col-33"><div class="yd-button-light" @click="recordAudio"><i class="fa fa-circle dark-red">&nbsp;</i>Record</div></div>
-      <div class="col col-33"><div class="yd-button-light" @click="playAudio"><i class="fa fa-play sky-blue">&nbsp;</i>Play</div></div>
-      <div class="col col-33"><div class="yd-button-light" @click="removeAudio"><i class="fa fa-trash-o">&nbsp;</i>Delete</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="recordAudio"><i class="fa fa-circle dark-red">&nbsp;</i>{{ $t('message.record') }}</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="playAudio"><i class="fa fa-play sky-blue">&nbsp;</i>{{ $t('message.play') }}</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="removeAudio"><i class="fa fa-trash-o">&nbsp;</i>delete</div></div>
     </div>
     <div class="settings-dialog-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">{{ $t('message.confirm') }}</a></div>
     </div>
   </div>
 

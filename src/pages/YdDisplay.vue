@@ -26,13 +26,13 @@
   <div id="app-settings-header" v-if="editMode">
     <div class="row align-center">
       <div class="col col-25">
-        <div class="yd-button" @click="toogleEditMode">结束编辑</div>
+        <div class="yd-button" @click="toogleEditMode">{{ $t('message.done') }}</div>
       </div>
       <div class="col col-50">
         <div class="yd-button" ref="classwarePopover" @click="openClasswarePopover">{{classwareName}}</div>
       </div>
       <div class="col col-25">
-        <div class="yd-button" @click="goToResource">素材库</div>
+        <div class="yd-button" @click="goToResource">{{ $t('message.library') }}</div>
       </div>
     </div>
   </div>
@@ -40,10 +40,10 @@
   <!--footer-->
   <div id="app-settings-footer" class="row row-bottom align-center" v-if="editMode">
     <div class="col col-25">
-      <div class="yd-button" @click="newClick" ref="newbutton">新建</div>
+      <div class="yd-button" @click="newClick" ref="newbutton">{{ $t('message.new') }}</div>
     </div>
     <div class="col col-25 col-offset-50">
-      <div class="yd-button" @click="openClasswareSettings">设置</div>
+      <div class="yd-button" @click="openClasswareSettings">{{ $t('message.done') }}</div>
     </div>
   </div>
 

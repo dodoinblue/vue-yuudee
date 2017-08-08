@@ -4,13 +4,13 @@
   <div id="app-settings-header">
     <div class="row align-center">
       <div class="col col-25">
-        <div class="yd-button" @click="back">Back</div>
+        <div class="yd-button" @click="back">{{ $t('message.back') }}</div>
       </div>
       <div class="col col-50 title">
         Library
       </div>
       <div class="col col-25">
-        <div class="yd-button" ref="newButton" v-if="!editMode" @click="showNewPopover">New</div>
+        <div class="yd-button" ref="newButton" v-if="!editMode" @click="showNewPopover">{{ $t('message.new') }}</div>
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@
     <div class="col col-33">
     </div>
     <div class="col col-33">
-      <a href='#' class="button button-fill color-blue button-raised" @click="selectionDone">Done</a>
+      <a href='#' class="button button-fill color-blue button-raised" @click="selectionDone">{{ $t('message.done') }}</a>
     </div>
     <div class="col col-33">
     </div>
@@ -45,8 +45,8 @@
     <div class="popover-inner">
       <div class="list-block inset">
         <ul>
-          <li> <a href="#" class="list-button item-link" @click="newCard()">New Card</a></li>
-          <li> <a href="#" class="list-button item-link" @click="newCategory()">New Category</a></li>
+          <li> <a href="#" class="list-button item-link" @click="newCard()">{{ $t('message.new_card') }}</a></li>
+          <li> <a href="#" class="list-button item-link" @click="newCategory()">{{ $t('message.new_category') }}</a></li>
         </ul>
       </div>
     </div>

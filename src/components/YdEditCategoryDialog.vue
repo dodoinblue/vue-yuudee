@@ -5,16 +5,16 @@
     <div class="settings-frame">
       <img src="static/img/edit-dialog-with-text-field.png">
     </div>
-    <div class="settings-dialog-title">Edit Category</div>
+    <div class="settings-dialog-title">{{ $t('message.edit_category') }}</div>
     <div class="classware-title">
-      <input v-if="newCategory" type=text placeholder="Category name" v-model="cardTitle"></input>
+      <input v-if="newCategory" type=text :placeholder="$t('message.category_name')" v-model="cardTitle"></input>
       <input v-else type=text :placeholder="cardTitle" v-model="cardTitle"></input>
     </div>
 
-    <div class="classware-delete" @click="deleteCategory" v-if="!newCategory">Delete this courseware</div>
+    <div class="classware-delete" @click="deleteCategory" v-if="!newCategory">{{ $t('message.delete_courseware') }}</div>
     <div class="classware-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">{{ $t('message.confirm') }}</a></div>
     </div>
   </div>
 </div>

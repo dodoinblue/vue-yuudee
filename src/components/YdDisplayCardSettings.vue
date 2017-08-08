@@ -5,32 +5,32 @@
     <div class="settings-frame">
       <img src="static/img/parent_settingspop_bg.png">
     </div>
-    <div class="settings-dialog-title">Edit Card</div>
+    <div class="settings-dialog-title">{{ $t('message.edit_card') }}</div>
     <div class="classware-title">
       <!--<input type="text" :placeholder="cardContent.name"></input>-->
       {{cardContent.name}}
     </div>
     <div class="classware-layout">
-      <div class="row">Choose animation</div>
+      <div class="row">{{ $t('message.choose_animation') }}</div>
       <div class="row">
         <div v-for="animation in animations" class="col col-33" :key="animation.id" @click="select(animation.value)">
           <img class="layout" :class="{'selected': animation.value === selected}" :src="animation.pic">
-          <small>{{ animation.name}}</small>
+          <small>{{ animation.name }}</small>
         </div>
       </div>
     </div>
     <div class="classware-delete row">
-      <div class="col col-50 delete-text" @click="deleteClasswareItem">Delete this card</div>
+      <div class="col col-50 delete-text" @click="deleteClasswareItem">{{ $t('message.delete_card') }}</div>
       <div class="col col-50 delete-checkbox">
         <div class="item-input">
             <input type="checkbox" id="checkbox" v-model="mute">
-            <label for="checkbox">{{ mute ? 'muted' : 'mute' }}</label>
+            <label for="checkbox">{{ $t('message.mute') }}</label>
         </div>
       </div>
     </div>
     <div class="classware-confirm row">
-      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">Cancel</a></div>
-      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">Confirm</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
+      <div class="col col-50"><a href='#' class="button button-fill color-blue button-raised" @click="confirm">{{ $t('message.confirm') }}</a></div>
     </div>
   </div>
 </div>
@@ -51,19 +51,19 @@ export default {
       animations: [
         {
           id: 0,
-          name: 'None',
+          name: this.$t('message.none'),
           value: 'none',
           pic: 'static/img/parent_settingspop_layout1_1.png'
         },
         {
           id: 1,
-          name: 'Enlarge',
+          name: this.$t('message.enlarge'),
           value: 'enlarge',
           pic: 'static/img/animation-enlarge.png'
         },
         {
           id: 2,
-          name: 'Rotate',
+          name: this.$t('message.swing'),
           value: 'rotate',
           pic: 'static/img/animation-rotate.png'
         }
