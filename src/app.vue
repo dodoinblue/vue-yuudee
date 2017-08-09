@@ -49,7 +49,7 @@ export default {
       if (! db.hasClasswareBuilt()) {
       // if (true) {
         var f7 = this.f7;
-        f7.showPreloader("Downloading...");
+        f7.showPreloader(this.$t('message.downloading'));
         // Start fresh
         db.removeResourceCollection().then(function(){
           console.log('resource deleted');

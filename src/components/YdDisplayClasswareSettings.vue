@@ -57,10 +57,12 @@ export default {
       EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE);
     },
     deleteClassware: function() {
+      console.log(this.$t)
       if (this.classwareId == 'all') {
-        this.f7.alert('Cannot delete All', 'Forbiden');
+        this.f7.alert(this.$t('message.cannot_delete_all'), this.$t('message.forbidden'));
       } else {
-        this.f7.confirm('Are you sure?', 'Delete Whole Category', () => {
+        console.log(this.$t('are_you_sure'))
+        this.f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
           if (this.classwareInfo.type == 'folder') {
             // remove sub content
             db.deleteAllSubClasswareItem(this.classwareInfo);

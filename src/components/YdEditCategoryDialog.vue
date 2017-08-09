@@ -41,7 +41,7 @@ export default {
     confirm: function() {
       if (this.cardTitle == '') {
         var f7 = Utils.getF7();
-        f7.alert("Category title is required", "Missing info");
+        f7.alert(this.$t('message.require_category_title'), this.$t('message.missing_info_title'));
         return
       }
       if(this.newCategory) {
@@ -54,12 +54,12 @@ export default {
       // Editing existing
       if (this.card.parent == 'root') {
         var f7 = Utils.getF7();
-        f7.confirm('Cannot edit in All category', 'Forbiden', function () {
+        f7.confirm(this.$t('message.cannot_edit_in_all'), this.$t('message.forbidden'), function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
       } else if (this.card.type == 'card') {
         var f7 = Utils.getF7();
-        f7.confirm('Can be modified in Asset library', 'Forbiden', function () {
+        f7.confirm(this.$t('message.modify_card_in_library'), this.$t('message.forbidden'), function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
       } else {
@@ -76,12 +76,12 @@ export default {
       console.log(this.card.parent);
       if (this.card.parent == 'root') {
         var f7 = Utils.getF7();
-        f7.confirm('Cannot delete items in All category', 'Forbiden', function () {
+        f7.confirm(this.$t('message.cannot_delete_in_all'), this.$t('message.forbidden'), function () {
           EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
         });
       } else {
         var f7 = Utils.getF7();
-        f7.confirm('Are you sure?', 'Delete Whole Category', () => {
+        f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
           if (this.card.type == 'folder') {
             // remove sub content
             db.deleteAllSubClasswareItem(this.card);

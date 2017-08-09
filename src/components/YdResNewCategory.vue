@@ -96,7 +96,7 @@ export default {
     confirm: function() {
       if (this.cardName == "") {
         var f7 = Utils.getF7();
-        f7.alert('Please choose a name before save', 'Missing info');
+        f7.alert(this.$t('message.must_choose_name'), this.$t('message.missing_info_title'));
         return
       }
       if (!_.isEmpty(this.cardInEdit)) {

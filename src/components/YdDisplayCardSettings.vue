@@ -81,7 +81,7 @@ export default {
     },
     deleteClasswareItem: function() {
       var f7 = Utils.getF7();
-      f7.confirm('Are you sure?', 'Delete Card', () => {
+      f7.confirm(this.$t('message.are_you_sure'), this.$t('message.alert_delete_card'), () => {
         db.deleteClasswareItem(this.card);
         EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent);
         EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);

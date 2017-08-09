@@ -39,7 +39,7 @@
     <div class="settings-dialog-audio row">
       <div class="col col-33"><div class="yd-button-light" @click="recordAudio"><i class="fa fa-circle dark-red">&nbsp;</i>{{ $t('message.record') }}</div></div>
       <div class="col col-33"><div class="yd-button-light" @click="playAudio"><i class="fa fa-play sky-blue">&nbsp;</i>{{ $t('message.play') }}</div></div>
-      <div class="col col-33"><div class="yd-button-light" @click="removeAudio"><i class="fa fa-trash-o">&nbsp;</i>delete</div></div>
+      <div class="col col-33"><div class="yd-button-light" @click="removeAudio"><i class="fa fa-trash-o">&nbsp;</i>{{ $t('message.delete') }}</div></div>
     </div>
     <div class="settings-dialog-confirm row">
       <div class="col col-50"><a href='#' class="button button-fill color-gray button-raised" @click="cancel">{{ $t('message.cancel') }}</a></div>
@@ -179,7 +179,7 @@ export default {
     confirm: function() {
       if (this.cardName == "" || ! this.category.uuid || this.cardImage == "static/img/dummy_content.jpg") {
         var f7 = Utils.getF7();
-        f7.alert('Please choose name, category and image before save', 'Missing info');
+        f7.alert(this.$t('message.missing_info_body'), this.$t('message.missing_info_title'));
         return
       }
 

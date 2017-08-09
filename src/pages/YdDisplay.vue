@@ -43,7 +43,7 @@
       <div class="yd-button" @click="newClick" ref="newbutton">{{ $t('message.new') }}</div>
     </div>
     <div class="col col-25 col-offset-50">
-      <div class="yd-button" @click="openClasswareSettings">{{ $t('message.done') }}</div>
+      <div class="yd-button" @click="openClasswareSettings">{{ $t('message.settings') }}</div>
     </div>
   </div>
 

@@ -157,7 +157,6 @@ export default {
       if (this.isStack) {
         if (this.from == "resource") {
           if (this.editMode && PickedCards.hasItem()) {
-            // Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
             EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
           } else {
             EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);

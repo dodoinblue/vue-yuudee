@@ -81,7 +81,7 @@ export default {
     backClicked: function() {
       if (this.from == "resource") {
         if (this.editMode && PickedCards.hasItem()) {
-            Utils.getF7().alert("Please add chosen items before navigating to another folder", "Forbidden")
+            Utils.getF7().alert(this.$t('message.cannot_navi_chosen_items'), this.$t('message.forbidden'))
           } else {
             EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
           }
