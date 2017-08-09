@@ -170,11 +170,11 @@ export default {
     },
     deleteCard: function() {
       FileHelper.removeFolderIfExistPromise(this.cardInEdit.cdvpath).then(() => {
-        return db.getResourceCollection().remove(this.cardInEdit)
+        return db.deleteResourceCard(this.cardInEdit)
       }).then(() => {
         EventBus.$emit(Events.RESOURCE_ITEM_DELETED, this.cardInEdit.category)
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      })
+      }).catch(console.log)
     },
     confirm: function() {
       if (this.cardName == "" || ! this.category.uuid || this.cardImage == "static/img/dummy_content.jpg") {

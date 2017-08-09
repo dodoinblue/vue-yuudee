@@ -497,14 +497,27 @@ var deleteResourceCategory = function(doc) {
     console.log("Mismatch. Should be a category")
     return Q.reject('Not a category')
   }
-  // Step 1, delete from resource collection
   // Resource does not allow more than 2 layer. No need to do it resursively
+  // Step 1, find all cards in this category, delete it in classware collection
+  var resCards = getResourceCollection().find({
+    'category': {'$eq': doc.uuid}
+  })
+  if (resCards && resCards.length > 0) {
+    resCards.forEach((card) => {
+      console.log('removing res card ' + card.uuid + ' from classware')
+      removeCoursewareItemByContentId(card.uuid)
+    })
+  }
+  // Now search and delete itself in courseware collection
+  removeCoursewareItemByContentId(doc.uuid)
+
+  // Step 2, delete from resource collection
   getResourceCollection().findAndRemove({
     'category': {'$eq': doc.uuid}
   })
   getResourceCollection().remove(doc)
 
-  // Step 2, remove folder from fs
+  // Step 3, remove folder from fs
   return FileHelper.removeFolderIfExistPromise(doc.cdvpath)
 }
 
@@ -549,6 +562,21 @@ var insertRootClassware = function(name) {
     return getClasswareCollection().insert(classware);
 }
 
+var deleteResourceCard = function(doc) {
+  getResourceCollection().remove(doc)
+  // Remove corresponding courseware items
+  removeCoursewareItemByContentId(doc.uuid)
+}
+
+var removeCoursewareItemByContentId = function(id) {
+  var coursewareItems = getClasswareCollection().find({'content': {'$eq': id}})
+  if (coursewareItems && coursewareItems.length > 0) {
+    coursewareItems.forEach((item) => {
+      deleteClasswareItem(item)
+    })
+  }
+}
+
 export default {
   initDB,
 
@@ -572,6 +600,7 @@ export default {
   insertResourceCategory,
   insertResourceCard,
   deleteResourceCategory,
+  deleteResourceCard,
 
   // Build database
   // generateOfficialClasswares,
