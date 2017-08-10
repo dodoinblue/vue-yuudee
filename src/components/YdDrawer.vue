@@ -9,7 +9,7 @@
         <!-- Slides -->
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group" :ref="'group' + index" :id="'card-group-' + index">
-            <div :class="'card-group-item-' + row" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
+            <div class="card-group-item" :class="'card-group-item-' + row" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
               <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
             </div>
           </div>
