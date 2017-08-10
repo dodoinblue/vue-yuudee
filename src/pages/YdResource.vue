@@ -29,7 +29,7 @@
     <div class="col col-33">
     </div>
     <div class="col col-33">
-      <a href='#' class="button button-fill color-blue button-raised" @click="selectionDone">{{ $t('message.done') }}</a>
+      <a href='#' class="button button-fill color-blue button-raised" @click="selectionDone">{{ $t('message.confirm') }}</a>
     </div>
     <div class="col col-33">
     </div>

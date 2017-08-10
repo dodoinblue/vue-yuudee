@@ -359,8 +359,8 @@ export default {
             console.log('press again')
             this.backCount++
             this.f7.addNotification({
-              title: 'Notice',
-              message: 'Press back button again to exit',
+              title: this.$t('message.notice'),
+              message: this.$t('message.press_again_to_exit'),
               hold: 2000
             });
             window.setTimeout(() => {
