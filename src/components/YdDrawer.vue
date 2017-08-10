@@ -312,11 +312,9 @@ export default {
           this.row = grid.row
         } else {
           var classware = db.getClasswareItemByUuid(this.uuid)
-          console.log(classware)
           var col = classware.col
           var row = classware.row
           if (!col || ! row) {
-            console.log('set to default')
             this.col = grid.col
             this.row = grid.row
           } else {
@@ -414,21 +412,29 @@ export default {
       });
 
       EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, (object) => {
-        console.log('drawerId: ' + object.drawerId)
         if (this.uuid !== object.drawerId) {
           return
         }
-        console.log('adding cards: ' + object.list)
         let added = []
+        let folders = [] // Keep track of this, add all cards belong to folder
         for (let i = 0; i < object.list.length; i ++) {
+          let resContent = db.getCardByUuid(object.list[i])
           let newClasswareItem = {}
           newClasswareItem.uuid = uuidv4()
-          newClasswareItem.type = 'card'
           newClasswareItem.content = object.list[i]
           newClasswareItem.parent = object.drawerId
-          newClasswareItem.animation = 'enlarge' // default
           newClasswareItem.order = parseInt(object.order) + i
-          newClasswareItem.mute = false
+
+          if (resContent.isCategory) {
+            newClasswareItem.type = 'folder'
+            newClasswareItem.cover = resContent.cover;
+            newClasswareItem.name = resContent.name
+            folders.push(newClasswareItem)
+          } else {
+            newClasswareItem.type = 'card'
+            newClasswareItem.animation = 'enlarge' // default
+            newClasswareItem.mute = false
+          }
           added.push(newClasswareItem)
         }
         if (object.order >= this.cardList.length) {
@@ -442,7 +448,6 @@ export default {
             placeholder.order = i
             added.push(placeholder)
           }
-          console.log('Processed: ' + JSON.stringify(added))
           db.getClasswareCollection().insert(added)
         } else {
           console.log('requesting position in the middle of the list')
@@ -452,13 +457,10 @@ export default {
                    && item.order < object.order + object.list.length
                    && item.type == 'placeholder'
           }).simplesort('order').data()
-          console.log('emptySlots')
-          console.log(emptySlots)
           for (let i = 0; i < emptySlots.length; i++) {
             // use new card's info to override everything except for order
             let o = emptySlots[i].order
             let updatedDoc = _.assign(emptySlots[i], added.pop())
-            console.log('im here')
             updatedDoc.order = o
             console.log(updatedDoc)
             db.getClasswareCollection().update(updatedDoc)
@@ -469,10 +471,15 @@ export default {
             for (let i = 0; i < added.length; i++) {
               added[i].order = this.cardList.length + i
             }
-            console.log(added)
             db.getClasswareCollection().insert(added)
           }
         }
+
+        // Add subcontent if there is any
+        folders.forEach((folder) => {
+          console.log('adding sub contents of folder: ' + folder.uuid)
+          db.addFolderContentToCourseware(folder)
+        })
 
         // Done. Wait db written and update cardList
         window.setTimeout(() => {

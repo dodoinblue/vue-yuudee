@@ -577,6 +577,32 @@ var removeCoursewareItemByContentId = function(id) {
   }
 }
 
+var addFolderContentToCourseware = function(folder) {
+  // Find its content
+  var cards = getCardsOfRecourceCategory(folder.content)
+
+  var toAdd = []
+  if (cards && cards.length > 0) {
+    // Generate a courseware item and push to array
+    for (let i = 0; i < cards.length; i++) {
+      let item = cards[i]
+      let card = {};
+      card.uuid = uuidv4();
+      card.type = 'card';
+      card.content = item.uuid;
+      card.parent = folder.uuid;
+      card.animation = 'enlarge';
+      card.order = i;
+      card.mute = false;
+      toAdd.push(card)
+      console.log('new classware item created: ' + card.uuid)
+    }
+    getClasswareCollection().insert(toAdd)
+  } else {
+    console.log("Warning: Adding a category but sub content is not found")
+  }
+}
+
 export default {
   initDB,
 
@@ -592,6 +618,7 @@ export default {
   deleteClasswareItem,
   deleteAllSubClasswareItem,
   insertRootClassware,
+  addFolderContentToCourseware,
 
   // YdResource methods
   getCardByUuid,
