@@ -100,8 +100,8 @@ export default {
         changedObj.mute = this.mute;
       }
       if (changed) {
-        var obj = _.assign(this.card, changedObj);
-        db.updateClasswareItem(obj);
+        this.card = _.assign(this.card, changedObj);
+        db.updateClasswareItem(this.card);
       }
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card, changed);
     }
