@@ -372,6 +372,9 @@ export default {
           console.log('/resource')
           EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
           break
+        case "/resource/pick":
+          EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
+          break
         default:
           console.log(this.$route.path)
       }
