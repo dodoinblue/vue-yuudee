@@ -82,8 +82,9 @@ const messages = {
       must_choose_name: "Please choose a name before save",
       alert_delete_card: "Delete card",
       notice: "Notice",
-      press_again_to_exit: "Press back button again to exit app"
-
+      press_again_to_exit: "Press back button again to exit app",
+      // Other category
+      other: "Other"
     }
   },
   zh: {
@@ -142,7 +143,9 @@ const messages = {
       must_choose_name: "请输入一个名称，然后保存",
       alert_delete_card: "删除卡片",
       notice: "提示",
-      press_again_to_exit: "再按一次后退键退出应用"
+      press_again_to_exit: "再按一次后退键退出应用",
+      // Other category
+      other: "其他"
     }
   }
 }

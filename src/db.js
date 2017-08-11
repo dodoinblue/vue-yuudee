@@ -104,6 +104,25 @@ var setDefaultGridSize = function(row, col) {
   getSettingsCollection().update(doc)
 }
 
+var getLanguage = function() {
+  var lang = getSettingsCollection().findOne({'name': 'language'});
+  if (lang) {
+    return lang.value
+  } else {
+    return null
+  }
+}
+
+var setLanguage = function(langString) {
+  var lang = getSettingsCollection().findOne({'name': 'language'});
+  if (lang == null) {
+    lang = getSettingsCollection().insert({'name': 'language', 'value': langString});
+  } else {
+    lang.value = langString;
+    getSettingsCollection().update(lang);
+  }
+}
+
 var getRootClasswareUuid = function() {
   var rootUuid = getSettingsCollection().findOne({'name': 'rootClassware'});
   if (rootUuid == null) {
@@ -605,6 +624,9 @@ var addFolderContentToCourseware = function(folder) {
 
 export default {
   initDB,
+
+  getLanguage,
+  setLanguage,
 
   // YdDisplay methods
   getDefaultGridSize,

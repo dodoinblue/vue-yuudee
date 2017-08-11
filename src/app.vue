@@ -21,83 +21,139 @@ import Q from 'q'
 
 export default {
   methods: {
-    startupChecks: function() {
-      // No need to chain this part. Next step is either downloading or user navigate to resource
-      // page to create new category/ card, which all will take much longer time than this.
-      FileHelper.getDirPromise(FileHelper.getUserAssetFolder()).catch(function(error){
+    prepareResource: function() {
+
+      let cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
+      let lang = this.$root.$i18n.locale || 'zh'
+      let preloadZipPath = cordova.file.applicationDirectory + 'www/static/' + lang + '/yuudee-card-v1.zip'
+      FileHelper.listDirectoryPromise(cordova.file.applicationDirectory + 'www/static/' + lang).then(console.log)
+      let f7 = this.f7;
+      f7.showPreloader(this.$t('message.downloading'));
+      return db.removeResourceCollection().then(() => {
+        console.log('resource db cleared')
+        return db.removeClasswareCollection()
+      }).then(() => {
+        console.log('classware db cleared')
+        return FileHelper.removeFolderIfExistPromise(cardResourceFolder)
+      }).then(() => {
+        db.setRootClasswareUuid('all')
+        // https://github.com/MobileChromeApps/cordova-plugin-zip/issues/56
+        return FileHelper.copyFilePromise(preloadZipPath, cordova.file.cacheDirectory, 'yuudee-card.zip')
+      }).then(() => {
+        console.log('Previous resource folder removed')
+        var deferred = Q.defer()
+        zip.unzip(cordova.file.cacheDirectory + 'yuudee-card.zip', cordova.file.dataDirectory, () => {
+          console.log("before resolve zip")
+          deferred.resolve()
+        }, function(progressEvent){
+          // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
+        });
+        console.log('returning from zip block')
+        return deferred.promise
+      }).then(() => {
+        return db.buildOfficialResourceCollection()
+      }).then(() => {
+        return db.generateOfficialClasswares()
+      }).then(() => {
+        // Wait for db save.
+        return Utils.waitForSeconds(1.5)
+      }).then(() => {
+        // TODO: load external user cards
+        // return db.removeResourceCollection('USER_RESOURCE_PATH');
+        // Cleanup
+        FileHelper.removeFile(cordova.file.cacheDirectory + 'yuudee-card.zip')
+        // TODO: Remove temp file
+        f7.hidePreloader();
+      }).catch(function(error){
+        // Close preloader
+        f7.hidePreloader()
+        console.log(error)
+      })
+    },
+    createUserFolders: function() {
+      return FileHelper.getDirPromise(FileHelper.getUserAssetFolder()).catch((error) => {
         console.log("User Asset folder is not available, creating..");
         return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserAssets', false)
-      }).then(function(){
-        return FileHelper.getDirPromise(FileHelper.getUserAssetFolder() + '/Other').catch(function(error){
-          return FileHelper.createDirPromise(FileHelper.getUserAssetFolder(), 'Other', false).then(function(){
-            return FileHelper.writeJsonToFilePromise({name: 'Other'}, FileHelper.getUserAssetFolder() + '/Other', 'info.json');
-          });
+      }).then(() => {
+        return FileHelper.getDirPromise(FileHelper.getUserAssetFolder() + '/Other').catch((error) => {
+          return FileHelper.createDirPromise(FileHelper.getUserAssetFolder(), 'Other', false)
+        }).then(() => {
+          let infoName = this.$t('message.other')
+          console.log('other category name: ' + infoName)
+          return FileHelper.writeJsonToFilePromise({name: infoName}, FileHelper.getUserAssetFolder() + '/Other', 'info.json');
         })
-      }).then(function(){
+      }).then(() => {
         return FileHelper.getDirPromise(FileHelper.getUserCoverFolder()).catch(function(error){
           console.log("User Cover folder is not available, creating..");
           return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserCovers', false)
         })
-      }).then(function(){
-        console.log("User folders created");
+      }).then(() => {
+        console.log("User folders checked");
       }).catch(console.log);
-
-      // Check if classwareCollection has been built
-      var cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
-      var downloadTempPath = `${cordova.file.cacheDirectory}/Download/yuudee-card-lite.zip`
-      var remoteResourceURL = "http://orrmhr3bd.bkt.clouddn.com/yuudee-card-uuid-v1-lite-cn.zip"
-      if (! db.hasClasswareBuilt()) {
-      // if (true) {
-        var f7 = this.f7;
-        f7.showPreloader(this.$t('message.downloading'));
-        // Start fresh
-        db.removeResourceCollection().then(function(){
-          console.log('resource deleted');
-          return db.removeClasswareCollection();
-        }).then(function(){
-          console.log('classware deleted');
-
-          return FileHelper.removeFolderIfExistPromise(cardResourceFolder).then(function(){
-            var onProgress = function(progressEvent) {
-              if (progressEvent.lengthComputable) {
-                // console.log(`percentage: ${progressEvent.loaded / progressEvent.total * 100} %`);
-              } else {
-                console.log('onProgress');
-              }
+    },
+    chooseLanguage: function() {
+      let deferred = Q.defer()
+      this.f7.modal({
+        title:  '选择语言<br>Choose language',
+        text: '',
+        verticalButtons: true,
+        buttons: [
+          {
+            text: '中文',
+            onClick: function() {
+              deferred.resolve('zh')
             }
-            return FileHelper.downloadFilePromise(remoteResourceURL, downloadTempPath, onProgress);
-          })
-        }).then(function(){
-          var deferred = Q.defer();
-          zip.unzip(downloadTempPath, cordova.file.dataDirectory, function(){
-            deferred.resolve();
-          }, function(progressEvent){
-            // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
-          });
-          return deferred.promise;
-        }).then(function(){
-          return db.buildOfficialResourceCollection();
-        }).then(function(){
-          return db.generateOfficialClasswares();
-        }).then(() => {
-          // Wait for db save.
-          return Utils.waitForSeconds(1.5);
-        }).then(function(){
-          // TODO: load external user cards
-          // return db.removeResourceCollection('USER_RESOURCE_PATH');
-          // Cleanup
-          // TODO: Remove temp file
-          EventBus.$emit("RESOURCE_LOADED");
-          f7.hidePreloader();
-        }).catch(function(error){
-          // Close preloader
-          f7.hidePreloader();
-          console.log(error);
+          },
+          {
+            text: 'English',
+            onClick: function() {
+              deferred.resolve('en')
+            }
+          },
+        ]
+      })
+      return deferred.promise
+    },
+    startupChecks: function() {
+      // window.fhelper = FileHelper
+      // window.db = db
+      let startPromise = Q()
+      let langString = db.getLanguage()
+      // let langString
+      if (!langString) {
+        startPromise = startPromise.then(() => {
+          return this.chooseLanguage()
+        }).then((langString) => {
+          db.setLanguage(langString)
+          this.$root.$i18n.locale = langString
         })
       } else {
-        // Done
-        EventBus.$emit("RESOURCE_LOADED");
+        this.$root.$i18n.locale = langString
       }
+
+      startPromise = startPromise.then(() => {
+        // Check and create
+        return this.createUserFolders()
+      })
+
+      // Check if classwareCollection has been built
+      if (! db.hasClasswareBuilt()) {
+      // if (true) {
+        startPromise = startPromise.then(() => {
+          console.log('prepareRes')
+          return this.prepareResource()
+        })
+      }
+      startPromise = startPromise.then(() => {
+        // Check and create other category in resource collection
+        let otherCategory = db.getCardByUuid('Other')
+        if (!otherCategory) {
+          console.log('creating otherCategory in db')
+          db.insertResourceCategory(FileHelper.getUserAssetFolder() + '/Other', true)
+        }
+        console.log("emit: RESOURCE_LOADED")
+        EventBus.$emit("RESOURCE_LOADED")
+      })
     },
   },
   created() {
