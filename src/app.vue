@@ -137,6 +137,7 @@ export default {
   color: rgb(230,220,210);
   font-weight: bold;
   text-align: center;
+  box-shadow: 2px 2px 2px #8c642d;
 }
 
 /* Animations */
