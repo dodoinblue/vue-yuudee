@@ -26,7 +26,7 @@
   <div id="app-settings-header" v-if="editMode">
     <div class="row align-center">
       <div class="col col-25">
-        <div class="yd-button" @click="toogleEditMode">{{ $t('message.done') }}</div>
+        <div class="yd-button" @click="toggleEditMode">{{ $t('message.done') }}</div>
       </div>
       <div class="col col-50">
         <div class="yd-button" ref="classwarePopover" @click="openClasswarePopover">{{classwareName}}</div>
@@ -251,7 +251,7 @@ export default {
     newClick: function() {
       this.showNewClasswareCategorySettings = true;
     },
-    toogleEditMode: function() {
+    toggleEditMode: function() {
       this.editMode = ! this.editMode;
     },
     openClasswarePopover: function() {
