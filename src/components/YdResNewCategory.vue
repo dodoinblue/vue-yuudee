@@ -156,8 +156,10 @@ export default {
     },
   },
   created() {
-    this.cardImage = this.cardInEdit.cover
-    this.cardName = this.cardInEdit.name
+    if (this.isEditing) {
+      this.cardImage = this.cardInEdit.cover
+      this.cardName = this.cardInEdit.name
+    }
   }
 }
 </script>
