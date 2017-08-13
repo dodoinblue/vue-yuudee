@@ -86,7 +86,9 @@ export default {
             EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
           }
       } else {
-        EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
+        if (!this.$store.state.isCardPlaying) {
+          EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
+        }
       }
     },
     createSwiper: function() {
