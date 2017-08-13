@@ -396,6 +396,20 @@ var updateClasswareItem = function(doc) {
   getClasswareCollection().update(doc);
 }
 
+var deleteTopLevelCourseware = function(doc) {
+  // Remove sub content
+  deleteAllSubClasswareItem(doc);
+  var collection = getClasswareCollection()
+  var order = doc.order
+  var parent = doc.parent
+  collection.remove(doc)
+
+  // Reorder. Move all cards after deleted card 1 position forward
+  collection.findAndUpdate({'order': {'$gt': order}, 'parent': {'$eq': parent}}, function(obj) {
+    obj.order = obj.order - 1;
+  })
+}
+
 var deleteClasswareItem = function(doc) {
   var collection = getClasswareCollection();
   var order = doc.order;
@@ -638,6 +652,7 @@ export default {
 
   updateClasswareItem,
   deleteClasswareItem,
+  deleteTopLevelCourseware,
   deleteAllSubClasswareItem,
   insertRootClassware,
   addFolderContentToCourseware,

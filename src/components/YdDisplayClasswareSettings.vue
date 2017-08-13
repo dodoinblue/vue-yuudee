@@ -63,11 +63,8 @@ export default {
       } else {
         console.log(this.$t('are_you_sure'))
         this.f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
-          if (this.classwareInfo.type == 'folder') {
-            // remove sub content
-            db.deleteAllSubClasswareItem(this.classwareInfo);
-            // reorder
-            db.deleteClasswareItem(this.classwareInfo);
+          if (this.classwareInfo.parent == 'root') {
+            db.deleteTopLevelCourseware(this.classwareInfo);
           }
           EventBus.$emit(Events.DISPLAY_CURRENT_CATEGORY_DELETED, this.classwareInfo);
           EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
