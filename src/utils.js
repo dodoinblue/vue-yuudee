@@ -149,11 +149,11 @@ export default {
     var media = new Media(audioSrc, function(){
       this.stop()
       this.release()
-      deferred.resolve
+      deferred.resolve()
     }, function(){
       this.stop()
       this.release()
-      deferred.reject
+      deferred.reject()
     });
     media.play()
     return deferred.promise;

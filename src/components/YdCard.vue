@@ -56,6 +56,11 @@ var playAnimation = function(context) {
     return
   }
 
+  if (context.classware.mute && context.classware.animation == 'none') {
+    console.log('no audio and no animation, skip playing')
+    return
+  }
+
   var el = context.$el;
   var oldStyle = {
     scaleX: 1,
@@ -89,15 +94,16 @@ var playAnimation = function(context) {
 
     // Start playing sound
     if (!context.classware.mute) {
-      var playAudioFn = Utils.mediaPluginPlayAudio
-      var numOfAudios = context.card.audios.length
-      var p
+      let playAudioFn = Utils.mediaPluginPlayAudio
+      let numOfAudios = context.card.audios.length
+      let p
       if (numOfAudios > 0) {
         p = playAudioFn(context.card.audios[0])
       }
       if (numOfAudios > 1) {
-        for (var i = 1; i < numOfAudios; i++) {
-          p = p.then(function(){
+        console.log('more than 1 audio')
+        for (let i = 1; i < numOfAudios; i++) {
+          p = p.then(() => {
             return playAudioFn(context.card.audios[i]);
           });
         }
@@ -121,6 +127,12 @@ var playAnimation = function(context) {
       return Utils.waitForSeconds(4);
     }
   })
+
+  if (context.card.audios.length > 1 && !context.classware.mute) {
+    playPromise = playPromise.then(() => {
+      return Utils.waitForSeconds((context.card.audios.length - 1) * 3)
+    })
+  }
 
   if (context.classware.animation != 'none') {
     playPromise = playPromise.then(() => {
