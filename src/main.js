@@ -34,7 +34,7 @@ const messages = {
       library: 'Library',
       new: 'New',
       settings: 'Settings',
-      downloading: 'Downloading...',
+      downloading: 'Uncompressing image resources, please wait',
 
       // Dialogs
       edit_card: 'Edit Card',
@@ -84,7 +84,10 @@ const messages = {
       notice: "Notice",
       press_again_to_exit: "Press back button again to exit app",
       // Other category
-      other: "Other"
+      other: "Other",
+      // OK, Cancel
+      ok: "Ok",
+      cancel: "Cancel"
     }
   },
   zh: {
@@ -94,7 +97,7 @@ const messages = {
       library: '素材库',
       new: '新建',
       settings: '设置',
-      downloading: '正在下载小雨滴卡片资源，请稍候...',
+      downloading: '正在解压小雨滴卡片资源，请稍候...',
 
       // Dialogs
       edit_card: '编辑卡片',
@@ -145,7 +148,10 @@ const messages = {
       notice: "提示",
       press_again_to_exit: "再按一次后退键退出应用",
       // Other category
-      other: "其他"
+      other: "其他",
+      // OK, Cancel
+      ok: "确认",
+      cancel: "取消"
     }
   }
 }
