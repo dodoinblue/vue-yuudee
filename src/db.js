@@ -40,9 +40,7 @@ var initDB = function() {
   
   var dbFSAdapter = new LokiCordovaFSAdapter({"prefix": DB_PREFIX});
 
-  if (Utils.isCordova) {
-    dbConfig.adapter = dbFSAdapter;
-  }
+  dbConfig.adapter = dbFSAdapter;
 
   database = new Loki(DATABASE_NAME, dbConfig);
   return deferred.promise;

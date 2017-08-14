@@ -115,8 +115,9 @@ export default {
       return deferred.promise
     },
     startupChecks: function() {
-      // window.fhelper = FileHelper
-      // window.db = db
+      console.log("startup check")
+      window.fhelper = FileHelper
+      window.db = db
       let startPromise = Q()
       let langString = db.getLanguage()
       // let langString

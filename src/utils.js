@@ -12,14 +12,6 @@ export default {
     return f7
   },
 
-  isCordova: () => {
-    console.log(typeof cordova);
-    return typeof cordova != 'undefined';
-  },
-  isBrowser: () => {
-    return typeof cordova == 'undefined' || cordova.platformId == 'browser'
-  },
-
   /*
    * Convert an 1-D array to 2-D array with each sub-array has a size
    * of row * col. This is a helper function to divide card list into

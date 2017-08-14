@@ -293,8 +293,6 @@ export default {
   },
   created() {
     this.categoryList = db.getAllResourceCategories();
-    console.log(this.categoryList)
-    console.log(this.cardInEdit)
     if (this.isEditing) {
       this.cardImage = _.isEmpty(this.cardInEdit.images) ? "static/img/dummy_content.jpg" : this.cardInEdit.images[0]
       this.cardAudio = _.isEmpty(this.cardInEdit.audios) ? "" : this.cardInEdit.audios[0]
@@ -305,6 +303,10 @@ export default {
       })
     } else {
       this.uuid = uuidv4();
+      let other = db.getCardByUuid('Other')
+      if (other) {
+        this.category = other
+      }
     }
   }
 }
