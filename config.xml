@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.supersuperstar.yuudee.vue" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.supersuperstar.yuudee.vue" version="0.8.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <hook src="hooks/hookers.js" type="before_prepare"/>
     <hook src="hooks/beforedep.js" type="before_deploy"/>
+    <hook src="hooks/after_prepare.sh" type="after_prepare"/>
     <name>cdv-yuudee</name>
     <description>
         Yuudee AAC Hybrid
@@ -54,4 +55,11 @@
     <plugin name="cordova-plugin-statusbar" spec="https://github.com/apache/cordova-plugin-statusbar.git"/>
     <plugin name="cordova-plugin-ios-longpress-fix" spec="~1.1.0"/>
     <plugin name="cordova-plugin-media" spec="~3.0.1"/>
+    <plugin name="cordova-plugin-crosswalk-webview" spec="~2.3.0">
+        <variable name="XWALK_VERSION" value="23+"/>
+        <variable name="XWALK_LITEVERSION" value="xwalk_core_library_canary:17+"/>
+        <variable name="XWALK_COMMANDLINE" value="--disable-pull-to-refresh-effect"/>
+        <variable name="XWALK_MODE" value="embedded"/>
+        <variable name="XWALK_MULTIPLEAPK" value="false"/>
+    </plugin>
 </widget>
