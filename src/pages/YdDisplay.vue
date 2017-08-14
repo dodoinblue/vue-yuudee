@@ -273,7 +273,9 @@ export default {
     },
     pressed: function(index) {
       this.touchAreas[index].pressed = true;
-      if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
+      // if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
+      // TODO: temp modification for automated compability test
+      if(true) {
         this.editMode = true;
         this.touchAreas[0].pressed = false;
         this.touchAreas[1].pressed = false;
@@ -353,8 +355,8 @@ export default {
             this.editMode = false
           } else if (this.backCount > 0) {
             console.log('exit')
-            // navigator.app.exitApp()
-            this.$router.back()
+            navigator.app.exitApp()
+            // this.$router.back()
           } else {
             console.log('press again')
             this.backCount++
