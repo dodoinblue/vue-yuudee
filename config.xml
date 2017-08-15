@@ -3,7 +3,7 @@
     <hook src="hooks/hookers.js" type="before_prepare"/>
     <hook src="hooks/beforedep.js" type="before_deploy"/>
     <hook src="hooks/after_prepare.sh" type="after_prepare"/>
-    <name>cdv-yuudee</name>
+    <name>Yuudee</name>
     <description>
         Yuudee AAC Hybrid
     </description>

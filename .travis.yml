@@ -1,0 +1,34 @@
+sudo: true
+
+language: node_js
+node_js:
+  - "6.11"
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - openjdk-7-jdk
+
+before_script:
+  - wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+  - unzip sdk-tools-linux-3859397.zip
+  - mkdir android-sdk
+  - mv tools android-sdk/tools
+  - export ANDROID_HOME=${PWD}/android-sdk
+  - export PATH=${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${PATH}
+  - echo y | android update sdk -u -a -t platform-tools
+  - echo y | android update sdk -u -a -t build-tools-25.0.2
+  - echo y | android update sdk -u -a -t android-25
+
+before_install:
+  - sudo apt-get install imagemagick
+
+script:
+  - ls
+  - mkdir www
+  - npm install -g cordova cordova-splash cordova-icon
+  - npm install
+  - cordova platform add android
+  - cordova build android
