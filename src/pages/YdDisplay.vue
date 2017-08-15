@@ -335,6 +335,10 @@ export default {
     // Back button
     this.backCount = 0
     document.addEventListener("backbutton", () => {
+      if (this.$store.state.isCardPlaying) {
+        console.log("Card playing, ignore back event")
+        return
+      }
       switch (this.$route.path) {
         case "/display":
           console.log('/display')
