@@ -5,7 +5,7 @@
     <div class="settings-frame">
       <img src="static/img/edit-dialog-big-background.png">
     </div>
-    <div class="settings-dialog-title">{{ $t('message.edit_card') }}</div>
+    <div class="settings-dialog-title">{{ isEditing ? $t('message.edit_card') : $t('message.new_card') }}</div>
     <div class="settings-dialog-content row">
       <div class="col col-50 yd-card">
         <div class="card-frame">
