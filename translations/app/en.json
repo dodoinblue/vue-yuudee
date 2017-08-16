@@ -1,0 +1,10 @@
+{
+	"config_ios": {
+		"NSCameraUsageDescription": "An alternative communication tool for children with autism",
+		"CFBundleDisplayName": "Yuudee AAC",
+		"CFBundleName": "Yuudee AAC"
+	},
+	"config_android": {
+		"app_name": "Yuudee AAC"
+	}
+}

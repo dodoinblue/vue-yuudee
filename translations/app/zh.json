@@ -1,0 +1,10 @@
+{
+	"config_ios": {
+		"NSCameraUsageDescription": "孤独症儿童的辅助共同工具",
+		"CFBundleDisplayName": "小雨滴",
+		"CFBundleName": "小雨滴"
+	},
+	"config_android": {
+		"app_name": "小雨滴"
+	}
+}
