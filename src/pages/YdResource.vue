@@ -7,7 +7,7 @@
         <div class="yd-button" @click="back">{{ $t('message.back') }}</div>
       </div>
       <div class="col col-50 title">
-        Library
+        {{ $t('message.library') }}
       </div>
       <div class="col col-25">
         <div class="yd-button" ref="newButton" v-if="!editMode" @click="showNewPopover">{{ $t('message.new') }}</div>
@@ -161,8 +161,9 @@ export default {
 <style scoped>
 div.title {
   text-align: center;
-  font-size: 22px;
+  font-size: 26px;
   color: bisque;
+  text-shadow: 1px 1px 2px rgb(80,45,17), 0 0 1em rgb(80,45,17);
 }
 
 /* Settings Layer */
