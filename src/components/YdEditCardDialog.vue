@@ -123,6 +123,11 @@ export default {
         // Update audio
         let ext = FileHelper.getExtensionFromPath(this.cardAudio);
         p = p.then(() => {
+          return FileHelper.removeFile(originalAudio).then(function(){
+          }).catch(function(error){
+            console.log("error removing old audio" + error.code)
+          })
+        }).then(() => {
           return FileHelper.copyFilePromise(this.cardAudio, this.cardInEdit.cdvpath + 'audios', '01.' + ext);
         }).then(() => {
           editObj.audios = [this.cardInEdit.cdvpath + 'audios/01.' + ext]
@@ -233,7 +238,6 @@ export default {
         // TODO: create a "other" category at startup.
         return FileHelper.moveDirPromise(cordova.file.cacheDirectory, this.uuid, userResourceRoot + this.category.uuid, this.uuid + '.xydcard');
       }).then((dirEntry) => {
-        console.log(dirEntry);
         // Sync db
         return db.insertResourceCard(dirEntry.nativeURL, this.category);
       }).then(function(doc){
@@ -273,11 +277,17 @@ export default {
     recordAudio: function() {
       Utils.recordAudioPromise().then(function(audio){
         // Move to cache folder
-        var extension = FileHelper.getExtensionFromPath(audio.fullPath);
-        var oldFolder = FileHelper.getFolderFromPath(audio.fullPath);
-        var filename = uuidv4();
-        return FileHelper.moveFilePromise(oldFolder, audio.name,
-               cordova.file.cacheDirectory, filename + '.' + extension);
+        if(cordova.platformId == 'ios') {
+          console.log(audio)
+          return FileHelper.getFilePromise(audio.localURL)
+        } else {
+          var extension = FileHelper.getExtensionFromPath(audio.fullPath);
+          var oldFolder = FileHelper.getFolderFromPath(audio.fullPath);
+          var filename = uuidv4();
+          return FileHelper.moveFilePromise(oldFolder, audio.name,
+              cordova.file.cacheDirectory, filename + '.' + extension);
+        }
+
       }).then((audioEntry) => {
         this.cardAudio = audioEntry.toInternalURL();
       }).catch(console.log);

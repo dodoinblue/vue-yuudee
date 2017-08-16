@@ -96,9 +96,16 @@ var playAnimation = function(context) {
     if (!context.classware.mute) {
       let playAudioFn = Utils.mediaPluginPlayAudio
       let numOfAudios = context.card.audios.length
-      let p
+      let p = Utils.emptyPromise()
       if (numOfAudios > 0) {
-        p = playAudioFn(context.card.audios[0])
+        p = p.then(() => {
+          if (context.card.audios[0]) {
+            return playAudioFn(context.card.audios[0])
+          } else {
+            console.log('error!!!!!')
+            throw new Error("audio not defined")
+          }
+        })
       }
       if (numOfAudios > 1) {
         console.log('more than 1 audio')

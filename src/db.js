@@ -242,8 +242,10 @@ var getCardImages = function(imagesPath) {
 var getCardAudios = function(audioPath) {
   return FileHelper.listDirectoryPromise(audioPath).then(function(list){
     return Q.all(list.map(function(node){
-      if(_.endsWith(node.nativeURL, '.mp3')) {
+      if(_.endsWith(node.nativeURL, '.mp3') || _.endsWith(node.nativeURL, '.wav')) {
         return node.toInternalURL();
+      } else {
+        console.log("Audio format not supported!!!! " + node.nativeURL)
       }
     }));
   });
