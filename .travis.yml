@@ -26,8 +26,11 @@ before_install:
   - sudo apt-get install imagemagick
 
 script:
-  - ls
+  - android list
+  - ls $ANDROID_HOME/platforms/
+  - ls $ANDROID_HOME/platform-tools/
   - mkdir www
+  - ls
   - npm install -g cordova cordova-splash cordova-icon
   - npm install
   - cordova platform add android
