@@ -150,7 +150,7 @@ export default {
         let otherCategory = db.getCardByUuid('Other')
         if (!otherCategory) {
           console.log('creating otherCategory in db')
-          db.insertResourceCategory(FileHelper.getUserAssetFolder() + '/Other', false)
+          db.insertResourceCategory(FileHelper.getUserAssetFolder() + '/Other', true)
         }
         console.log("emit: RESOURCE_LOADED")
         EventBus.$emit("RESOURCE_LOADED")

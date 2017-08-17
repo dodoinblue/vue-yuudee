@@ -580,12 +580,14 @@ var getAllResourceCategories = function() {
 }
 
 var getNonOfficialResourceCategories = function() {
-  return getResourceCollection().chain()
+  let result = getResourceCollection().chain()
          .find({
            'isCategory': {'$eq': true},
            'isOffcial': {'$eq': false}
           }).simplesort('originalOrder')
          .data();
+  result.push(db.getCardByUuid('Other'))
+  return result
 }
 
 var insertRootClassware = function(name) {
