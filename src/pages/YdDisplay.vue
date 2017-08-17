@@ -273,9 +273,7 @@ export default {
     },
     pressed: function(index) {
       this.touchAreas[index].pressed = true;
-      // if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
-      // TODO: temp modification for automated compability test
-      if(true) {
+      if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
         this.editMode = true;
         this.touchAreas[0].pressed = false;
         this.touchAreas[1].pressed = false;
