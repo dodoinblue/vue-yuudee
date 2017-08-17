@@ -302,7 +302,7 @@ export default {
     }
   },
   created() {
-    this.categoryList = db.getAllResourceCategories();
+    this.categoryList = db.getNonOfficialResourceCategories();
     if (this.isEditing) {
       this.cardImage = _.isEmpty(this.cardInEdit.images) ? "static/img/dummy_content.jpg" : this.cardInEdit.images[0]
       this.cardAudio = _.isEmpty(this.cardInEdit.audios) ? "" : this.cardInEdit.audios[0]
@@ -529,7 +529,7 @@ img.selected {
   color: skyblue;
 }
 .popover-resource-categories {
-  height: 50%;
+  height: 30%;
   width: 50%;
 }
 

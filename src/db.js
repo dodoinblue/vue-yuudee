@@ -579,6 +579,15 @@ var getAllResourceCategories = function() {
          .data();
 }
 
+var getNonOfficialResourceCategories = function() {
+  return getResourceCollection().chain()
+         .find({
+           'isCategory': {'$eq': true},
+           'isOffcial': {'$eq': false}
+          }).simplesort('originalOrder')
+         .data();
+}
+
 var insertRootClassware = function(name) {
     var classware = {}
     classware.uuid = uuidv4();
@@ -663,6 +672,7 @@ export default {
   getCardByUuid,
   getCardsOfRecourceCategory,
   getAllResourceCategories,
+  getNonOfficialResourceCategories,
   insertResourceCategory,
   insertResourceCard,
   deleteResourceCategory,
