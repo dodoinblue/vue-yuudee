@@ -2,7 +2,11 @@
 	"config_ios": {
 		"NSCameraUsageDescription": "孤独症儿童的辅助共同工具",
 		"CFBundleDisplayName": "小雨滴",
-		"CFBundleName": "小雨滴"
+		"CFBundleName": "小雨滴",
+		"PHOTO_LIBRARY_USAGE_DESCRIPTION": "从相册里为自定义卡片选择封面",
+		"PHOTOLIBRARY_USAGE_DESCRIPTION": "从相册里为自定义卡片选择封面",
+		"CAMERA_USAGE_DESCRIPTION": "拍摄照片作为自定义卡片的封面",
+		"MICROPHONE_USAGE_DESCRIPTION": "为自已编辑的卡片添加语音"
 	},
 	"config_android": {
 		"app_name": "小雨滴"
