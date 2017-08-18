@@ -159,6 +159,9 @@ export default {
     if (this.isEditing) {
       this.cardImage = this.cardInEdit.cover
       this.cardName = this.cardInEdit.name
+      window.ga.trackEvent('USER_EVENT', 'RESOURCE_CATEGORY', 'EDIT')
+    } else {
+      window.ga.trackEvent('USER_EVENT', 'RESOURCE_CATEGORY', 'CREATE')
     }
   }
 }

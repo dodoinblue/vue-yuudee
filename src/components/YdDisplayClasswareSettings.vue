@@ -57,7 +57,6 @@ export default {
       EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE);
     },
     deleteClassware: function() {
-      console.log(this.$t)
       if (this.classwareId == 'all') {
         this.f7.alert(this.$t('message.cannot_delete_all'), this.$t('message.forbidden'));
       } else {
@@ -68,6 +67,7 @@ export default {
           }
           EventBus.$emit(Events.DISPLAY_CURRENT_CATEGORY_DELETED, this.classwareInfo);
           EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
+          window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'COURSEWARE_DELETED')
         });
       }
     },
@@ -92,7 +92,7 @@ export default {
     console.log(this.classwareId);
     if (this.classwareId == 'all') {
       this.classwareInfo = {
-        name: 'All'
+        name: this.$t('message.all')
       }
     } else  {
       this.classwareInfo = db.getClasswareItemByUuid(this.classwareId);
@@ -102,6 +102,7 @@ export default {
         this.selectedGridSize = db.getDefaultGridSize().row
       }
     }
+    window.ga.trackEvent('USER_EVENT', 'DISPLAY_COURSE_SETTING', 'ENTER')
   },
   mounted() {
     this.f7 = Utils.getF7();

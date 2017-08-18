@@ -219,6 +219,11 @@ export default {
     }
   },
   components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
+  watch: {
+    editMode: function(val, oldVal) {
+      window.ga.trackEvent('USER_EVENT', 'EDITMODE', 'CHANGE', val, false)
+    },
+  },
   computed: {
     classwareName: function() {
       // TODO: check root classware existance before displaying
@@ -304,6 +309,7 @@ export default {
       this.showClasswareSettings = false;
     });
     EventBus.$on(Events.DISPLAY_NEW_ROOT_CLASSWARE, (doc) => {
+      window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'ROOT_COURSEWARE_CHANGED')
       window.setTimeout(() => {
         this.classwares = db.getClasswareList()
         this.drawers = []
@@ -360,7 +366,6 @@ export default {
             navigator.app.exitApp()
             // this.$router.back()
           } else {
-            console.log('press again')
             this.backCount++
             this.f7.addNotification({
               title: this.$t('message.notice'),
@@ -387,6 +392,7 @@ export default {
   },
   mounted() {
     this.f7 = Utils.getF7();
+    window.ga.trackView('PAGE_DISPLAY')
   },
 }
 </script>

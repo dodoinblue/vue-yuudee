@@ -85,8 +85,8 @@ export default {
         db.deleteClasswareItem(this.card);
         EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent);
         EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'ITEM_DELETED')
       });
-
     },
     confirm: function() {
       var changed = false;
@@ -111,6 +111,7 @@ export default {
     this.cardContent = db.getCardByUuid(this.card.content);
     this.selected = this.card.animation;
     this.mute = this.card.mute;
+    window.ga.trackEvent('USER_EVENT', 'DISPLAY_CARD_SETTING', 'ENTER')
   }
 }
 </script>

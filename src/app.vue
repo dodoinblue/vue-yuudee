@@ -22,12 +22,11 @@ import Q from 'q'
 export default {
   methods: {
     prepareResource: function() {
-
       let cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
       let lang = this.$root.$i18n.locale || 'zh'
       let preloadZipPath = cordova.file.applicationDirectory + 'www/static/' + lang + '/yuudee-card-v1.zip'
       FileHelper.listDirectoryPromise(cordova.file.applicationDirectory + 'www/static/' + lang).then(console.log)
-      let f7 = this.f7;
+      let f7 = Utils.getF7();
       f7.showPreloader(this.$t('message.downloading'));
       return db.removeResourceCollection().then(() => {
         console.log('resource db cleared')
@@ -93,7 +92,7 @@ export default {
     },
     chooseLanguage: function() {
       let deferred = Q.defer()
-      this.f7.modal({
+      Utils.getF7().modal({
         title:  '选择语言<br>Choose language',
         text: '',
         verticalButtons: true,
@@ -116,8 +115,12 @@ export default {
     },
     startupChecks: function() {
       console.log("startup check")
-      window.fhelper = FileHelper
-      window.db = db
+      // For GA
+      let t0
+      let firstStartup = false
+
+      // window.fhelper = FileHelper
+      // window.db = db
       let startPromise = Q()
       let langString = db.getLanguage()
       // let langString
@@ -127,18 +130,22 @@ export default {
         }).then((langString) => {
           db.setLanguage(langString)
           this.$root.$i18n.locale = langString
+          window.ga.trackEvent('USER_EVENT', 'LANGUAGE', 'CHOOSE', langString, false)
         })
       } else {
         this.$root.$i18n.locale = langString
       }
 
+
       startPromise = startPromise.then(() => {
+        t0 = Date.now()
         // Check and create
         return this.createUserFolders()
       })
 
       // Check if classwareCollection has been built
       if (! db.hasClasswareBuilt()) {
+        firstStartup = true
       // if (true) {
         startPromise = startPromise.then(() => {
           console.log('prepareRes')
@@ -153,19 +160,22 @@ export default {
           db.insertResourceCategory(FileHelper.getUserAssetFolder() + '/Other', true)
         }
         console.log("emit: RESOURCE_LOADED")
+        if (firstStartup) {
+          window.ga.trackEvent('LIFE_CYCLE', 'APP_LAUNCH', 'FIRST_TIME_SPEND', Date.now() - t0, false)
+        } else {
+          window.ga.trackEvent('LIFE_CYCLE', 'APP_LAUNCH', 'REGULAR_TIME_SPEND', Date.now() - t0, false)
+        }
         EventBus.$emit("RESOURCE_LOADED")
       })
     },
   },
   created() {
+    window.ga.trackEvent('LIFE_CYCLE', 'APP_LAUNCH', 'DEVICE_READY', Date.now(), true)
     // Startup checks here...
     EventBus.$on('ROOT_MOUNTED', () => {
       this.startupChecks();
     });
   },
-  mounted() {
-    this.f7 = Utils.getF7();
-  }
 }
 </script>
 

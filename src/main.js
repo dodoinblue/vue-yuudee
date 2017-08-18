@@ -87,7 +87,8 @@ const messages = {
       other: "Other",
       // OK, Cancel
       ok: "Ok",
-      cancel: "Cancel"
+      cancel: "Cancel",
+      all: "All"
     }
   },
   zh: {
@@ -151,7 +152,8 @@ const messages = {
       other: "其他",
       // OK, Cancel
       ok: "确认",
-      cancel: "取消"
+      cancel: "取消",
+      all: "全部"
     }
   }
 }
@@ -216,6 +218,9 @@ var initApp = function() {
 
 document.addEventListener("deviceready", function(){
   console.log("device ready");
+  window.ga.startTrackerWithId('UA-104921838-2', 30)
+  window.ga.setAppVersion('0.8.3')
+  window.ga.enableUncaughtExceptionReporting(true)
   db.initDB().then(function(){
     initApp();
   });

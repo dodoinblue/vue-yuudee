@@ -154,6 +154,11 @@ export default {
   mounted() {
     this.f7 = Utils.getF7();
     console.log('query: ' + this.$route.query.request)
+    if (this.editMode) {
+      window.ga.trackView('PAGE_RESOURCE_PICK')
+    } else {
+      window.ga.trackView('PAGE_RESOURCE')
+    }
   }
 }
 </script>

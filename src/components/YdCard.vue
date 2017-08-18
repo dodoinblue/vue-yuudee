@@ -153,6 +153,7 @@ var playAnimation = function(context) {
     context.onTop = false;
     context.slideshow = null;
     context.currentImageIndex = 0;
+    window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'CARD_PLAY')
   })
 }
 

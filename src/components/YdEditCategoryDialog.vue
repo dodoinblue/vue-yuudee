@@ -99,14 +99,17 @@ export default {
   },
   created() {
     if (this.newCategory) {
+      window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'CREATE')
       return
     }
     if (this.card.type == 'folder') {
       this.cardTitle = this.card.name
+      window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'EDIT')
     } else {
       // This item is a collection of asset cards
       var content = db.getCardByUuid(this.card.content);
       this.cardTitle = content.name;
+      window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'EDIT_RES_CAT')
     }
   },
 }

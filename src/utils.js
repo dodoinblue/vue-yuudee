@@ -6,8 +6,21 @@ var f7 = null;
 
 export default {
   getF7: function(){
+    // comment this
+    let okLocalized, cancelLocalized
+    try {
+      okLocalized = window.app.$t('message.ok')
+      cancelLocalized = window.app.$t('message.cancel')
+    } catch(error) {
+      okLocalized = "Ok",
+      cancelLocalized = "Cancel"
+    }
     if (!f7) {
-      f7 = new Framework7({statusbarOverlay: false})
+      f7 = new Framework7({
+        statusbarOverlay: false,
+        modalButtonOk: okLocalized,
+        modalButtonCancel: cancelLocalized,
+      })
     }
     return f7
   },

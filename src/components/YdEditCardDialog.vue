@@ -144,6 +144,7 @@ export default {
         // FileHelper.moveDirPromise
         console.log('update category')
         p = p.then(() => {
+          window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'MOVE')
           // Move in fs
           return FileHelper.moveDirPromise(
             FileHelper.getUserAssetFolder() + this.cardInEdit.category,
@@ -171,7 +172,10 @@ export default {
       p = p.then(() => {
         console.log('close dialog')
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      }).catch(console.log)
+        window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'EDIT_OK')
+      }).catch((error) => {
+        window.ga.trackException('UpdateResCardError: [' + error.message + ']', false)
+      })
     },
     deleteCard: function() {
       FileHelper.removeFolderIfExistPromise(this.cardInEdit.cdvpath).then(() => {
@@ -179,7 +183,10 @@ export default {
       }).then(() => {
         EventBus.$emit(Events.RESOURCE_ITEM_DELETED, this.cardInEdit.category)
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      }).catch(console.log)
+        window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'DELETE_OK')
+      }).catch((error) => {
+        window.ga.trackException('DeleteResCardError: [' + error.message + ']', false)
+      })
     },
     confirm: function() {
       if (this.cardName == "" || ! this.category.uuid || this.cardImage == "static/img/dummy_content.jpg") {
@@ -244,7 +251,10 @@ export default {
         console.log('card saving done');
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CARD_ADDED, doc);
-      }).catch(console.log);
+        window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'CREATE_OK')
+      }).catch((error) => {
+        window.ga.trackException('CreateNewResCardError: [' + error.message + ']', false)
+      });
     },
     takePicture: function(){
       console.log('take picture');
@@ -258,7 +268,9 @@ export default {
       }).then((internalPath) => {
         this.cardImage = internalPath;
         // TODO Cleanup cache folder. or do this when save/cancel
-      }).catch(console.log);
+      }).catch((error) => {
+        window.ga.trackException('TakePictureError: [' + error.message + ']', false)
+      });
     },
     choosePicture: function() {
       console.log('choose picture');
@@ -272,7 +284,9 @@ export default {
       }).then((internalPath) => {
         this.cardImage = internalPath;
         // TODO Cleanup cache folder. or do this when save/cancel
-      }).catch(console.log);
+      }).catch((error) => {
+        window.ga.trackException('ChoosePictureError: [' + error.message + ']', false)
+      });
     },
     recordAudio: function() {
       Utils.recordAudioPromise().then(function(audio){
@@ -290,12 +304,16 @@ export default {
 
       }).then((audioEntry) => {
         this.cardAudio = audioEntry.toInternalURL();
-      }).catch(console.log);
+      }).catch((error) => {
+        window.ga.trackException('RecordAudioError: [' + error.message + ']', false)
+      });
     },
     playAudio: function() {
       FileHelper.getCdvPath(this.cardAudio).then(function(cdvPath){
         Utils.mediaPluginPlayAudio(cdvPath)
-      }).catch(console.log); // Notify when no audio.
+      }).catch(() => {
+        window.ga.trackException('PlayAudioError: [' + error.message + ']', false)
+      }); // Notify when no audio.
     },
     removeAudio: function() {
       this.cardAudio = "";
@@ -311,12 +329,14 @@ export default {
       this.category = _.find(this.categoryList, (o) => {
         return o.uuid === this.cardInEdit.category
       })
+      window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'EDIT')
     } else {
       this.uuid = uuidv4();
       let other = db.getCardByUuid('Other')
       if (other) {
         this.category = other
       }
+      window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'CREATE')
     }
   }
 }

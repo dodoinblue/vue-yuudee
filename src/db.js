@@ -141,7 +141,13 @@ var setRootClasswareUuid = function(uuid) {
 
 var getClasswareItemByUuid = function(uuid) {
   if (uuid == 'all') {
-    return {'name': 'All'}
+    let allLocalized
+    try {
+      allLocalized = window.app.$t('message.all')
+    } catch(error) {
+      allLocalized = "All"
+    }
+    return {'name': allLocalized}
   }
   return getClasswareCollection().findOne({'uuid': uuid});
 }
@@ -249,6 +255,7 @@ var getCardAudios = function(audioPath) {
         return node.toInternalURL();
       } else {
         console.log("Audio format not supported!!!! " + node.nativeURL)
+        window.ga.trackException('Audio format not supported: ' + ext, Fatal)//where Fatal is boolean
       }
     }));
   });
@@ -376,7 +383,13 @@ var getClasswareList = function() {
               .find({'parent': 'root'})
               .simplesort('order')
               .data();
-  fromDB.push({'name': 'All', 'uuid': 'all'});
+  let allLocalized
+  try {
+    allLocalized = window.app.$t('message.all')
+  } catch(error) {
+    allLocalized = "All"
+  }
+  fromDB.push({'name': allLocalized, 'uuid': 'all'});
   return fromDB;
 }
 

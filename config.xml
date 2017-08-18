@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.supersuperstar.yuudee.vue" version="0.8.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.supersuperstar.yuudee.vue" version="0.8.3" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <hook src="hooks/hookers.js" type="before_prepare"/>
     <hook src="hooks/beforedep.js" type="before_deploy"/>
     <hook src="hooks/after_prepare.sh" type="after_prepare"/>
@@ -63,5 +63,6 @@
         <variable name="XWALK_MULTIPLEAPK" value="false"/>
     </plugin>
     <plugin name="cordova-plugin-localization-strings" spec="https://github.com/kelvinhokk/cordova-plugin-localization-strings.git"/>
+    <plugin name="cordova-plugin-google-analytics" spec="~1.8.3"/>
     <plugin name="cordova-plugin-crop" spec="https://github.com/dodoinblue/cordova-plugin-crop"/>
 </widget>
