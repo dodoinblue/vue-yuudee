@@ -242,9 +242,10 @@ var getCardImages = function(imagesPath) {
 var getCardAudios = function(audioPath) {
   return FileHelper.listDirectoryPromise(audioPath).then(function(list){
     return Q.all(list.map(function(node){
-      if(_.endsWith(node.nativeURL, '.mp3')
-          || _.endsWith(node.nativeURL, '.wav')
-          || _.endsWith(node.nativeURL, '.amr')) {
+      let ext = FileHelper.getExtensionFromPath(node.nativeURL)
+      let possibleAudioFormats = ['mp3', 'wav', 'mp4', 'm4a', 'amr',
+                                  'ogg', 'mkv', '.flac', '3gp', 'ts', 'aac']
+      if(_.indexOf(possibleAudioFormats, ext) > -1) {
         return node.toInternalURL();
       } else {
         console.log("Audio format not supported!!!! " + node.nativeURL)
