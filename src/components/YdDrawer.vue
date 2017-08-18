@@ -60,12 +60,12 @@ export default {
     }
   },
   watch: {
-    editMode: function(val, oldVal) {
-      console.log('!!!!!!!!!setting draggable disabled: ' + this.draggableDisabled)
-      for (let i = 0; i < this.sortables.length; i++) {
-        this.sortables[i].option("disabled", this.draggableDisabled)
-      }
-    },
+    // editMode: function(val, oldVal) {
+    //   console.log('!!!!!!!!!setting draggable disabled: ' + this.draggableDisabled)
+    //   for (let i = 0; i < this.sortables.length; i++) {
+    //     this.sortables[i].option("disabled", this.draggableDisabled)
+    //   }
+    // },
     isCardPlaying: function(val, oldVal) {
       if (!this.mySwiper) {
         return
