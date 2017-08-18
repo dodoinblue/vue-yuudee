@@ -25,6 +25,7 @@
     <preference name="DisallowOverscroll" value="true"/>
     <preference name="Fullscreen" value="true"/>
     <preference name="Suppress3DTouch" value="true"/>
+    <preference name="target-device" value="handset"/>
     <platform name="android">
         <allow-intent href="market:*"/>
     </platform>
