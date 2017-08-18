@@ -523,7 +523,7 @@ export default {
 
 .drawer.with-background {
   background-image: url("../../static/img/child_incat_woodbg.png");
-  min-height: 65%;
+  min-height: 68%;
 }
 /*.drawer:after {*/
 /*content: " ";*/
@@ -578,13 +578,14 @@ export default {
   margin: 0px;
   padding: 0px;
 }
-.ghost-card {
+/* for debug */
+/*.ghost-card {
   background-color: black;
 }
 
 .dragging-card {
   background-color: red;
-}
+}*/
 
 /* Animations */
 .slide-enter-active {
