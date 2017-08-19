@@ -478,7 +478,7 @@ var deleteAllSubClasswareItem = function(doc) {
   var subfolders = collection.find({'parent': {'$eq': doc.uuid}, 'type': {'$eq': 'folder'}});
   for (var i = 0; i < subfolders.length; i++) {
     console.log('recursively deleting: ' + i);
-    deleteAllSubClasswareItem(subfolders(i));
+    deleteAllSubClasswareItem(subfolders[i]);
   }
   // TODO: switch to findAndRemove
   // collection.findAndUpdate({'parent': {'$eq': doc.uuid}}, function(obj) {
