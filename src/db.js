@@ -451,7 +451,14 @@ var deleteClasswareItem = function(doc) {
   }).simplesort('order').data()
 
   var lastOfAll = allCards[allCards.length - 1].order
-  var lastOfNonPlaceholder = allNonPlaceholders[allNonPlaceholders.length - 1].order
+  var lastOfNonPlaceholder
+  if (allNonPlaceholders.length == 0) {
+    // No non-placeholder left, delete from 0
+    lastOfNonPlaceholder = 0
+  } else {
+    // Delete everything after this card
+    lastOfNonPlaceholder = allNonPlaceholders[allNonPlaceholders.length - 1].order
+  }
 
   if (lastOfNonPlaceholder < lastOfAll) {
     console.log(`Removing trailing placeholder cards. pos: ${lastOfNonPlaceholder} to pos: ${lastOfAll}`)
