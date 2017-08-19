@@ -10,7 +10,7 @@
         <div class="swiper-slide" v-for="(page, index) in pagedCards" :key="index">
           <div class="card-group" :ref="'group' + index" :id="'card-group-' + index">
             <div class="card-group-item" :class="'card-group-item-' + row" v-for="(card , index) in page" :key="card.uuid" :data-id="card.uuid">
-              <yd-card :classware="card" :edit-mode="editMode" :from="from"></yd-card>
+              <yd-card :classware="card" :edit-mode="editMode" :from="from" v-on:pick="pickFromResource"></yd-card>
             </div>
           </div>
         </div>
@@ -38,17 +38,6 @@ import db from '../db.js'
 import PickedCards from '../PickedCards'
 import uuidv4 from 'uuid/v4'
 
-Vue.component('debug', {
-  template: "<!-- debug -->",
-  props: [
-    "item"
-  ],
-  created: function() {
-    console.log("debug", this.item);
-    // debugger
-  }
-});
-
 export default {
   props: ['root', 'editMode', 'uuid', 'from'],
   components: { YdCard },
@@ -60,12 +49,6 @@ export default {
     }
   },
   watch: {
-    // editMode: function(val, oldVal) {
-    //   console.log('!!!!!!!!!setting draggable disabled: ' + this.draggableDisabled)
-    //   for (let i = 0; i < this.sortables.length; i++) {
-    //     this.sortables[i].option("disabled", this.draggableDisabled)
-    //   }
-    // },
     isCardPlaying: function(val, oldVal) {
       if (!this.mySwiper) {
         return
@@ -78,6 +61,88 @@ export default {
     },
   },
   methods: {
+    pickFromResource: function(holder) {
+      // Clean any previous listener
+      EventBus.$off(Events.ADD_CARDS_FROM_RESOURCE)
+      EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, this.addFromResource)
+      this.$router.push('resource/pick?request=' + holder.placeholderId
+                  + '&drawerId=' + this.uuid
+                  + '&order=' + holder.placeholderOrder);
+    },
+    addFromResource: function(object) {
+      let added = []
+      let folders = [] // Keep track of this, add all cards belong to folder
+      for (let i = 0; i < object.list.length; i ++) {
+        let resContent = db.getCardByUuid(object.list[i])
+        let newClasswareItem = {}
+        newClasswareItem.uuid = uuidv4()
+        newClasswareItem.content = object.list[i]
+        newClasswareItem.parent = object.drawerId
+        newClasswareItem.order = parseInt(object.order) + i
+
+        if (resContent.isCategory) {
+          newClasswareItem.type = 'folder'
+          newClasswareItem.cover = resContent.cover;
+          newClasswareItem.name = resContent.name
+          folders.push(newClasswareItem)
+        } else {
+          newClasswareItem.type = 'card'
+          newClasswareItem.animation = 'enlarge' // default
+          newClasswareItem.mute = false
+        }
+        added.push(newClasswareItem)
+      }
+      if (object.order >= this.cardList.length) {
+        // Fill in placeholder cards
+        console.log(`filling gap between ${this.cardList.length} and ${object.order}`)
+        for (let i = this.cardList.length; i < object.order; i++) {
+          let placeholder = {}
+          placeholder.uuid = uuidv4()
+          placeholder.type = 'placeholder'
+          placeholder.parent = object.drawerId
+          placeholder.order = i
+          added.push(placeholder)
+        }
+        db.getClasswareCollection().insert(added)
+      } else {
+        console.log('requesting position in the middle of the list')
+        let emptySlots = db.getClasswareCollection().chain().where((item) => {
+          return item.parent === object.drawerId
+                  && item.order >= object.order
+                  && item.order < object.order + object.list.length
+                  && item.type == 'placeholder'
+        }).simplesort('order').data()
+        console.log(`empty slots between ${object.order} and ${object.order + object.list.length}`)
+        for (let i = 0; i < emptySlots.length; i++) {
+          // use new card's info to override everything except for order
+          let o = emptySlots[i].order
+          let updatedDoc = _.assign(emptySlots[i], added.pop())
+          updatedDoc.order = o
+          console.log(updatedDoc)
+          db.getClasswareCollection().update(updatedDoc)
+        }
+        if (added.length > 0) {
+          console.log('remaining inserts')
+          // reset order
+          for (let i = 0; i < added.length; i++) {
+            added[i].order = this.cardList.length + i
+          }
+          db.getClasswareCollection().insert(added)
+        }
+      }
+
+      // Add subcontent if there is any
+      folders.forEach((folder) => {
+        console.log('adding sub contents of folder: ' + folder.uuid)
+        db.addFolderContentToCourseware(folder)
+      })
+
+      // Done. Wait db written and update cardList
+      window.setTimeout(() => {
+        this.cardList = db.getCardsOfClassware(this.uuid)
+      }, 200)
+      EventBus.$off(Events.ADD_CARDS_FROM_RESOURCE)
+    },
     backClicked: function() {
       if (this.from == "resource") {
         if (this.editMode && PickedCards.hasItem()) {
@@ -113,7 +178,6 @@ export default {
           }
         }
         return tmp
-        console.log(tmp)
       }
 
       var processScroll = function(fromGroupId, toGroupId) {
@@ -357,7 +421,11 @@ export default {
     console.log('updating swipper')
     this.mySwiper.update(true)
   },
+  destroyed() {
+    console.log('drawer destroyed: ' + this.uuid)
+  },
   created() {
+    console.log('drawer creating...')
     this.initList()
     // console.log(this.cardList)
 
@@ -413,82 +481,6 @@ export default {
         }
       });
 
-      EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, (object) => {
-        if (this.uuid !== object.drawerId) {
-          return
-        }
-        let added = []
-        let folders = [] // Keep track of this, add all cards belong to folder
-        for (let i = 0; i < object.list.length; i ++) {
-          let resContent = db.getCardByUuid(object.list[i])
-          let newClasswareItem = {}
-          newClasswareItem.uuid = uuidv4()
-          newClasswareItem.content = object.list[i]
-          newClasswareItem.parent = object.drawerId
-          newClasswareItem.order = parseInt(object.order) + i
-
-          if (resContent.isCategory) {
-            newClasswareItem.type = 'folder'
-            newClasswareItem.cover = resContent.cover;
-            newClasswareItem.name = resContent.name
-            folders.push(newClasswareItem)
-          } else {
-            newClasswareItem.type = 'card'
-            newClasswareItem.animation = 'enlarge' // default
-            newClasswareItem.mute = false
-          }
-          added.push(newClasswareItem)
-        }
-        if (object.order >= this.cardList.length) {
-          // Fill in placeholder cards
-          console.log(`filling gap between ${this.cardList.length} and ${object.order}`)
-          for (let i = this.cardList.length; i < object.order; i++) {
-            let placeholder = {}
-            placeholder.uuid = uuidv4()
-            placeholder.type = 'placeholder'
-            placeholder.parent = object.drawerId
-            placeholder.order = i
-            added.push(placeholder)
-          }
-          db.getClasswareCollection().insert(added)
-        } else {
-          console.log('requesting position in the middle of the list')
-          let emptySlots = db.getClasswareCollection().chain().where((item) => {
-            return item.parent === object.drawerId 
-                   && item.order >= object.order
-                   && item.order < object.order + object.list.length
-                   && item.type == 'placeholder'
-          }).simplesort('order').data()
-          for (let i = 0; i < emptySlots.length; i++) {
-            // use new card's info to override everything except for order
-            let o = emptySlots[i].order
-            let updatedDoc = _.assign(emptySlots[i], added.pop())
-            updatedDoc.order = o
-            console.log(updatedDoc)
-            db.getClasswareCollection().update(updatedDoc)
-          }
-          if (added.length > 0) {
-            console.log('remaining inserts')
-            // reset order
-            for (let i = 0; i < added.length; i++) {
-              added[i].order = this.cardList.length + i
-            }
-            db.getClasswareCollection().insert(added)
-          }
-        }
-
-        // Add subcontent if there is any
-        folders.forEach((folder) => {
-          console.log('adding sub contents of folder: ' + folder.uuid)
-          db.addFolderContentToCourseware(folder)
-        })
-
-        // Done. Wait db written and update cardList
-        window.setTimeout(() => {
-          this.cardList = db.getCardsOfClassware(this.uuid)
-        }, 200)
-        
-      })
     }
   },
   mounted() {

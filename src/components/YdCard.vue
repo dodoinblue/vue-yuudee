@@ -202,9 +202,10 @@ export default {
       EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
     },
     selectFromResource: function() {
-      this.$router.push('resource/pick?request=' + this.classware.uuid
-                        + '&drawerId=' + this.classware.parent
-                        + '&order=' + this.classware.order);
+      this.$emit("pick", {
+        placeholderId: this.classware.uuid,
+        placeholderOrder: this.classware.order
+      })
     },
     onCardPicked: function() {
       if (this.picked) {
