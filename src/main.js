@@ -223,7 +223,7 @@ var initApp = function() {
 document.addEventListener("deviceready", function(){
   console.log("device ready");
   window.ga.startTrackerWithId('UA-104921838-2', 30)
-  window.ga.setAppVersion('0.8.3')
+  window.ga.setAppVersion('1.0.0')
   window.ga.enableUncaughtExceptionReporting(true)
   db.initDB().then(function(){
     initApp();
