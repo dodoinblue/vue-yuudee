@@ -1,7 +1,7 @@
 <template>
 <transition name="slide">
 <div class="drawer-all">
-  <div class="drawer-back" @click="backClicked()" v-if="!root"></div>
+  <div :class="$t('message.drawer_back')" @click="backClicked()" v-if="!root"></div>
   <div class="drawer" :class="{'with-background': !root}">
     <div class="swiper-container drawer-content">
       <div class="swiper-wrapper drawer-wrapper">
@@ -548,6 +548,14 @@ export default {
 .drawer-back {
   position: absolute;
   content: url("../../static/img/child_incat_backbutton.png");
+  height: 10%;
+  top: 12%;
+  left: 7%;
+}
+
+.drawer-back-en {
+  position: absolute;
+  content: url("../../static/img/child_incat_backbutton_en.png");
   height: 10%;
   top: 12%;
   left: 7%;

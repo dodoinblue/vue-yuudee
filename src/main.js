@@ -88,7 +88,9 @@ const messages = {
       // OK, Cancel
       ok: "Ok",
       cancel: "Cancel",
-      all: "All"
+      all: "All",
+      // Drawer back image
+      drawer_back: "drawer-back-en"
     }
   },
   zh: {
@@ -153,7 +155,9 @@ const messages = {
       // OK, Cancel
       ok: "确认",
       cancel: "取消",
-      all: "全部"
+      all: "全部",
+      // Drawer back image
+      drawer_back: "drawer-back"
     }
   }
 }
