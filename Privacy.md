@@ -1,8 +1,3 @@
----
-layout: post
-title: Yuudee Privacy Statement
-date: 2017-08-20
----
 
 # Privacy
 
