@@ -102,13 +102,11 @@ var playAnimation = function(context) {
           if (context.card.audios[0]) {
             return playAudioFn(context.card.audios[0])
           } else {
-            console.log('error!!!!!')
             throw new Error("audio not defined")
           }
         })
       }
       if (numOfAudios > 1) {
-        console.log('more than 1 audio')
         for (let i = 1; i < numOfAudios; i++) {
           p = p.then(() => {
             return playAudioFn(context.card.audios[i]);
@@ -252,20 +250,15 @@ export default {
   created() {
     this.initContent()
     EventBus.$on(Events.RESOURCE_CARD_UPDATED, (doc) => {
-      console.log('event received: ' + doc.uuid + " this: " + this.classware.uuid)
       if (doc.uuid === this.classware.uuid) {
-        console.log('doc.uuid === this.classware.uuid')
         window.setTimeout(() => {
-          console.log('reload')
           this.classware = doc
           this.card = doc
         }, 200)
       } else if (doc.uuid === this.classware.content) {
-        console.log('doc.uuid === this.classware.content')
         this.card = doc
       }
     })
-    console.log('card initiated')
   }
 }
 </script>

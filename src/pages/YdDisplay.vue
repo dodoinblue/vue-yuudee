@@ -340,29 +340,21 @@ export default {
     this.backCount = 0
     document.addEventListener("backbutton", () => {
       if (this.$store.state.isCardPlaying) {
-        console.log("Card playing, ignore back event")
         return
       }
       switch (this.$route.path) {
         case "/display":
-          console.log('/display')
           if (this.showClasswareSettings) {
-            console.log("showClasswareSettings")
             this.showClasswareSettings = false
           } else if (this.showNewClasswareCategorySettings) {
-            console.log("showNewClasswareCategorySettings")
             this.showNewClasswareCategorySettings = false
           } else if (!_.isEmpty(this.cardInEdit)) {
-            console.log("cardInEdit")
             this.cardInEdit = {}
           } else if (this.drawers.length > 1) {
-            console.log('drawers.length > 1')
             this.drawers.pop()
           } else if (this.editMode) {
-            console.log("editMode")
             this.editMode = false
           } else if (this.backCount > 0) {
-            console.log('exit')
             navigator.app.exitApp()
             // this.$router.back()
           } else {
@@ -378,7 +370,6 @@ export default {
           }
           break
         case "/resource":
-          console.log('/resource')
           EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
           break
         case "/resource/pick":

@@ -60,7 +60,6 @@ export default {
       if (this.classwareId == 'all') {
         this.f7.alert(this.$t('message.cannot_delete_all'), this.$t('message.forbidden'));
       } else {
-        console.log(this.$t('are_you_sure'))
         this.f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
           if (this.classwareInfo.parent == 'root') {
             db.deleteTopLevelCourseware(this.classwareInfo);
@@ -89,7 +88,6 @@ export default {
     }
   },
   created() {
-    console.log(this.classwareId);
     if (this.classwareId == 'all') {
       this.classwareInfo = {
         name: this.$t('message.all')

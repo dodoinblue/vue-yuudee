@@ -84,14 +84,17 @@ export default {
       }
       p = p.then(function() {
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      }).catch(console.log)
+      }).catch((error) => {
+        window.ga.trackException('UpdateDisplayCategoryError: [' + error.message + ']', false)
+      })
     },
     deleteCard: function() {
-      console.log("deleting card")
       db.deleteResourceCategory(this.cardInEdit).then(() => {
         EventBus.$emit(Events.RESOURCE_ITEM_DELETED, 'all')
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-      }).catch(console.log)
+      }).catch((error) => {
+        window.ga.trackException('DeleteDisplayCardError: [' + error.message + ']', false)
+      })
     },
     confirm: function() {
       if (this.cardName == "") {
@@ -129,7 +132,7 @@ export default {
           originalOrder: order,
         }, cordova.file.cacheDirectory + cat_path, 'info.json');
       }).then(() => {
-        FileHelper.readFromFilePromise(cordova.file.cacheDirectory + cat_path + '/info.json').then(console.log);
+        // FileHelper.readFromFilePromise(cordova.file.cacheDirectory + cat_path + '/info.json').then(console.log);
         return FileHelper.getDirPromise(userResourceRoot).catch(function(error){
           console.log(userResourceRoot + ' does not exist ' + error);
           return FileHelper.createDirPromise(userResourceParentFolder, 'UserAssets/', false);
@@ -141,7 +144,9 @@ export default {
       }).then((doc) => {
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CATEGORY_ADDED, doc);
-      }).catch(console.log)
+      }).catch((error) => {
+        window.ga.trackException('NewResCategoryError: [' + error.message + ']', false)
+      })
     },
     choosePicture: function() {
       Utils.choosePicturePromise().then(function(filePath){
@@ -152,7 +157,9 @@ export default {
       }).then((internalPath) => {
         this.cardImage = internalPath;
         // TODO Cleanup cache folder. or do this when save/cancel
-      }).catch(console.log);
+      }).catch((error) => {
+        window.ga.trackException('ChoosePictureError: [' + error.message + ']', false)
+      });
     },
   },
   created() {

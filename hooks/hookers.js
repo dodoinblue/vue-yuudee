@@ -177,7 +177,7 @@ module.exports = function (ctx) {
 		startWebpackBuild(isRelease) {
 			let defer = new Q.defer()
 
-			console.log('Starting webpack build...')
+			console.log('Starting webpack build... isRelease? ' + isRelease)
 
       let wpPath = webpackPath + (os.platform() === 'win32' ? '.cmd' : '')
 

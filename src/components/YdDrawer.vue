@@ -94,7 +94,6 @@ export default {
       }
       if (object.order >= this.cardList.length) {
         // Fill in placeholder cards
-        console.log(`filling gap between ${this.cardList.length} and ${object.order}`)
         for (let i = this.cardList.length; i < object.order; i++) {
           let placeholder = {}
           placeholder.uuid = uuidv4()
@@ -105,24 +104,20 @@ export default {
         }
         db.getClasswareCollection().insert(added)
       } else {
-        console.log('requesting position in the middle of the list')
         let emptySlots = db.getClasswareCollection().chain().where((item) => {
           return item.parent === object.drawerId
                   && item.order >= object.order
                   && item.order < object.order + object.list.length
                   && item.type == 'placeholder'
         }).simplesort('order').data()
-        console.log(`empty slots between ${object.order} and ${object.order + object.list.length}`)
         for (let i = 0; i < emptySlots.length; i++) {
           // use new card's info to override everything except for order
           let o = emptySlots[i].order
           let updatedDoc = _.assign(emptySlots[i], added.pop())
           updatedDoc.order = o
-          console.log(updatedDoc)
           db.getClasswareCollection().update(updatedDoc)
         }
         if (added.length > 0) {
-          console.log('remaining inserts')
           // reset order
           for (let i = 0; i < added.length; i++) {
             added[i].order = this.cardList.length + i
@@ -133,7 +128,6 @@ export default {
 
       // Add subcontent if there is any
       folders.forEach((folder) => {
-        console.log('adding sub contents of folder: ' + folder.uuid)
         db.addFolderContentToCourseware(folder)
       })
 
@@ -185,11 +179,6 @@ export default {
           console.log('Warning: Scroll will not happen since it is at the boundary')
           return
         }
-        console.log('from ' + fromGroupId + ': ' + sortables[fromGroupId].toArray())
-        console.log('to ' + toGroupId + ' :' + sortables[toGroupId].toArray())
-
-        console.log('dragged: ' + that.draggedItem.attributes['data-id'].value)
-        console.log(els[fromGroupId].childNodes[0].attributes['data-id'].value)
         var fromElGroupFiltered = _.filter(els[fromGroupId].childNodes, function(o){
           var dataAttr = o.attributes['data-id']
           if (!dataAttr) {
@@ -206,32 +195,23 @@ export default {
             return dataAttr.value !== that.draggedItem.attributes['data-id']
           }
         })
-        console.log('========filtered======')
-        console.log(fromElGroupFiltered)
-        console.log(toElGroupFiltered)
         logElementsByDataId(fromElGroupFiltered)
         logElementsByDataId(toElGroupFiltered)
 
         if (toGroupId < fromGroupId) {
-          console.log('toGroupId < fromGroupId')
           let oldNode = els[toGroupId].removeChild(toElGroupFiltered[toElGroupFiltered.length -1])
-          console.log('removed: ' + oldNode.attributes['data-id'].value)
           els[fromGroupId].insertBefore(oldNode, fromElGroupFiltered[0])
           logElementsByDataId(els[fromGroupId].childNodes)
         } else {
-          console.log('else')
           let oldNode = els[toGroupId].removeChild(toElGroupFiltered[0])
-          console.log('removed: ' + oldNode.attributes['data-id'].value)
           els[fromGroupId].appendChild(oldNode)
           logElementsByDataId(els[fromGroupId].childNodes)
         }
       }
 
       var delayedScrollNext = _.throttle((from, to) => {
-        console.log('before scroll to next: ' + this.mySwiper.activeIndex)
         processScroll(from, to)
         this.mySwiper.slideNext()
-        console.log('after scroll to next: ' + this.mySwiper.activeIndex)
       }, 1000, { 'trailing': false });
 
       var delayedScrollPrev = _.throttle((from, to) => {
@@ -239,10 +219,8 @@ export default {
         this.mySwiper.slidePrev()
       }, 1000, { 'trailing': false });
 
-      console.log('~~~~~~~~~setting draggable disabled: ' + this.draggableDisabled)
       for(var i=0; i< els.length; i++) {
         var el = els[i]
-        console.log('group: ' + el.id)
         var sorta = Sortable.create(el, {
           group: 'cards',
           sort: true,
@@ -255,13 +233,10 @@ export default {
           preventOnFilter: true,
           fallbackOnBody: true,
           scrollFn: function(offsetX, offsetY, originalEvent) {
-            console.log(this.el.id + ': scrollFn X: ' + originalEvent.clientX + ' Y: ' + originalEvent.clientY)
             if (originalEvent.clientX < 30) {
-              console.log(this.el.id + ": calling prev");
               var from = parseInt(this.el.id.slice(11))
               delayedScrollPrev(from, from - 1);
             } else if (originalEvent.clientX > window.innerWidth - 30){
-              console.log(this.el.id + ": calling next");
               var from = parseInt(this.el.id.slice(11))
               delayedScrollNext(from, from + 1);
             }
@@ -274,25 +249,23 @@ export default {
             },
             set: function (sortable) {
               var order = sortable.toArray();
-              console.log(sortable.el.id + ": " + order);
             }
           },
           onMove: function(event, originalEvent) {
-            console.log(this.el.id + ': onmove X: ' + originalEvent.clientX + ' Y: ' + originalEvent.clientY)
+            // console.log(this.el.id + ': onmove X: ' + originalEvent.clientX + ' Y: ' + originalEvent.clientY)
           },
           onAdd: function() {
-            console.log(this.el.id + ': onAdd')
+            // console.log(this.el.id + ': onAdd')
           },
           onRemove: function() {
-            console.log(this.el.id + ': onRemove')
+            // console.log(this.el.id + ': onRemove')
           },
           onStart: function(evt) {
-            console.log(this.el.id + ': onStart ')
+            // console.log(this.el.id + ': onStart ')
             that.mySwiper.disableTouchControl()
             that.draggedItem = evt.item
           },
           onEnd: function() {
-            console.log(this.el.id + ': onEnd')
             that.mySwiper.enableTouchControl()
             that.draggedItem = null
             var dataIdByGroup = []
@@ -318,21 +291,15 @@ export default {
               }
               return result
             }
-            // that.appendedCards.forEach(function(e){console.log(e.uuid)})
             var afterDragging = sortByRef(that.appendedCards, flattened)
-            // console.log(afterDragging)
             var nonPlaceholder
             // Step 3: Remove trailing placeholder cards and update db
             var trailingPlaceholder = true
             for (let i = afterDragging.length -1; i >= 0; i-- ) {
               if (trailingPlaceholder && afterDragging[i].type === 'placeholder') {
-                console.log(`${i}th card is a placeholder`)
                 let docToRemove = db.getClasswareItemByUuid(afterDragging[i].uuid)
                 if (docToRemove) {
-                  console.log('removing trailing placeholder cards from db')
                   db.getClasswareCollection().remove(docToRemove)
-                } else {
-                  console.log('ignore trailing placeholder...')
                 }
                 continue
               } else {
@@ -342,13 +309,9 @@ export default {
                 if (docToReorder) {
                   docToReorder.order = i
                   db.getClasswareCollection().update(docToReorder)
-                  console.log(`Updating order. Original: ${originalOrder}, after: ${i}`)
                 } else {
                   afterDragging[i].order = i
                   db.getClasswareCollection().insert(afterDragging[i])
-                  console.log("original doc")
-                  // console.log(afterDragging[i])
-                  console.log(`inserting new placehoder card ${afterDragging[i].uuid} at pos: ${i}`)
                 }
 
               }
@@ -356,7 +319,6 @@ export default {
             // Sort done. Update cardlist
             window.setTimeout(() => {
               that.cardList = db.getCardsOfClassware(that.uuid);
-              console.log("+++++++ cardList updated")
             }, 200)
           }
         });
@@ -366,7 +328,6 @@ export default {
     },
     initList: function() {
       var grid = db.getDefaultGridSize();
-      console.log('default grid: ' + grid.col + " row: " + grid.row)
       if (this.from == 'resource') {
         this.cardList = db.getCardsOfRecourceCategory(this.uuid);
         this.col = grid.col
@@ -418,14 +379,9 @@ export default {
     }
   },
   updated() {
-    console.log('updating swipper')
     this.mySwiper.update(true)
   },
-  destroyed() {
-    console.log('drawer destroyed: ' + this.uuid)
-  },
   created() {
-    console.log('drawer creating...')
     this.initList()
     // console.log(this.cardList)
 
@@ -466,7 +422,6 @@ export default {
         if (uuid == this.uuid) {
           // this.cardList = db.getCardsOfClassware(this.uuid);
           this.initList()
-          console.log('updated list');
           // console.log(this.cardList);
         }
       });

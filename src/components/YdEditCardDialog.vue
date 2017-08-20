@@ -109,10 +109,9 @@ export default {
         p = p.then(() => {
           return FileHelper.removeFile(originalImage).then(function(){
           }).catch(function(error){
-            console.log("error removing old image" + error.code)
+            window.ga.trackException('MoveResCardError: [' + error.message + ']', false)
           })
         }).then(() => {
-          console.log('adding new')
           return FileHelper.copyFilePromise(this.cardImage, this.cardInEdit.cdvpath, newImage);
         }).then((fileEntry) => {
           editObj.images = [this.cardInEdit.cdvpath + newImage]
@@ -125,7 +124,7 @@ export default {
         p = p.then(() => {
           return FileHelper.removeFile(originalAudio).then(function(){
           }).catch(function(error){
-            console.log("error removing old audio" + error.code)
+            window.ga.trackException('RemoveAudioError: [' + error.message + ']', false)
           })
         }).then(() => {
           return FileHelper.copyFilePromise(this.cardAudio, this.cardInEdit.cdvpath + 'audios', '01.' + ext);
@@ -142,7 +141,6 @@ export default {
       if (this.category.uuid !== this.cardInEdit.category) {
         // Move card - keep uuid
         // FileHelper.moveDirPromise
-        console.log('update category')
         p = p.then(() => {
           window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'MOVE')
           // Move in fs
@@ -170,7 +168,6 @@ export default {
         })
       }
       p = p.then(() => {
-        console.log('close dialog')
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'EDIT_OK')
       }).catch((error) => {
@@ -206,26 +203,22 @@ export default {
       // create card folder in cache folder first
       FileHelper.createDirPromise(cordova.file.cacheDirectory, this.uuid, false).then(() => {
         // Copy audio if exist
-        console.log('saving audio');
         return FileHelper.getFilePromise(this.cardAudio).then(() => {
           var ext = FileHelper.getExtensionFromPath(this.cardAudio);
           return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'audios', false).then(() => {
             return FileHelper.copyFilePromise(this.cardAudio, cordova.file.cacheDirectory + this.uuid + '/audios', '01.' + ext);
           })
         }).catch((error) => {
-          console.log("error saving audio: " + error.code);
           return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'audios', false)
         })
       }).then(() => {
         // Do the same for image
-        console.log('saving images: ' + this.cardImage)
         return FileHelper.getFilePromise(this.cardImage).then(() => {
           var ext = FileHelper.getExtensionFromPath(this.cardImage);
           return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'images', false).then(() => {
             return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + this.uuid + '/images', '01.' + ext);
           })
         }).catch((error) => {
-          console.log("error saving image: " + error.code);
           return FileHelper.createDirPromise(cordova.file.cacheDirectory + this.uuid, 'images', false)
         })
       }).then(() => {
@@ -235,20 +228,15 @@ export default {
         var info = {};
         info.name = this.cardName;
         info.originalOrder = order
-        console.log('writing card info.json with order: ' + order)
         return FileHelper.writeJsonToFilePromise(info, cordova.file.cacheDirectory + this.uuid, 'info.json')
       }).then(() => {
-        console.log('moving...');
         // Move folder to final location
         // Assume root folder exist since it asks for a category.
-        // TODO: check userasset folder at startup
-        // TODO: create a "other" category at startup.
         return FileHelper.moveDirPromise(cordova.file.cacheDirectory, this.uuid, userResourceRoot + this.category.uuid, this.uuid + '.xydcard');
       }).then((dirEntry) => {
         // Sync db
         return db.insertResourceCard(dirEntry.nativeURL, this.category);
       }).then(function(doc){
-        console.log('card saving done');
         EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
         EventBus.$emit(Events.RESOURCE_NEW_CARD_ADDED, doc);
         window.ga.trackEvent('USER_EVENT', 'RESOURCE_CARD', 'CREATE_OK')
@@ -257,12 +245,9 @@ export default {
       });
     },
     takePicture: function(){
-      console.log('take picture');
       Utils.takePicturePromise({}).then(function(filePath){
-        console.log(filePath);
         return plugins.crop.promise(filePath, {quality: 50});
       }).then((croppedPath) => {
-        console.log('cropped: ' + croppedPath);
         // this.cardImage = croppedPath;
         return FileHelper.getCdvPath(croppedPath);
       }).then((internalPath) => {
@@ -273,12 +258,9 @@ export default {
       });
     },
     choosePicture: function() {
-      console.log('choose picture');
       Utils.choosePicturePromise().then(function(filePath){
-        console.log(filePath);
         return plugins.crop.promise(filePath, {quality: 50});
       }).then((croppedPath) => {
-        console.log('cropped: ' + croppedPath);
         // this.cardImage = croppedPath;
         return FileHelper.getCdvPath(croppedPath);
       }).then((internalPath) => {
@@ -292,7 +274,6 @@ export default {
       Utils.recordAudioPromise().then(function(audio){
         // Move to cache folder
         if(cordova.platformId == 'ios') {
-          console.log(audio)
           return FileHelper.getFilePromise(audio.localURL)
         } else {
           var extension = FileHelper.getExtensionFromPath(audio.fullPath);
@@ -311,7 +292,7 @@ export default {
     playAudio: function() {
       FileHelper.getCdvPath(this.cardAudio).then(function(cdvPath){
         Utils.mediaPluginPlayAudio(cdvPath)
-      }).catch(() => {
+      }).catch((error) => {
         window.ga.trackException('PlayAudioError: [' + error.message + ']', false)
       }); // Notify when no audio.
     },

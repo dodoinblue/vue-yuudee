@@ -28,17 +28,14 @@ export default {
       let f7 = Utils.getF7();
       f7.showPreloader(this.$t('message.downloading'));
       return db.removeResourceCollection().then(() => {
-        console.log('resource db cleared')
         return db.removeClasswareCollection()
       }).then(() => {
-        console.log('classware db cleared')
         return FileHelper.removeFolderIfExistPromise(cardResourceFolder)
       }).then(() => {
         db.setRootClasswareUuid('all')
         // https://github.com/MobileChromeApps/cordova-plugin-zip/issues/56
         return FileHelper.copyFilePromise(preloadZipPath, cordova.file.cacheDirectory, 'yuudee-card.zip').catch(() => {
           return Q().then(() => {
-            console.log("failed to copy")
             f7.hidePreloader()
             let comfirmDeferred = Q.defer()
             f7.alert(this.$t('message.download_confirm_body'), this.$t('message.download_confirm_title'), () => {
@@ -55,14 +52,12 @@ export default {
           })
         })
       }).then(() => {
-        console.log('Previous resource folder removed')
         var deferred = Q.defer()
         zip.unzip(cordova.file.cacheDirectory + 'yuudee-card.zip', cordova.file.dataDirectory, () => {
           deferred.resolve()
         }, function(progressEvent){
           // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
         });
-        console.log('returning from zip block')
         return deferred.promise
       }).then(() => {
         return db.buildOfficialResourceCollection()
@@ -72,39 +67,31 @@ export default {
         // Wait for db save.
         return Utils.waitForSeconds(1.5)
       }).then(() => {
-        // TODO: load external user cards
-        // return db.removeResourceCollection('USER_RESOURCE_PATH');
-        // Cleanup
         FileHelper.removeFile(cordova.file.cacheDirectory + 'yuudee-card.zip')
-
-        // TODO: Remove temp file
         f7.hidePreloader();
       }).catch(function(error){
         // Close preloader
         f7.hidePreloader()
-        console.log(error)
+        window.ga.trackException('Failed to prepare resource": [' + error.message + ']', false)
       })
     },
     createUserFolders: function() {
       return FileHelper.getDirPromise(FileHelper.getUserAssetFolder()).catch((error) => {
-        console.log("User Asset folder is not available, creating..");
         return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserAssets', false)
       }).then(() => {
         return FileHelper.getDirPromise(FileHelper.getUserAssetFolder() + '/Other').catch((error) => {
           return FileHelper.createDirPromise(FileHelper.getUserAssetFolder(), 'Other', false)
         }).then(() => {
           let infoName = this.$t('message.other')
-          console.log('other category name: ' + infoName)
           return FileHelper.writeJsonToFilePromise({name: infoName}, FileHelper.getUserAssetFolder() + '/Other', 'info.json');
         })
       }).then(() => {
         return FileHelper.getDirPromise(FileHelper.getUserCoverFolder()).catch(function(error){
-          console.log("User Cover folder is not available, creating..");
           return FileHelper.createDirPromise(FileHelper.getUserFolderParent(), 'UserCovers', false)
         })
-      }).then(() => {
-        console.log("User folders checked");
-      }).catch(console.log);
+      }).catch((error) => {
+        window.ga.trackException('CreateUserFoldersError: [' + error.message + ']', false)
+      });
     },
     chooseLanguage: function() {
       let deferred = Q.defer()
@@ -130,7 +117,6 @@ export default {
       return deferred.promise
     },
     startupChecks: function() {
-      console.log("startup check")
       // For GA
       let t0
       let firstStartup = false
@@ -164,7 +150,6 @@ export default {
         firstStartup = true
       // if (true) {
         startPromise = startPromise.then(() => {
-          console.log('prepareRes')
           return this.prepareResource()
         })
       }
@@ -172,10 +157,8 @@ export default {
         // Check and create other category in resource collection
         let otherCategory = db.getCardByUuid('Other')
         if (!otherCategory) {
-          console.log('creating otherCategory in db')
           db.insertResourceCategory(FileHelper.getUserAssetFolder() + '/Other', true)
         }
-        console.log("emit: RESOURCE_LOADED")
         if (firstStartup) {
           window.ga.trackEvent('LIFE_CYCLE', 'APP_LAUNCH', 'FIRST_TIME_SPEND', Date.now() - t0, false)
         } else {
@@ -190,12 +173,9 @@ export default {
             } else if (entry.isDirectory) {
               FileHelper.removeFolderIfExistPromise(cordova.file.cacheDirectory + entry.fullPath)
             } else {
-              console.log("error deleting cache files" + entry.fullPath)
             }
           })
         })
-      }).then(() => {
-        console.log("cache contents removed")
       })
     },
   },

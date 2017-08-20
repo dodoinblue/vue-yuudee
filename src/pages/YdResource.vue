@@ -103,7 +103,6 @@ export default {
       this.popover = null;
     },
     selectionDone: function() {
-      console.log('Finally picked: ' + PickedCards.getList());
       EventBus.$emit(Events.ADD_CARDS_FROM_RESOURCE, {
         list: PickedCards.getList(),
         requested: this.$route.query.request,
@@ -153,7 +152,6 @@ export default {
   },
   mounted() {
     this.f7 = Utils.getF7();
-    console.log('query: ' + this.$route.query.request)
     if (this.editMode) {
       window.ga.trackView('PAGE_RESOURCE_PICK')
     } else {

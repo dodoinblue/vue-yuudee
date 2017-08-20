@@ -142,10 +142,11 @@ export default {
     var aud = new Audio();
     aud.src=audioSrc;
     aud.onended = function(){
-      console.log('play audio done')
       deferred.resolve('audio end: ' + audioSrc);
     };
-    aud.play().catch(console.log);
+    aud.play().catch((error) => {
+      window.ga.trackException('PlayAudioError: [' + error.message + ']', false)
+    });
     return deferred.promise;
   },
 
@@ -173,12 +174,10 @@ export default {
       let child = elChildren[i]
       var drag = child.attributes.getNamedItem('draggable')
       if (drag && drag.value == 'false') {
-        console.log('found!!!!!')
         count++
         break;
       }
     }
-    console.log(`${elChildren.length} - ${count};`);
     return elChildren.length - count;
   },
 
@@ -187,7 +186,6 @@ export default {
     let firstChild = groupEl.firstChild
     let drag = firstChild.attributes.getNamedItem('draggable')
     if (drag && drag.value == 'false') {
-      console.log('first child is a ghost')
       return elChildren[1]
     } else {
       return groupEl.firstChild
@@ -199,7 +197,6 @@ export default {
     let lastChild = groupEl.lastChild
     let drag = lastChild.attributes.getNamedItem('draggable')
     if (drag && drag.value == 'false') {
-      console.log('last child is a ghost')
       return elChildren[elChildren.length - 2]
     } else {
       return groupEl.lastChild

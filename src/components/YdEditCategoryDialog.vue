@@ -67,13 +67,11 @@ export default {
           var changedObj = {};
           changedObj.name = cardTitle;
           var obj = _.assign(this.card, changedObj);
-          console.log(obj);
           // db.updateClasswareItem(this.card);
         }
       }
     },
     deleteCategory: function() {
-      console.log(this.card.parent);
       if (this.card.parent == 'root') {
         var f7 = Utils.getF7();
         f7.confirm(this.$t('message.cannot_delete_in_all'), this.$t('message.forbidden'), function () {
