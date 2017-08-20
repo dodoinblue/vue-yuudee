@@ -90,7 +90,13 @@ const messages = {
       cancel: "Cancel",
       all: "All",
       // Drawer back image
-      drawer_back: "drawer-back-en"
+      drawer_back: "drawer-back-en",
+
+      // Startup checks
+      download_confirm_title: "Download content",
+      download_confirm_body: "Preload content not found, will start downloading. This will use about 30Mb data",
+      download_fail_body: "Failed to download from server. Please reopen app to try again",
+      download_fail_title: "Failded"
     }
   },
   zh: {
@@ -157,7 +163,13 @@ const messages = {
       cancel: "取消",
       all: "全部",
       // Drawer back image
-      drawer_back: "drawer-back"
+      drawer_back: "drawer-back",
+
+      // Startup checks
+      download_confirm_title: "下载",
+      download_confirm_body: "没有找到内置卡片，需要下载，这将花费约30M流量",
+      download_fail_body: "下载失败，请重新打开app下载",
+      download_fail_title: "失败"
     }
   }
 }
@@ -223,7 +235,7 @@ var initApp = function() {
 document.addEventListener("deviceready", function(){
   console.log("device ready");
   window.ga.startTrackerWithId('UA-104921838-2', 30)
-  window.ga.setAppVersion('1.0.0')
+  window.ga.setAppVersion('0.8.3')
   window.ga.enableUncaughtExceptionReporting(true)
   db.initDB().then(function(){
     initApp();

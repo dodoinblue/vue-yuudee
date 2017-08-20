@@ -25,7 +25,6 @@ export default {
       let cardResourceFolder = `${cordova.file.dataDirectory}card-assets/`
       let lang = this.$root.$i18n.locale || 'zh'
       let preloadZipPath = cordova.file.applicationDirectory + 'www/static/' + lang + '/yuudee-card-v1.zip'
-      FileHelper.listDirectoryPromise(cordova.file.applicationDirectory + 'www/static/' + lang).then(console.log)
       let f7 = Utils.getF7();
       f7.showPreloader(this.$t('message.downloading'));
       return db.removeResourceCollection().then(() => {
@@ -37,12 +36,28 @@ export default {
       }).then(() => {
         db.setRootClasswareUuid('all')
         // https://github.com/MobileChromeApps/cordova-plugin-zip/issues/56
-        return FileHelper.copyFilePromise(preloadZipPath, cordova.file.cacheDirectory, 'yuudee-card.zip')
+        return FileHelper.copyFilePromise(preloadZipPath, cordova.file.cacheDirectory, 'yuudee-card.zip').catch(() => {
+          return Q().then(() => {
+            console.log("failed to copy")
+            f7.hidePreloader()
+            let comfirmDeferred = Q.defer()
+            f7.alert(this.$t('message.download_confirm_body'), this.$t('message.download_confirm_title'), () => {
+              comfirmDeferred.resolve()
+            })
+            return comfirmDeferred.promise
+          }).then(() => {
+            f7.showPreloader(this.$t('message.downloading'));
+            return FileHelper.downloadFilePromise(`http://orrmhr3bd.bkt.clouddn.com/yuudee-card-v1-${lang}.zip`, cordova.file.cacheDirectory + 'yuudee-card.zip')
+          }).catch(() => {
+            f7.alert(this.$t('message.download_fail_body'), this.$t('message.download_fail_title'), () => {
+              navigator.app.exitApp()
+            })
+          })
+        })
       }).then(() => {
         console.log('Previous resource folder removed')
         var deferred = Q.defer()
         zip.unzip(cordova.file.cacheDirectory + 'yuudee-card.zip', cordova.file.dataDirectory, () => {
-          console.log("before resolve zip")
           deferred.resolve()
         }, function(progressEvent){
           // console.log("unzipping..." + Math.round((progressEvent.loaded / progressEvent.total) * 100))
@@ -61,6 +76,7 @@ export default {
         // return db.removeResourceCollection('USER_RESOURCE_PATH');
         // Cleanup
         FileHelper.removeFile(cordova.file.cacheDirectory + 'yuudee-card.zip')
+
         // TODO: Remove temp file
         f7.hidePreloader();
       }).catch(function(error){
@@ -166,6 +182,20 @@ export default {
           window.ga.trackEvent('LIFE_CYCLE', 'APP_LAUNCH', 'REGULAR_TIME_SPEND', Date.now() - t0, false)
         }
         EventBus.$emit("RESOURCE_LOADED")
+      }).then(() => {
+        return FileHelper.listDirectoryPromise(cordova.file.cacheDirectory).then((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isFile) {
+              FileHelper.removeFile(cordova.file.cacheDirectory + entry.fullPath)
+            } else if (entry.isDirectory) {
+              FileHelper.removeFolderIfExistPromise(cordova.file.cacheDirectory + entry.fullPath)
+            } else {
+              console.log("error deleting cache files" + entry.fullPath)
+            }
+          })
+        })
+      }).then(() => {
+        console.log("cache contents removed")
       })
     },
   },
