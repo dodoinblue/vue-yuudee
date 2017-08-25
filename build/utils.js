@@ -22,7 +22,9 @@ exports.cssLoaders = function (options) {
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
+    console.log("generateLoaders!!!!!")
     var loaders = [cssLoader]
+    console.log(loaders)
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
@@ -35,6 +37,7 @@ exports.cssLoaders = function (options) {
     // Extract CSS when that option is specified
     // (which is the case during production build)
     if (options.extract) {
+      console.log("options.extract")
       return ExtractTextPlugin.extract({
         use: loaders,
         fallback: 'vue-style-loader'
