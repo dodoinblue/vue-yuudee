@@ -62,6 +62,7 @@ import YdResNewCategory from '../components/YdResNewCategory'
 import {EventBus, Events} from '../EventBus'
 import Utils from '../utils'
 import PickedCards from 'PickedCards'
+import _ from 'lodash'
 
 export default {
   components: { YdDrawer, YdEditCardDialog, YdResNewCategory },
@@ -80,27 +81,27 @@ export default {
   computed: {
     editMode: function() { // share this with pick mode. if in resource, this setting means pick mode TODO: a better name
       return this.mode === 'pick'
-    },
+    }
   },
   methods: {
     back: function() {
-      this.$router.back();
+      this.$router.back()
     },
     isRoot: function(uuid) {
-      return this.rootUuid == uuid;
+      return this.rootUuid === uuid
     },
     showNewPopover: function() {
-      this.popover = this.f7.popover('.popover-new-card', this.$refs.newButton);
+      this.popover = this.f7.popover('.popover-new-card', this.$refs.newButton)
     },
     newCard: function() {
-      this.f7.closeModal(this.popover, false);
-      this.popover = null;
-      this.showNewCardDialog = true;
+      this.f7.closeModal(this.popover, false)
+      this.popover = null
+      this.showNewCardDialog = true
     },
     newCategory: function() {
-      this.f7.closeModal(this.popover, false);
-      this.showNewCategoryDialog = true;
-      this.popover = null;
+      this.f7.closeModal(this.popover, false)
+      this.showNewCategoryDialog = true
+      this.popover = null
     },
     selectionDone: function() {
       EventBus.$emit(Events.ADD_CARDS_FROM_RESOURCE, {
@@ -110,37 +111,37 @@ export default {
         order: parseInt(this.$route.query.order)
       })
       PickedCards.clearList()
-      this.$router.back();
+      this.$router.back()
     }
   },
   created() {
-    this.drawers.push('all');
+    this.drawers.push('all')
     EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
-      this.showNewCardDialog = false;
-      this.showNewCategoryDialog = false;
+      this.showNewCardDialog = false
+      this.showNewCategoryDialog = false
       this.cardInEdit = {}
-    });
+    })
     EventBus.$on(Events.RESOURCE_CATEGORY, uuid => {
-      this.drawers.push(uuid);
-    });
+      this.drawers.push(uuid)
+    })
     EventBus.$on(Events.RESOURCE_DRAWER_CLOSE, uuid => {
-      this.drawers.pop();
-    });
+      this.drawers.pop()
+    })
     EventBus.$on(Events.EDIT_RESOURCE_CATEGORY, card => {
-      // this.drawers.pop();
+      // this.drawers.pop()
       this.cardInEdit = card
       this.showNewCategoryDialog = true
-    });
+    })
     EventBus.$on(Events.EDIT_RESOURCE_CARD, card => {
-      // this.drawers.pop();
+      // this.drawers.pop()
       this.cardInEdit = card
       this.showNewCardDialog = true
-    });
+    })
     EventBus.$on(Events.RESOURCE_BACK_PRESSED, () => {
       if (this.showNewCardDialog) {
         this.showNewCardDialog = false
       } else if (this.showNewCategoryDialog) {
-        this.showNewCategoryDialog = fasle
+        this.showNewCategoryDialog = false
       } else if (!_.isEmpty(this.cardInEdit)) {
         this.cardInEdit = {}
       } else if (this.drawers.length > 1) {
@@ -151,7 +152,7 @@ export default {
     })
   },
   mounted() {
-    this.f7 = Utils.getF7();
+    this.f7 = Utils.getF7()
     if (this.editMode) {
       window.ga.trackView('PAGE_RESOURCE_PICK')
     } else {

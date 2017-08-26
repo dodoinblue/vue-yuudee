@@ -22,7 +22,6 @@
 
 <script>
 import { EventBus, Events } from '../EventBus.js'
-import { TweenLite } from "gsap"
 import _ from 'lodash'
 import db from '../db.js'
 import Utils from '../utils'
@@ -35,13 +34,13 @@ import PickedCards from '../PickedCards'
  * rect: element's rect from vm.$el.getBoundingClientRect()
  */
 var calcToCenterAnimParams = function(win, rect) {
-  var scale = win.width * 0.85 / rect.width;
-  var winCenterLeft = win.width / 2;
-  var winCenterTop = win.height / 2;
-  var cardCenterLeft = rect.left + rect.width / 2;
-  var cardCenterTop = rect.top + rect.height / 2;
-  var xTrans = winCenterLeft - cardCenterLeft;
-  var yTrans = winCenterTop - cardCenterTop;
+  var scale = win.width * 0.85 / rect.width
+  var winCenterLeft = win.width / 2
+  var winCenterTop = win.height / 2
+  var cardCenterLeft = rect.left + rect.width / 2
+  var cardCenterTop = rect.top + rect.height / 2
+  var xTrans = winCenterLeft - cardCenterLeft
+  var yTrans = winCenterTop - cardCenterTop
 
   return {
     scaleX: scale,
@@ -56,27 +55,28 @@ var playAnimation = function(context) {
     return
   }
 
-  if (context.classware.mute && context.classware.animation == 'none') {
+  if (context.classware.mute && context.classware.animation === 'none') {
     console.log('no audio and no animation, skip playing')
     return
   }
 
-  var el = context.$el;
+  var el = context.$el
   var oldStyle = {
     scaleX: 1,
     scaleY: 1,
     x: 0,
     y: 0
   }
-  var win = {width: window.innerWidth, height: window.innerHeight};
-  var animationParams = calcToCenterAnimParams(win, el.getBoundingClientRect());
+  var win = {width: window.innerWidth, height: window.innerHeight}
+  var animationParams = calcToCenterAnimParams(win, el.getBoundingClientRect())
 
   // Start Playing
-  context.$store.commit("cardPlayStart")
-  context.onTop = true;
+  context.$store.commit('cardPlayStart')
+  context.onTop = true
+  /* eslint-disable no-unused-vars */
   var playPromise = Utils.emptyPromise()
 
-  if (context.classware.animation != 'none') {
+  if (context.classware.animation !== 'none') {
     playPromise = playPromise.then(() => {
       return Utils.animationChain(el, 1, animationParams)
     })
@@ -85,12 +85,12 @@ var playAnimation = function(context) {
   playPromise = playPromise.then(() => {
     // Start slideshow
     context.slideshow = window.setInterval(() => {
-      if (context.currentImageIndex == context.card.images.length - 1) {
-        context.currentImageIndex = 0;
+      if (context.currentImageIndex === context.card.images.length - 1) {
+        context.currentImageIndex = 0
       } else {
-        context.currentImageIndex ++;
+        context.currentImageIndex++
       }
-    }, 500);
+    }, 500)
 
     // Start playing sound
     if (!context.classware.mute) {
@@ -102,34 +102,34 @@ var playAnimation = function(context) {
           if (context.card.audios[0]) {
             return playAudioFn(context.card.audios[0])
           } else {
-            throw new Error("audio not defined")
+            throw new Error('audio not defined')
           }
         })
       }
       if (numOfAudios > 1) {
         for (let i = 1; i < numOfAudios; i++) {
           p = p.then(() => {
-            return playAudioFn(context.card.audios[i]);
-          });
+            return playAudioFn(context.card.audios[i])
+          })
         }
       }
     }
 
     // Swing if set to or wait
-    if (context.classware.animation == 'rotate') {
-      return Utils.animationChain(el, 0.5, {rotation: 20}).then(function(){
-        return Utils.animationChain(el, 1, {rotation: -20});
-      }).then(function(){
-        return Utils.animationChain(el, 1, {rotation: 20});
-      }).then(function(){
-        return Utils.animationChain(el, 1, {rotation: -20});
-      }).then(function(){
-        return Utils.animationChain(el, 0.5, {rotation: 0});
+    if (context.classware.animation === 'rotate') {
+      return Utils.animationChain(el, 0.5, {rotation: 20}).then(function() {
+        return Utils.animationChain(el, 1, {rotation: -20})
+      }).then(function() {
+        return Utils.animationChain(el, 1, {rotation: 20})
+      }).then(function() {
+        return Utils.animationChain(el, 1, {rotation: -20})
+      }).then(function() {
+        return Utils.animationChain(el, 0.5, {rotation: 0})
       })
-    } else if (context.classware.animation == 'enlarge') {
-      return Utils.waitForSeconds(3);
+    } else if (context.classware.animation === 'enlarge') {
+      return Utils.waitForSeconds(3)
     } else {
-      return Utils.waitForSeconds(4);
+      return Utils.waitForSeconds(4)
     }
   })
 
@@ -139,18 +139,18 @@ var playAnimation = function(context) {
     })
   }
 
-  if (context.classware.animation != 'none') {
+  if (context.classware.animation !== 'none') {
     playPromise = playPromise.then(() => {
       return Utils.animationChain(el, 1, oldStyle)
     })
   }
 
   playPromise = playPromise.then(() => {
-    window.clearInterval(context.slideshow);
-    context.$store.commit("cardPlayStop")
-    context.onTop = false;
-    context.slideshow = null;
-    context.currentImageIndex = 0;
+    window.clearInterval(context.slideshow)
+    context.$store.commit('cardPlayStop')
+    context.onTop = false
+    context.slideshow = null
+    context.currentImageIndex = 0
     window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'CARD_PLAY')
   })
 }
@@ -173,23 +173,23 @@ export default {
         return
       }
       if (this.isStack) {
-        if (this.from == "resource") {
+        if (this.from === 'resource') {
           if (this.editMode && PickedCards.hasItem()) {
-            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
+            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid)
           } else {
-            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid);
+            EventBus.$emit(Events.RESOURCE_CATEGORY, this.card.uuid)
           }
         } else {
-          EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid);
+          EventBus.$emit(Events.DISPLAY_CATEGORY, this.card.uuid)
         }
       } else {
-        if (this.editMode || this.from == "resource") {
+        if (this.editMode || this.from === 'resource') {
           return
         }
-        playAnimation(this);
+        playAnimation(this)
       }
     }, 500, {trailing: false}),
-    editResCard: _.throttle(function(){
+    editResCard: _.throttle(function() {
       if (this.card.isCategory) {
         EventBus.$emit(Events.EDIT_RESOURCE_CATEGORY, this.card)
       } else {
@@ -197,10 +197,10 @@ export default {
       }
     }, 500, {trailing: false}),
     onCardEditClick: function() {
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_OPEN, this.classware)
     },
     selectFromResource: function() {
-      this.$emit("pick", {
+      this.$emit('pick', {
         placeholderId: this.classware.uuid,
         placeholderOrder: this.classware.order
       })
@@ -215,37 +215,37 @@ export default {
       }
     },
     initContent: function() {
-      if (this.classware.type == 'folder') {
-        this.card = this.classware;
-      } else if (this.from == 'resource') {
-        this.card = this.classware;
+      if (this.classware.type === 'folder') {
+        this.card = this.classware
+      } else if (this.from === 'resource') {
+        this.card = this.classware
       } else {
-        var content = db.getCardByUuid(this.classware.content);
-        this.card = content;
+        var content = db.getCardByUuid(this.classware.content)
+        this.card = content
       }
     }
   },
   computed: {
     isStack: function() {
-      return this.card.type == 'folder' || this.card.isCategory
+      return this.card.type === 'folder' || this.card.isCategory
     },
     card_bg_image: function() {
       if (this.isStack) {
-        return 'static/img/cat_bg.png';
+        return 'static/img/cat_bg.png'
       } else {
-        return 'static/img/card_bg.png';
+        return 'static/img/card_bg.png'
       }
     },
     content_image: function() {
       if (this.isStack) {
-        if (! this.card.cover) {
-          return 'static/img/dummy_content.jpg';
+        if (!this.card.cover) {
+          return 'static/img/dummy_content.jpg'
         }
-        return this.card.cover;
+        return this.card.cover
       } else {
-        return this.card.images[this.currentImageIndex];
+        return this.card.images[this.currentImageIndex]
       }
-    },
+    }
   },
   created() {
     this.initContent()

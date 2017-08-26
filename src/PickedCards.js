@@ -5,8 +5,8 @@ export default {
     pickedCards.push(uuid)
   },
   removeCard: function(uuid) {
-    _.remove(pickedCards, function(o){
-      return o == uuid
+    _.remove(pickedCards, function(o) {
+      return o === uuid
     })
   },
   clearList: function() {

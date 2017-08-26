@@ -191,7 +191,7 @@
 </style>
 
 <script>
-import YdCard from '../components/YdCard.vue'
+// import YdCard from '../components/YdCard.vue'
 import YdDrawer from '../components/YdDrawer.vue'
 import { EventBus, Events } from '../EventBus.js'
 import db from '../db.js'
@@ -199,6 +199,7 @@ import Utils from '../utils'
 import YdDisplayClasswareSettings from '../components/YdDisplayClasswareSettings'
 import YdDisplayCardSettings from '../components/YdDisplayCardSettings'
 import YdEditCategoryDialog from '../components/YdEditCategoryDialog'
+import _ from 'lodash'
 
 export default {
   data() {
@@ -212,9 +213,9 @@ export default {
       showClasswareSettings: false,
       showNewClasswareCategorySettings: false,
       touchAreas: [
-        { name: 'touch-top-left', pressed: false},
-        { name: 'touch-top-right', pressed: false},
-        { name: 'touch-bottom-right', pressed: false}
+        { name: 'touch-top-left', pressed: false },
+        { name: 'touch-top-right', pressed: false },
+        { name: 'touch-bottom-right', pressed: false }
       ]
     }
   },
@@ -222,25 +223,25 @@ export default {
   watch: {
     editMode: function(val, oldVal) {
       window.ga.trackEvent('USER_EVENT', 'EDITMODE', 'CHANGE', val, false)
-    },
+    }
   },
   computed: {
     classwareName: function() {
       // TODO: check root classware existance before displaying
-      var classwareObj = db.getClasswareItemByUuid(this.rootUuid);
+      var classwareObj = db.getClasswareItemByUuid(this.rootUuid)
       if (!classwareObj) {
-        return "Error"
+        return 'Error'
       }
-      return classwareObj.name;
+      return classwareObj.name
     },
     showCardSettings: function() {
-      if (this.cardInEdit && this.cardInEdit.type == 'card') {
+      if (this.cardInEdit && this.cardInEdit.type === 'card') {
         return true
       }
       return false
     },
     showCategorySettings: function() {
-      if (this.cardInEdit && this.cardInEdit.type == 'folder' || this.showNewClasswareCategorySettings) {
+      if ((this.cardInEdit && this.cardInEdit.type === 'folder') || this.showNewClasswareCategorySettings) {
         return true
       }
       return false
@@ -251,63 +252,63 @@ export default {
   },
   methods: {
     isRoot: function(uuid) {
-      return this.rootUuid == uuid;
+      return this.rootUuid === uuid
     },
     newClick: function() {
-      this.showNewClasswareCategorySettings = true;
+      this.showNewClasswareCategorySettings = true
     },
     toggleEditMode: function() {
-      this.editMode = ! this.editMode;
+      this.editMode = !this.editMode
     },
     openClasswarePopover: function() {
-      this.popover = this.f7.popover('.popover-classwares', this.$refs.classwarePopover);
+      this.popover = this.f7.popover('.popover-classwares', this.$refs.classwarePopover)
     },
     goToResource: function() {
-      this.$router.push('/resource');
+      this.$router.push('/resource')
     },
     onChooseRootClassware: function(uuid) {
       this.f7.closeModal(this.popover, false)
-      this.popover = null;
-      this.drawers = [];
-      this.rootUuid = uuid;
-      this.drawers.push(uuid);
-      db.setRootClasswareUuid(uuid);
+      this.popover = null
+      this.drawers = []
+      this.rootUuid = uuid
+      this.drawers.push(uuid)
+      db.setRootClasswareUuid(uuid)
     },
     openClasswareSettings: function() {
-      this.showClasswareSettings = true;
+      this.showClasswareSettings = true
     },
     pressed: function(index) {
-      this.touchAreas[index].pressed = true;
+      this.touchAreas[index].pressed = true
       if (this.touchAreas[0].pressed && this.touchAreas[1].pressed && this.touchAreas[2].pressed) {
-        this.editMode = true;
-        this.touchAreas[0].pressed = false;
-        this.touchAreas[1].pressed = false;
-        this.touchAreas[2].pressed = false;
+        this.editMode = true
+        this.touchAreas[0].pressed = false
+        this.touchAreas[1].pressed = false
+        this.touchAreas[2].pressed = false
       }
     },
     pressup: function(index) {
-      this.touchAreas[index].pressed = false;
+      this.touchAreas[index].pressed = false
     }
   },
   created() {
     window.db = db
     EventBus.$on(Events.DISPLAY_DRAWER_CLOSE, uuid => {
-      this.drawers.pop();
-    });
+      this.drawers.pop()
+    })
     EventBus.$on(Events.DISPLAY_CATEGORY, uuid => {
-      this.drawers.push(uuid);
-    });
+      this.drawers.push(uuid)
+    })
     EventBus.$on(Events.DISPLAY_CARD_SETTINGS_OPEN, cardOrCategory => {
-      this.cardInEdit = cardOrCategory;
+      this.cardInEdit = cardOrCategory
     })
     EventBus.$on(Events.DISPLAY_CARD_SETTINGS_CLOSE, uuid => {
-      this.cardInEdit = {};
-      this.showNewClasswareCategorySettings = false;
-    });
+      this.cardInEdit = {}
+      this.showNewClasswareCategorySettings = false
+    })
     EventBus.$on(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, () => {
       // TODO: Close drawers or warn if root is not the same with top classware
-      this.showClasswareSettings = false;
-    });
+      this.showClasswareSettings = false
+    })
     EventBus.$on(Events.DISPLAY_NEW_ROOT_CLASSWARE, (doc) => {
       window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'ROOT_COURSEWARE_CHANGED')
       window.setTimeout(() => {
@@ -316,34 +317,34 @@ export default {
         this.rootUuid = doc.uuid
         this.drawers.push(doc.uuid)
         db.setRootClasswareUuid(doc.uuid)
-      }, 250);
+      }, 250)
     })
     EventBus.$on(Events.DISPLAY_CURRENT_CATEGORY_DELETED, (doc) => {
       window.setTimeout(() => {
         this.classwares = db.getClasswareList()
-        this.drawers = [];
-        this.rootUuid = 'all';
-        this.drawers.push('all');
-        db.setRootClasswareUuid('all');
-      }, 250);
+        this.drawers = []
+        this.rootUuid = 'all'
+        this.drawers.push('all')
+        db.setRootClasswareUuid('all')
+      }, 250)
     })
 
     // Load root classware uuid
-    this.classwares = db.getClasswareList();
-    this.rootUuid = db.getRootClasswareUuid();
-    this.drawers.push(this.rootUuid);
+    this.classwares = db.getClasswareList()
+    this.rootUuid = db.getRootClasswareUuid()
+    this.drawers.push(this.rootUuid)
 
     // TODO: Grid size should be classware specific
-    // this.gridSize = db.getDisplayGridSize();
+    // this.gridSize = db.getDisplayGridSize()
 
     // Back button
     this.backCount = 0
-    document.addEventListener("backbutton", () => {
+    document.addEventListener('backbutton', () => {
       if (this.$store.state.isCardPlaying) {
         return
       }
       switch (this.$route.path) {
-        case "/display":
+        case '/display':
           if (this.showClasswareSettings) {
             this.showClasswareSettings = false
           } else if (this.showNewClasswareCategorySettings) {
@@ -363,27 +364,26 @@ export default {
               title: this.$t('message.notice'),
               message: this.$t('message.press_again_to_exit'),
               hold: 2000
-            });
+            })
             window.setTimeout(() => {
               this.backCount = 0
             }, 2000)
           }
           break
-        case "/resource":
+        case '/resource':
           EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
           break
-        case "/resource/pick":
+        case '/resource/pick':
           EventBus.$emit(Events.RESOURCE_BACK_PRESSED)
           break
         default:
           console.log(this.$route.path)
       }
-    }, false);
-
+    }, false)
   },
   mounted() {
-    this.f7 = Utils.getF7();
+    this.f7 = Utils.getF7()
     window.ga.trackView('PAGE_DISPLAY')
-  },
+  }
 }
 </script>

@@ -46,25 +46,27 @@ import Utils from '../utils'
 import FileHelper from '../FileHelper'
 import uuidv4 from 'uuid/v4'
 import db from '../db'
+import _ from 'lodash'
 
 export default {
   props: ['mode', 'cardInEdit'],
   data() {
     return {
-      cardImage: "static/img/dummy_content.jpg",
-      cardName: "",
+      cardImage: 'static/img/dummy_content.jpg',
+      cardName: ''
     }
   },
   computed: {
     isEditing: function() {
-      return ! _.isEmpty(this.cardInEdit)
+      return !_.isEmpty(this.cardInEdit)
     }
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+      EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE)
       // remove content in cache folder
     },
+    /* eslint-disable no-unused-vars */
     updateCard: function() {
       var p = Utils.emptyPromise()
       if (this.cardImage !== this.cardInEdit.cover) {
@@ -83,7 +85,7 @@ export default {
         })
       }
       p = p.then(function() {
-        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE)
       }).catch((error) => {
         window.ga.trackException('UpdateDisplayCategoryError: [' + error.message + ']', false)
       })
@@ -91,76 +93,77 @@ export default {
     deleteCard: function() {
       db.deleteResourceCategory(this.cardInEdit).then(() => {
         EventBus.$emit(Events.RESOURCE_ITEM_DELETED, 'all')
-        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE)
       }).catch((error) => {
         window.ga.trackException('DeleteDisplayCardError: [' + error.message + ']', false)
       })
     },
+    /* eslint-disable no-undef */
     confirm: function() {
-      if (this.cardName == "") {
-        var f7 = Utils.getF7();
-        f7.alert(this.$t('message.must_choose_name'), this.$t('message.missing_info_title'));
+      if (this.cardName === '') {
+        var f7 = Utils.getF7()
+        f7.alert(this.$t('message.must_choose_name'), this.$t('message.missing_info_title'))
         return
       }
       if (!_.isEmpty(this.cardInEdit)) {
         this.updateCard()
         return
       }
-      var cat_path = uuidv4();
+      var catPath = uuidv4()
       // create folder
-      var userResourceRoot;
-      var userResourceParentFolder;
-      if (cordova.platformId == 'ios') {
-        userResourceParentFolder = cordova.file.dataDirectory;
+      var userResourceRoot
+      var userResourceParentFolder
+      if (cordova.platformId === 'ios') {
+        userResourceParentFolder = cordova.file.dataDirectory
       } else {
-        userResourceParentFolder = cordova.file.externalApplicationStorageDirectory;
+        userResourceParentFolder = cordova.file.externalApplicationStorageDirectory
       }
-      userResourceRoot = userResourceParentFolder + 'UserAssets/';
+      userResourceRoot = userResourceParentFolder + 'UserAssets/'
 
-      FileHelper.createDirPromise(cordova.file.cacheDirectory, cat_path, false).then(() => {
-        if (this.cardImage == 'static/img/dummy_content.jpg') {
-          console.log('no cover image selected');
+      FileHelper.createDirPromise(cordova.file.cacheDirectory, catPath, false).then(() => {
+        if (this.cardImage === 'static/img/dummy_content.jpg') {
+          console.log('no cover image selected')
           return
         }
-        return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + cat_path, 'cover.jpg')
-      }).then(function(){
+        return FileHelper.copyFilePromise(this.cardImage, cordova.file.cacheDirectory + catPath, 'cover.jpg')
+      }).then(function() {
         // Get next order number
         return db.getAllResourceCategories().length + 1
       }).then((order) => {
         return FileHelper.writeJsonToFilePromise({
           name: this.cardName,
-          originalOrder: order,
-        }, cordova.file.cacheDirectory + cat_path, 'info.json');
+          originalOrder: order
+        }, cordova.file.cacheDirectory + catPath, 'info.json')
       }).then(() => {
-        // FileHelper.readFromFilePromise(cordova.file.cacheDirectory + cat_path + '/info.json').then(console.log);
-        return FileHelper.getDirPromise(userResourceRoot).catch(function(error){
-          console.log(userResourceRoot + ' does not exist ' + error);
-          return FileHelper.createDirPromise(userResourceParentFolder, 'UserAssets/', false);
+        // FileHelper.readFromFilePromise(cordova.file.cacheDirectory + catPath + '/info.json').then(console.log);
+        return FileHelper.getDirPromise(userResourceRoot).catch(function(error) {
+          console.log(userResourceRoot + ' does not exist ' + error)
+          return FileHelper.createDirPromise(userResourceParentFolder, 'UserAssets/', false)
         })
-      }).then(function(){
-        return FileHelper.moveDirPromise(cordova.file.cacheDirectory, cat_path, userResourceRoot, cat_path);
+      }).then(function() {
+        return FileHelper.moveDirPromise(cordova.file.cacheDirectory, catPath, userResourceRoot, catPath)
       }).then(() => {
-        return db.insertResourceCategory(userResourceRoot + cat_path, false);
+        return db.insertResourceCategory(userResourceRoot + catPath, false)
       }).then((doc) => {
-        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE);
-        EventBus.$emit(Events.RESOURCE_NEW_CATEGORY_ADDED, doc);
+        EventBus.$emit(Events.RESOURCE_NEW_CARD_CLOSE)
+        EventBus.$emit(Events.RESOURCE_NEW_CATEGORY_ADDED, doc)
       }).catch((error) => {
         window.ga.trackException('NewResCategoryError: [' + error.message + ']', false)
       })
     },
     choosePicture: function() {
-      Utils.choosePicturePromise().then(function(filePath){
-        return plugins.crop.promise(filePath, {quality: 50});
+      Utils.choosePicturePromise().then(function(filePath) {
+        return plugins.crop.promise(filePath, {quality: 50})
       }).then((croppedPath) => {
         // this.cardImage = croppedPath;
-        return FileHelper.getCdvPath(croppedPath);
+        return FileHelper.getCdvPath(croppedPath)
       }).then((internalPath) => {
-        this.cardImage = internalPath;
+        this.cardImage = internalPath
         // TODO Cleanup cache folder. or do this when save/cancel
       }).catch((error) => {
         window.ga.trackException('ChoosePictureError: [' + error.message + ']', false)
-      });
-    },
+      })
+    }
   },
   created() {
     if (this.isEditing) {

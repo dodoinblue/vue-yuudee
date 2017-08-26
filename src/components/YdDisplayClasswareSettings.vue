@@ -54,28 +54,28 @@ export default {
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE);
+      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE)
     },
     deleteClassware: function() {
-      if (this.classwareId == 'all') {
-        this.f7.alert(this.$t('message.cannot_delete_all'), this.$t('message.forbidden'));
+      if (this.classwareId === 'all') {
+        this.f7.alert(this.$t('message.cannot_delete_all'), this.$t('message.forbidden'))
       } else {
         this.f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
-          if (this.classwareInfo.parent == 'root') {
-            db.deleteTopLevelCourseware(this.classwareInfo);
+          if (this.classwareInfo.parent === 'root') {
+            db.deleteTopLevelCourseware(this.classwareInfo)
           }
-          EventBus.$emit(Events.DISPLAY_CURRENT_CATEGORY_DELETED, this.classwareInfo);
-          EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
+          EventBus.$emit(Events.DISPLAY_CURRENT_CATEGORY_DELETED, this.classwareInfo)
+          EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo)
           window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'COURSEWARE_DELETED')
-        });
+        })
       }
     },
     select: function(size) {
-      this.selectedGridSize = size;
+      this.selectedGridSize = size
     },
     confirm: function() {
-      if (this.classwareInfo.row != this.selectedGridSize) {
-        if (this.classwareId == 'all') {
+      if (this.classwareInfo.row !== this.selectedGridSize) {
+        if (this.classwareId === 'all') {
           db.setDefaultGridSize(this.selectedGridSize, this.selectedGridSize)
         } else {
           this.classwareInfo.col = this.selectedGridSize
@@ -83,17 +83,17 @@ export default {
           db.updateClasswareItem(this.classwareInfo)
         }
       }
-      EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.classwareId);
-      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo);
+      EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.classwareId)
+      EventBus.$emit(Events.DISPLAY_CLASSWARE_SETTINGS_CLOSE, this.classwareInfo)
     }
   },
   created() {
-    if (this.classwareId == 'all') {
+    if (this.classwareId === 'all') {
       this.classwareInfo = {
         name: this.$t('message.all')
       }
-    } else  {
-      this.classwareInfo = db.getClasswareItemByUuid(this.classwareId);
+    } else {
+      this.classwareInfo = db.getClasswareItemByUuid(this.classwareId)
       if (this.classwareInfo.row) {
         this.selectedGridSize = this.classwareInfo.row
       } else {
@@ -103,7 +103,7 @@ export default {
     window.ga.trackEvent('USER_EVENT', 'DISPLAY_COURSE_SETTING', 'ENTER')
   },
   mounted() {
-    this.f7 = Utils.getF7();
+    this.f7 = Utils.getF7()
   }
 }
 </script>

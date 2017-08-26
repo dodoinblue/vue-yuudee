@@ -31,67 +31,64 @@ export default {
   props: ['card', 'newCategory'],
   data() {
     return {
-      cardTitle: '',
+      cardTitle: ''
     }
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
     },
     confirm: function() {
-      if (this.cardTitle == '') {
-        var f7 = Utils.getF7();
-        f7.alert(this.$t('message.require_category_title'), this.$t('message.missing_info_title'));
+      var f7 = Utils.getF7()
+      if (this.cardTitle === '') {
+        f7.alert(this.$t('message.require_category_title'), this.$t('message.missing_info_title'))
         return
       }
-      if(this.newCategory) {
-        var doc = db.insertRootClassware(this.cardTitle);
-        EventBus.$emit(Events.DISPLAY_NEW_ROOT_CLASSWARE, doc);
-        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, doc);
+      if (this.newCategory) {
+        var doc = db.insertRootClassware(this.cardTitle)
+        EventBus.$emit(Events.DISPLAY_NEW_ROOT_CLASSWARE, doc)
+        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, doc)
         return
       }
 
       // Editing existing
-      if (this.card.parent == 'root') {
-        var f7 = Utils.getF7();
+      if (this.card.parent === 'root') {
         f7.confirm(this.$t('message.cannot_edit_in_all'), this.$t('message.forbidden'), function () {
-          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
-        });
-      } else if (this.card.type == 'card') {
-        var f7 = Utils.getF7();
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
+        })
+      } else if (this.card.type === 'card') {
         f7.confirm(this.$t('message.modify_card_in_library'), this.$t('message.forbidden'), function () {
-          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
-        });
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
+        })
       } else {
-        if (cardTitle != card.name) {
-          var changedObj = {};
-          changedObj.name = cardTitle;
-          var obj = _.assign(this.card, changedObj);
-          // db.updateClasswareItem(this.card);
+        if (this.cardTitle !== this.card.name) {
+          var changedObj = {}
+          changedObj.name = this.cardTitle
+          var obj = _.assign(this.card, changedObj)
+          db.updateClasswareItem(obj)
         }
       }
     },
     deleteCategory: function() {
-      if (this.card.parent == 'root') {
-        var f7 = Utils.getF7();
+      var f7 = Utils.getF7()
+      if (this.card.parent === 'root') {
         f7.confirm(this.$t('message.cannot_delete_in_all'), this.$t('message.forbidden'), function () {
-          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
-        });
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
+        })
       } else {
-        var f7 = Utils.getF7();
         f7.confirm(this.$t('message.are_you_sure'), this.$t('message.delete_whole_category'), () => {
-          if (this.card.type == 'folder') {
+          if (this.card.type === 'folder') {
             // remove sub content
-            db.deleteAllSubClasswareItem(this.card);
+            db.deleteAllSubClasswareItem(this.card)
             // reorder
-            db.deleteClasswareItem(this.card);
+            db.deleteClasswareItem(this.card)
           } else {
             // remove and reorder
-            db.deleteClasswareItem(this.card);
+            db.deleteClasswareItem(this.card)
           }
-          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
-          EventBus.$emit(Events.DISPLAY_CATEGORY_DELETED, this.card);
-        });
+          EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
+          EventBus.$emit(Events.DISPLAY_CATEGORY_DELETED, this.card)
+        })
       }
     }
   },
@@ -100,16 +97,16 @@ export default {
       window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'CREATE')
       return
     }
-    if (this.card.type == 'folder') {
+    if (this.card.type === 'folder') {
       this.cardTitle = this.card.name
       window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'EDIT')
     } else {
       // This item is a collection of asset cards
-      var content = db.getCardByUuid(this.card.content);
-      this.cardTitle = content.name;
+      var content = db.getCardByUuid(this.card.content)
+      this.cardTitle = content.name
       window.ga.trackEvent('USER_EVENT', 'DISPLAY_CATEGORY', 'EDIT_RES_CAT')
     }
-  },
+  }
 }
 </script>
 

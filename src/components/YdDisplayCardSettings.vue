@@ -74,43 +74,43 @@ export default {
   },
   methods: {
     cancel: function() {
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
     },
     select: function(value) {
-      this.selected = value;
+      this.selected = value
     },
     deleteClasswareItem: function() {
-      var f7 = Utils.getF7();
+      var f7 = Utils.getF7()
       f7.confirm(this.$t('message.are_you_sure'), this.$t('message.alert_delete_card'), () => {
-        db.deleteClasswareItem(this.card);
-        EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent);
-        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card);
+        db.deleteClasswareItem(this.card)
+        EventBus.$emit(Events.DISPLAY_DRAWER_UPDATED, this.card.parent)
+        EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card)
         window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'ITEM_DELETED')
-      });
+      })
     },
     confirm: function() {
-      var changed = false;
-      var changedObj = {};
-      if (this.card.animation != this.selected) {
-        changed = true;
-        changedObj.animation = this.selected;
+      var changed = false
+      var changedObj = {}
+      if (this.card.animation !== this.selected) {
+        changed = true
+        changedObj.animation = this.selected
       }
-      if (this.card.mute != this.mute) {
-        changed = true;
-        changedObj.mute = this.mute;
+      if (this.card.mute !== this.mute) {
+        changed = true
+        changedObj.mute = this.mute
       }
       if (changed) {
-        this.card = _.assign(this.card, changedObj);
-        db.updateClasswareItem(this.card);
+        this.card = _.assign(this.card, changedObj)
+        db.updateClasswareItem(this.card)
       }
-      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card, changed);
+      EventBus.$emit(Events.DISPLAY_CARD_SETTINGS_CLOSE, this.card, changed)
     }
   },
   created() {
     // Load data
-    this.cardContent = db.getCardByUuid(this.card.content);
-    this.selected = this.card.animation;
-    this.mute = this.card.mute;
+    this.cardContent = db.getCardByUuid(this.card.content)
+    this.selected = this.card.animation
+    this.mute = this.card.mute
     window.ga.trackEvent('USER_EVENT', 'DISPLAY_CARD_SETTING', 'ENTER')
   }
 }

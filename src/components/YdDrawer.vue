@@ -28,7 +28,6 @@
 
 <script>
 import YdCard from './YdCard.vue'
-import Vue from 'vue'
 import { EventBus, Events } from '../EventBus.js'
 import Swiper from 'swiper'
 import Sortable from 'sortablejs'
@@ -45,7 +44,7 @@ export default {
     return {
       cardList: [],
       row: 2,
-      col: 2,
+      col: 2
     }
   },
   watch: {
@@ -58,21 +57,19 @@ export default {
       } else {
         this.mySwiper.unlockSwipes()
       }
-    },
+    }
   },
   methods: {
     pickFromResource: function(holder) {
       // Clean any previous listener
       EventBus.$off(Events.ADD_CARDS_FROM_RESOURCE)
       EventBus.$on(Events.ADD_CARDS_FROM_RESOURCE, this.addFromResource)
-      this.$router.push('resource/pick?request=' + holder.placeholderId
-                  + '&drawerId=' + this.uuid
-                  + '&order=' + holder.placeholderOrder);
+      this.$router.push('resource/pick?request=' + holder.placeholderId + '&drawerId=' + this.uuid + '&order=' + holder.placeholderOrder)
     },
     addFromResource: function(object) {
       let added = []
       let folders = [] // Keep track of this, add all cards belong to folder
-      for (let i = 0; i < object.list.length; i ++) {
+      for (let i = 0; i < object.list.length; i++) {
         let resContent = db.getCardByUuid(object.list[i])
         let newClasswareItem = {}
         newClasswareItem.uuid = uuidv4()
@@ -82,7 +79,7 @@ export default {
 
         if (resContent.isCategory) {
           newClasswareItem.type = 'folder'
-          newClasswareItem.cover = resContent.cover;
+          newClasswareItem.cover = resContent.cover
           newClasswareItem.name = resContent.name
           folders.push(newClasswareItem)
         } else {
@@ -105,10 +102,7 @@ export default {
         db.getClasswareCollection().insert(added)
       } else {
         let emptySlots = db.getClasswareCollection().chain().where((item) => {
-          return item.parent === object.drawerId
-                  && item.order >= object.order
-                  && item.order < object.order + object.list.length
-                  && item.type == 'placeholder'
+          return item.parent === object.drawerId && item.order >= object.order && item.order < object.order + object.list.length && item.type === 'placeholder'
         }).simplesort('order').data()
         for (let i = 0; i < emptySlots.length; i++) {
           // use new card's info to override everything except for order
@@ -138,33 +132,33 @@ export default {
       EventBus.$off(Events.ADD_CARDS_FROM_RESOURCE)
     },
     backClicked: function() {
-      if (this.from == "resource") {
+      if (this.from === 'resource') {
         if (this.editMode && PickedCards.hasItem()) {
-            Utils.getF7().alert(this.$t('message.cannot_navi_chosen_items'), this.$t('message.forbidden'))
-          } else {
-            EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid);
-          }
+          Utils.getF7().alert(this.$t('message.cannot_navi_chosen_items'), this.$t('message.forbidden'))
+        } else {
+          EventBus.$emit(Events.RESOURCE_DRAWER_CLOSE, this.uuid)
+        }
       } else {
         if (!this.$store.state.isCardPlaying) {
-          EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid);
+          EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid)
         }
       }
     },
     createSwiper: function() {
-      var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0];
+      var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0]
       // Swiper
-      this.mySwiper = new Swiper (swiperContainerElement);
+      this.mySwiper = new Swiper(swiperContainerElement)
     },
     createDraggable: function() {
       // Draggable - Sortable
-      var that = this;
-      var els = this.$el.getElementsByClassName('card-group');
+      var that = this
+      var els = this.$el.getElementsByClassName('card-group')
 
       var sortables = []
 
       var logElementsByDataId = function(elements) {
         var tmp = []
-        for(var i = 0; i < elements.length; i++) {
+        for (var i = 0; i < elements.length; i++) {
           if (elements[i].attributes['data-id']) {
             tmp.push(elements[i].attributes['data-id'].value)
           } else {
@@ -179,7 +173,7 @@ export default {
           console.log('Warning: Scroll will not happen since it is at the boundary')
           return
         }
-        var fromElGroupFiltered = _.filter(els[fromGroupId].childNodes, function(o){
+        var fromElGroupFiltered = _.filter(els[fromGroupId].childNodes, function(o) {
           var dataAttr = o.attributes['data-id']
           if (!dataAttr) {
             return true
@@ -187,7 +181,7 @@ export default {
             return dataAttr !== that.draggedItem.attributes['data-id']
           }
         })
-        var toElGroupFiltered = _.filter(els[toGroupId].childNodes, function(o){
+        var toElGroupFiltered = _.filter(els[toGroupId].childNodes, function(o) {
           var dataAttr = o.attributes['data-id']
           if (!dataAttr) {
             return true
@@ -199,7 +193,7 @@ export default {
         logElementsByDataId(toElGroupFiltered)
 
         if (toGroupId < fromGroupId) {
-          let oldNode = els[toGroupId].removeChild(toElGroupFiltered[toElGroupFiltered.length -1])
+          let oldNode = els[toGroupId].removeChild(toElGroupFiltered[toElGroupFiltered.length - 1])
           els[fromGroupId].insertBefore(oldNode, fromElGroupFiltered[0])
           logElementsByDataId(els[fromGroupId].childNodes)
         } else {
@@ -212,43 +206,45 @@ export default {
       var delayedScrollNext = _.throttle((from, to) => {
         processScroll(from, to)
         this.mySwiper.slideNext()
-      }, 1000, { 'trailing': false });
+      }, 1000, { 'trailing': false })
 
       var delayedScrollPrev = _.throttle((from, to) => {
         processScroll(from, to)
         this.mySwiper.slidePrev()
-      }, 1000, { 'trailing': false });
+      }, 1000, { 'trailing': false })
 
-      for(var i=0; i< els.length; i++) {
+      for (var i = 0; i < els.length; i++) {
         var el = els[i]
         var sorta = Sortable.create(el, {
           group: 'cards',
           sort: true,
           delay: 500,
           animation: 100,
-          draggable: ".card-group-item",
-          dragClass: "dragging-card",
-          ghostClass: "ghost-card",
+          draggable: '.card-group-item',
+          dragClass: 'dragging-card',
+          ghostClass: 'ghost-card',
           disabled: that.draggableDisabled,
           preventOnFilter: true,
           fallbackOnBody: true,
           scrollFn: function(offsetX, offsetY, originalEvent) {
+            var from
             if (originalEvent.clientX < 30) {
-              var from = parseInt(this.el.id.slice(11))
-              delayedScrollPrev(from, from - 1);
-            } else if (originalEvent.clientX > window.innerWidth - 30){
-              var from = parseInt(this.el.id.slice(11))
-              delayedScrollNext(from, from + 1);
+              from = parseInt(this.el.id.slice(11))
+              delayedScrollPrev(from, from - 1)
+            } else if (originalEvent.clientX > window.innerWidth - 30) {
+              from = parseInt(this.el.id.slice(11))
+              delayedScrollNext(from, from + 1)
             }
           },
           scrollSensitivity: 30, // px, how near the mouse must be to an edge to start scrolling.
           scrollSpeed: 10,
           store: {
             get: function (sortable) {
-              return [];
+              return []
             },
+            /* eslint-disable no-unused-vars */
             set: function (sortable) {
-              var order = sortable.toArray();
+              var order = sortable.toArray()
             }
           },
           onMove: function(event, originalEvent) {
@@ -278,9 +274,9 @@ export default {
             // Step 2: Sort cardList with refence array
             var sortByRef = function(target, refs) {
               var result = []
-              for (let i = 0; i < refs.length; i ++) {
+              for (let i = 0; i < refs.length; i++) {
                 let ref = refs[i]
-                let f = _.find(target, function(o){
+                let f = _.find(target, function(o) {
                   return o.uuid === ref
                 })
                 if (f) {
@@ -292,10 +288,9 @@ export default {
               return result
             }
             var afterDragging = sortByRef(that.appendedCards, flattened)
-            var nonPlaceholder
             // Step 3: Remove trailing placeholder cards and update db
             var trailingPlaceholder = true
-            for (let i = afterDragging.length -1; i >= 0; i-- ) {
+            for (let i = afterDragging.length - 1; i >= 0; i--) {
               if (trailingPlaceholder && afterDragging[i].type === 'placeholder') {
                 let docToRemove = db.getClasswareItemByUuid(afterDragging[i].uuid)
                 if (docToRemove) {
@@ -304,7 +299,7 @@ export default {
                 continue
               } else {
                 trailingPlaceholder = false
-                var originalOrder = afterDragging[i].order
+                // var originalOrder = afterDragging[i].order
                 let docToReorder = db.getClasswareItemByUuid(afterDragging[i].uuid)
                 if (docToReorder) {
                   docToReorder.order = i
@@ -313,35 +308,34 @@ export default {
                   afterDragging[i].order = i
                   db.getClasswareCollection().insert(afterDragging[i])
                 }
-
               }
             }
             // Sort done. Update cardlist
             window.setTimeout(() => {
-              that.cardList = db.getCardsOfClassware(that.uuid);
+              that.cardList = db.getCardsOfClassware(that.uuid)
             }, 200)
           }
-        });
+        })
         sortables.push(sorta)
       }
       this.sortables = sortables
     },
     initList: function() {
-      var grid = db.getDefaultGridSize();
-      if (this.from == 'resource') {
-        this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+      var grid = db.getDefaultGridSize()
+      if (this.from === 'resource') {
+        this.cardList = db.getCardsOfRecourceCategory(this.uuid)
         this.col = grid.col
         this.row = grid.row
       } else {
-        this.cardList = db.getCardsOfClassware(this.uuid);
-        if (this.uuid == 'all') {
+        this.cardList = db.getCardsOfClassware(this.uuid)
+        if (this.uuid === 'all') {
           this.col = grid.col
           this.row = grid.row
         } else {
           var classware = db.getClasswareItemByUuid(this.uuid)
           var col = classware.col
           var row = classware.row
-          if (!col || ! row) {
+          if (!col || !row) {
             this.col = grid.col
             this.row = grid.row
           } else {
@@ -357,22 +351,22 @@ export default {
       return this.$store.state.isCardPlaying
     },
     appendedCards: function() {
-      if (this.from != 'resource' && this.editMode && this.uuid != 'all') {
+      if (this.from !== 'resource' && this.editMode && this.uuid !== 'all') {
         // Append placeholder cards in edit mode
-        var pageSize = this.row * this.col;
+        var pageSize = this.row * this.col
         var lastPageSize = this.cardList.length % pageSize
-        var numberToAppend = lastPageSize > 0 ? pageSize - lastPageSize + pageSize : pageSize;
+        var numberToAppend = lastPageSize > 0 ? pageSize - lastPageSize + pageSize : pageSize
         var appendList = []
         for (var i = 0; i < numberToAppend; i++) {
           appendList.push({type: 'placeholder', order: i + this.cardList.length, uuid: uuidv4(), parent: this.uuid})
         }
-        return this.cardList.concat(appendList);
+        return this.cardList.concat(appendList)
       } else {
-        return this.cardList;
+        return this.cardList
       }
     },
     pagedCards: function() {
-      return Utils.arrangeCards(this.appendedCards, this.row, this.col);
+      return Utils.arrangeCards(this.appendedCards, this.row, this.col)
     },
     draggableDisabled: function() {
       return !this.editMode || this.uuid === 'all' || this.from === 'resource'
@@ -385,62 +379,61 @@ export default {
     this.initList()
     // console.log(this.cardList)
 
-    if (this.from == 'resource') {
+    if (this.from === 'resource') {
       EventBus.$on(Events.RESOURCE_NEW_CATEGORY_ADDED, (doc) => {
-        if (this.uuid == 'all') {
+        if (this.uuid === 'all') {
           // this.cardList.push(doc);
           // Reload cardList and then move swiper to last page
           // TODO: wait 200ms for db update... need to find actual event for this..
           window.setTimeout(() => {
-            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid)
           }, 200)
         }
-      });
+      })
 
       EventBus.$on(Events.RESOURCE_NEW_CARD_ADDED, (doc) => {
-        if (this.uuid == doc.category) {
+        if (this.uuid === doc.category) {
           // this.cardList.push(doc);
           // Reload cardList and then move swiper to last page
           // TODO: wait 200ms for db update... need to find actual event for this..
           window.setTimeout(() => {
-            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid)
           }, 200)
         }
-      });
+      })
 
       EventBus.$on(Events.RESOURCE_ITEM_DELETED, (uuid) => {
-        if (this.uuid == uuid) {
+        if (this.uuid === uuid) {
           // Reload cardList and then move swiper to last page
           // TODO: wait 200ms for db update... need to find actual event for this..
           window.setTimeout(() => {
-            this.cardList = db.getCardsOfRecourceCategory(this.uuid);
+            this.cardList = db.getCardsOfRecourceCategory(this.uuid)
           }, 200)
         }
       })
     } else {
       EventBus.$on(Events.DISPLAY_DRAWER_UPDATED, (uuid) => {
-        if (uuid == this.uuid) {
+        if (uuid === this.uuid) {
           // this.cardList = db.getCardsOfClassware(this.uuid);
           this.initList()
           // console.log(this.cardList);
         }
-      });
+      })
 
       EventBus.$on(Events.DISPLAY_CATEGORY_DELETED, (item) => {
-        console.log('deleting, current drawer id: ' + this.uuid);
-        if (item.parent == 'root' && this.uuid == 'all' || item.parent == this.uuid) {
+        console.log('deleting, current drawer id: ' + this.uuid)
+        if ((item.parent === 'root' && this.uuid === 'all') || item.parent === this.uuid) {
           window.setTimeout(() => {
             // Wait for database update and then reload... Haven't found a callback for this...
-            this.cardList = db.getCardsOfClassware(this.uuid);
-          }, 200);
+            this.cardList = db.getCardsOfClassware(this.uuid)
+          }, 200)
         }
-      });
-
+      })
     }
   },
   mounted() {
-    this.createSwiper();
-    this.createDraggable();
+    this.createSwiper()
+    this.createDraggable()
   }
 }
 </script>
