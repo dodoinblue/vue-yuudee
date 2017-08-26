@@ -1,13 +1,13 @@
 const path = require('path'),
   fs = require('fs'),
-  
+
   webpack = require('webpack'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   CordovaHtmlOutputPlugin = require('./webpack/plugins/CordovaHtmlOutputPlugin.js'),
   UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
   CleanPlugin = require('clean-webpack-plugin'),
   ExtractTextPlugin = require("extract-text-webpack-plugin"),
-  
+
   entryFile = path.join(__dirname, 'src/main.js'),
   devServerPort = 8081
 
@@ -16,7 +16,7 @@ let config = function (env) {
     entry: entryFile,
 
     node: { fs: 'empty' },
-    
+
     resolve: {
       extensions: ['.js', '.json', '.vue'],
       modules: [path.join(__dirname, 'src'), 'node_modules'],
@@ -28,7 +28,7 @@ let config = function (env) {
         'components': path.resolve(__dirname, 'src/assets/vue/components/')
       }
     },
-    
+
     output: {
       pathinfo: true,
       devtoolLineToLine: true,
@@ -36,9 +36,20 @@ let config = function (env) {
       sourceMapFilename: "[hash].[name].js.map",
       path: path.join(__dirname, 'www')
     },
-    
+
     module: {
       rules: [
+        {
+          test: /\.js$/,
+          exclude: /(node_modules|bower_components)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['env'],
+              plugins: ['transform-runtime']
+            }
+          }
+        },
         {test: /\.(png|jpe?g|gif)$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
         {test: /\.(woff2?|eot|ttf|otf|mp3|wav)(\?.*)?$/, loader: 'file-loader', options: {name: '[name].[ext]?[hash]'}},
         {test: /\.svg$/, loader: 'url-loader'},
@@ -47,7 +58,7 @@ let config = function (env) {
         {test: /\.vue$/, loader: 'vue-loader'}
       ]
     },
-    
+
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
@@ -70,7 +81,7 @@ let config = function (env) {
       })
     ]
   }
-  
+
   if (typeof env === 'undefined' || typeof env.devserver === 'undefined') {
     returner.plugins.push(new CordovaHtmlOutputPlugin())
     returner.plugins.push(new ExtractTextPlugin("styles.css"))
@@ -81,7 +92,7 @@ let config = function (env) {
       })
     })
   }
-  
+
   if (env) {
     if (typeof env.devserver !== 'undefined' && env.devserver) {
       returner.module.rules.push({
@@ -117,7 +128,7 @@ let config = function (env) {
       returner.plugins.push(new UglifyJsPlugin())
     }
   }
-  
+
   return returner
 }
 
