@@ -13,7 +13,7 @@ const path = require('path'),
 
 let config = function (env) {
   let returner = {
-    entry: entryFile,
+    entry: ["babel-polyfill", entryFile],
 
     node: { fs: 'empty' },
 
