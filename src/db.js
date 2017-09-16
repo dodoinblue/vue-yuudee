@@ -194,12 +194,21 @@ var buildResourceCollection = function(resourceRootPath, isOfficial) {
     // Save categories to db
     getResourceCollection().insert(categories)
     // Build cards
-    return Q.all(categories.map(function(category) {
-      return getCardsInPath(category)
-    }))
+    let allCards = []
+    let deferred = Q()
+    for (let i = 0; i < categories.length; i++) {
+      deferred = deferred.then(() => {
+        return getCardsInPath(categories[i])
+      }).then((cards) => {
+        allCards = allCards.concat(cards)
+      })
+    }
+    return deferred.then(() => {
+      return allCards
+    })
   }).then(function(cards) {
     // Save cards to db
-    getResourceCollection().insert(_.flatten(cards))
+    getResourceCollection().insert(cards)
   })
 }
 
@@ -255,7 +264,7 @@ var getCardAudios = function(audioPath) {
         return node.toInternalURL()
       } else {
         console.log('Audio format not supported!!!! ' + node.nativeURL)
-        window.ga.trackException('Audio format not supported: ' + ext, Fatal) // where Fatal is boolean
+        window.ga.trackException('Audio format not supported: ' + ext, true) // where Fatal is boolean
       }
     }))
   })
@@ -608,26 +617,30 @@ var getNonOfficialResourceCategories = function() {
            'isOffcial': {'$eq': false}
           }).simplesort('originalOrder')
          .data()
-  result.push(db.getCardByUuid('Other'))
+  result.push(getCardByUuid('Other'))
   return result
 }
 
 var insertRootClassware = function(name) {
-    var classware = {}
-    classware.uuid = uuidv4()
-    classware.name = name
-    classware.type = 'folder'
-    classware.parent = 'root'
-    classware.cover = ''
-    // classware.order = 
-    var fromDB = getClasswareCollection()
-              .chain()
-              .find({'parent': 'root'})
-              .simplesort('order')
-              .data()
+  var classware = {}
+  classware.uuid = uuidv4()
+  classware.name = name
+  classware.type = 'folder'
+  classware.parent = 'root'
+  classware.cover = ''
+  var fromDB = getClasswareCollection()
+            .chain()
+            .find({'parent': 'root'})
+            .simplesort('order')
+            .data()
+  if (fromDB.length !== 0) {
     var largestOrder = fromDB[fromDB.length - 1].order
     classware.order = largestOrder + 1
-    return getClasswareCollection().insert(classware)
+  } else {
+    classware.order = 1
+  }
+
+  return getClasswareCollection().insert(classware)
 }
 
 var deleteResourceCard = function(doc) {

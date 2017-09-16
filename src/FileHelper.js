@@ -332,7 +332,6 @@ function createDirPromise(path, dirName, replaceBool) {
       fileSystem.getDirectory(dirName, options, function (result) {
         q.resolve(result)
       }, function (error) {
-        error.message = $cordovaFileError[error.code]
         q.reject(error)
       })
     }, function (err) {
