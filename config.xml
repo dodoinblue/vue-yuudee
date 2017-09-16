@@ -58,4 +58,5 @@
     <plugin name="cordova-plugin-localization-strings" spec="https://github.com/kelvinhokk/cordova-plugin-localization-strings.git"/>
     <plugin name="cordova-plugin-google-analytics" spec="~1.8.3"/>
     <plugin name="cordova-plugin-crop" spec="https://github.com/dodoinblue/cordova-plugin-crop"/>
+    <plugin name="cordova-plugin-splashscreen" spec="~4.0.3"/>
 </widget>
