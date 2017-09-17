@@ -122,6 +122,25 @@ var setLanguage = function(langString) {
   }
 }
 
+var getNewUserHelperFlag = function() {
+  let flag = getSettingsCollection().findOne({'name': 'newUserHelperFlag'})
+  if (typeof flag !== 'undefined' && flag !== null) {
+    return flag.value
+  } else {
+    return true
+  }
+}
+
+var setNewUserHelperFlag = function(value) {
+  var flag = getSettingsCollection().findOne({'name': 'newUserHelperFlag'})
+  if (flag === null) {
+    flag = getSettingsCollection().insert({'name': 'newUserHelperFlag', 'value': value})
+  } else {
+    flag.value = value
+    getSettingsCollection().update(value)
+  }
+}
+
 var getRootClasswareUuid = function() {
   var rootUuid = getSettingsCollection().findOne({'name': 'rootClassware'})
   if (rootUuid === null) {
@@ -689,6 +708,8 @@ export default {
 
   getLanguage,
   setLanguage,
+  getNewUserHelperFlag,
+  setNewUserHelperFlag,
 
   // YdDisplay methods
   getDefaultGridSize,

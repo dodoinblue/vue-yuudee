@@ -79,6 +79,21 @@
     </v-touch>
   </div>
 
+  <!-- Helper overlay -->
+  <div id="helper-overlay" v-if="firstStartup">
+    <img src="../../static/img/new-user-helper-overlay.png">
+    <div id="helper-content" class="row">
+      <span>{{ $t('message.helper_message') }} </span>
+      <div class="col-33">
+      </div>
+      <div class="col-33 app-logo">
+        <a href='#' class="button button-fill color-blue button-raised" @click="helperDone">{{ $t('message.confirm') }}</a>
+      </div>
+      <div class="col-33">
+      </div>
+    </div>
+  </div>
+
 </div>
 </template>
 
@@ -115,6 +130,39 @@
 }
 .card-img {
   width: 95%;
+}
+
+/* Helper overlay */
+#helper-overlay {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+
+}
+
+#helper-overlay img {
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.5;
+}
+
+#helper-content {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 37%;
+  height: 20%;
+  text-align: center;
+}
+
+#helper-content span {
+  font-size: 1.2em;
+  color: white;
 }
 
 /* Settings Layer */
@@ -212,6 +260,7 @@ export default {
       cardInEdit: {},
       showClasswareSettings: false,
       showNewClasswareCategorySettings: false,
+      firstStartup: false,
       touchAreas: [
         { name: 'touch-top-left', pressed: false },
         { name: 'touch-top-right', pressed: false },
@@ -266,6 +315,10 @@ export default {
     goToResource: function() {
       this.$router.push('/resource')
     },
+    helperDone: function() {
+      this.firstStartup = false
+      db.setNewUserHelperFlag(false)
+    },
     onChooseRootClassware: function(uuid) {
       this.f7.closeModal(this.popover, false)
       this.popover = null
@@ -292,6 +345,7 @@ export default {
   },
   created() {
     window.db = db
+    this.firstStartup = db.getNewUserHelperFlag()
     EventBus.$on(Events.DISPLAY_DRAWER_CLOSE, uuid => {
       this.drawers.pop()
     })

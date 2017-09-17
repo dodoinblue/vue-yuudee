@@ -95,7 +95,9 @@ const messages = {
       download_confirm_title: 'Download content',
       download_confirm_body: 'Preload content not found, will start downloading. This will use about 30Mb data',
       download_fail_body: 'Failed to download from server. Please reopen app to try again',
-      download_fail_title: 'Failded'
+      download_fail_title: 'Failded',
+
+      helper_message: 'Press and hold these 3 areas simultaneously to enter edit mode'
     }
   },
   zh: {
@@ -167,7 +169,9 @@ const messages = {
       download_confirm_title: '下载',
       download_confirm_body: '没有找到内置卡片，需要下载，这将花费约30M流量',
       download_fail_body: '下载失败，请重新打开app下载',
-      download_fail_title: '失败'
+      download_fail_title: '失败',
+
+      helper_message: '手指同时触摸这三个位置可以进入家长编辑模式'
     }
   }
 }
