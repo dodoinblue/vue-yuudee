@@ -131,7 +131,7 @@ export default {
       }, 200)
       EventBus.$off(Events.ADD_CARDS_FROM_RESOURCE)
     },
-    backClicked: function() {
+    backClicked: _.throttle(function() {
       if (this.from === 'resource') {
         if (this.editMode && PickedCards.hasItem()) {
           Utils.getF7().alert(this.$t('message.cannot_navi_chosen_items'), this.$t('message.forbidden'))
@@ -143,7 +143,7 @@ export default {
           EventBus.$emit(Events.DISPLAY_DRAWER_CLOSE, this.uuid)
         }
       }
-    },
+    }, 1000, { 'trailing': false }),
     createSwiper: function() {
       var swiperContainerElement = this.$el.getElementsByClassName('swiper-container')[0]
       // Swiper
