@@ -90,6 +90,8 @@ const messages = {
       all: 'All',
       // Drawer back image
       drawer_back: 'drawer-back-en',
+      // YdCard text class
+      card_text_class: 'card-text-small',
 
       // Startup checks
       download_confirm_title: 'Download content',
@@ -164,6 +166,8 @@ const messages = {
       all: '全部',
       // Drawer back image
       drawer_back: 'drawer-back',
+      // YdCard text class
+      card_text_class: 'card-text',
 
       // Startup checks
       download_confirm_title: '下载',

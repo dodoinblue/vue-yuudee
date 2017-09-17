@@ -7,7 +7,7 @@
     <div class="card-content">
       <img :src="content_image">
     </div>
-    <div class="card-text"><div>{{card.name}}</div></div>
+    <div :class="$t('message.card_text_class')"><div>{{card.name}}</div></div>
     <div class="card-edit-button" v-if="editMode && from !== 'resource'" @click.stop="onCardEditClick"></div>
     <div class="card-edit-button" v-if="from === 'resource' && !card.isOffcial" @click.stop="editResCard"></div>
     <div :class="picked ? 'card-box-checked' : 'card-box-unchecked'" v-if="editMode && from === 'resource'" @click.stop="onCardPicked"></div>
@@ -316,6 +316,20 @@ export default {
   right: 12.82%;
   height: 20%;
   font-size: 1.0em;
+  /*z-index: 10;*/
+  padding-top: 0.2em;
+  color: rgb(80,45,17);
+}
+
+.yd-card .card-text-small {
+  max-width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 69%;
+  left: 12.18%;
+  right: 12.82%;
+  height: 20%;
+  font-size: 0.8em;
   /*z-index: 10;*/
   padding-top: 0.2em;
   color: rgb(80,45,17);
