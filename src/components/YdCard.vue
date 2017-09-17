@@ -302,7 +302,7 @@ export default {
 .yd-card .card-content {
   position: absolute;
   left: 12%;
-  top: 7.3%;
+  top: 7.0%;
   right: 12%;
   bottom: 33.9%
 }
