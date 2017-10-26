@@ -26,6 +26,7 @@ import _ from 'lodash'
 import db from '../db.js'
 import Utils from '../utils'
 import PickedCards from '../PickedCards'
+import Q from 'q'
 // import YdEditCardDialog from './YdEditCardDialog'
 
 /*
@@ -93,12 +94,12 @@ var playAnimation = function(context) {
     }, 500)
 
     // Start playing sound
+    let audioPromise = Utils.emptyPromise()
     if (!context.classware.mute) {
       let playAudioFn = Utils.mediaPluginPlayAudio
       let numOfAudios = context.card.audios.length
-      let p = Utils.emptyPromise()
       if (numOfAudios > 0) {
-        p = p.then(() => {
+        audioPromise = audioPromise.then(() => {
           if (context.card.audios[0]) {
             return playAudioFn(context.card.audios[0])
           } else {
@@ -108,7 +109,7 @@ var playAnimation = function(context) {
       }
       if (numOfAudios > 1) {
         for (let i = 1; i < numOfAudios; i++) {
-          p = p.then(() => {
+          audioPromise = audioPromise.then(() => {
             return playAudioFn(context.card.audios[i])
           })
         }
@@ -116,8 +117,11 @@ var playAnimation = function(context) {
     }
 
     // Swing if set to or wait
+    let animationPromise = Utils.emptyPromise()
     if (context.classware.animation === 'rotate') {
-      return Utils.animationChain(el, 0.5, {rotation: 20}).then(function() {
+      animationPromise = animationPromise.then(() => {
+        return Utils.animationChain(el, 0.5, {rotation: 20})
+      }).then(function() {
         return Utils.animationChain(el, 1, {rotation: -20})
       }).then(function() {
         return Utils.animationChain(el, 1, {rotation: 20})
@@ -126,18 +130,10 @@ var playAnimation = function(context) {
       }).then(function() {
         return Utils.animationChain(el, 0.5, {rotation: 0})
       })
-    } else if (context.classware.animation === 'enlarge') {
-      return Utils.waitForSeconds(3)
-    } else {
-      return Utils.waitForSeconds(4)
     }
-  })
 
-  if (context.card.audios.length > 1 && !context.classware.mute) {
-    playPromise = playPromise.then(() => {
-      return Utils.waitForSeconds((context.card.audios.length - 1) * 3)
-    })
-  }
+    return Q.all([audioPromise, animationPromise])
+  })
 
   if (context.classware.animation !== 'none') {
     playPromise = playPromise.then(() => {
@@ -145,13 +141,25 @@ var playAnimation = function(context) {
     })
   }
 
-  playPromise = playPromise.then(() => {
+  let cleanup = function() {
     window.clearInterval(context.slideshow)
     context.$store.commit('cardPlayStop')
     context.onTop = false
     context.slideshow = null
     context.currentImageIndex = 0
+  }
+
+  playPromise = playPromise.then(() => {
+    cleanup()
     window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'CARD_PLAY')
+  })
+
+  playPromise.catch((error) => {
+    if (error === 'AUDIO KILLED APP IN BACKGROUND') {
+      window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'CARD_PLAY_INTERRUPTED')
+    }
+    Utils.animationChain(el, 0, oldStyle)
+    cleanup()
   })
 }
 

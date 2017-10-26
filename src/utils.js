@@ -157,12 +157,19 @@ export default {
     var media = new Media(audioSrc, function() {
       this.stop()
       this.release()
+      document.removeEventListener('pause', handleInterruption)
       deferred.resolve()
     }, function() {
       this.stop()
       this.release()
       deferred.reject()
     })
+    var handleInterruption = function() {
+      media.stop()
+      deferred.reject('AUDIO KILLED APP IN BACKGROUND')
+      document.removeEventListener('pause', handleInterruption)
+    }
+    document.addEventListener('pause', handleInterruption, false)
     media.play()
     return deferred.promise
   },
