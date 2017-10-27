@@ -115,6 +115,11 @@ var playAnimation = function(context) {
         }
       }
     }
+    if (context.classware.mute || context.card.audios.length === 0) {
+      audioPromise = audioPromise.then(() => {
+        return Utils.waitForSeconds(2)
+      })
+    }
 
     // Swing if set to or wait
     let animationPromise = Utils.emptyPromise()
