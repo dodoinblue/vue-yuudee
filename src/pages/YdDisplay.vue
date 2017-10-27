@@ -74,6 +74,7 @@
             class="touch-area" :class="area.name"
             v-on:press="pressed(index)"
             v-on:pressup="pressup(index)"
+            v-bind:press-options="{ time: 50 }"
             :key="area.name"
             >
     </v-touch>
