@@ -10,7 +10,7 @@
         {{ $t('message.library') }}
       </div>
       <div class="col col-25">
-        <div class="yd-button" ref="newButton" v-if="!editMode" @click="showNewPopover">{{ $t('message.new') }}</div>
+        <div class="yd-button" ref="newButton" @click="showNewPopover">{{ $t('message.new') }}</div>
       </div>
     </div>
   </div>
