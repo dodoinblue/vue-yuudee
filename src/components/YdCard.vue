@@ -113,6 +113,11 @@ var playAnimation = function(context) {
             return playAudioFn(context.card.audios[i])
           })
         }
+      } else { // numOfAudios === 1
+        audioPromise = audioPromise.then(() => {
+          // Add 1s delay before closing card.
+          return Utils.waitForSeconds(1)
+        })
       }
     }
     if (context.classware.mute || context.card.audios.length === 0) {
