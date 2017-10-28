@@ -1,14 +1,30 @@
+import YdDisplay from './pages/YdDisplay'
+import YdResource from './pages/YdResource'
+import { EventBus } from './EventBus.js'
+
 export default [
-//   {
-//       path: '/about/',
-//       component: require('./pages/about.vue')
-//   },
-//   {
-//       path: '/form/',
-//       component: require('./pages/about.vue')
-//   },
-//   {
-//       path: '/dynamic-route/blog/:blogId/post/:postId/',
-//       component: require('./pages/dynamic-route.vue')
-//   }
+  { path: '/display',
+    name: 'YdDisplay',
+    component: (resolve) => {
+      EventBus.$on('RESOURCE_LOADED', function() {
+        resolve(YdDisplay)
+      })
+    }
+  },
+  {
+    path: '/resource',
+    name: 'YdResource',
+    component: YdResource,
+    props: { mode: 'show' }
+  },
+  {
+    path: '/resource/pick',
+    name: 'YdResource',
+    component: YdResource,
+    props: { mode: 'pick' }
+  },
+  {
+    path: '/',
+    redirect: '/display'
+  }
 ]
