@@ -8,7 +8,7 @@
     <div class="settings-dialog-title">{{ $t('message.edit_card') }}</div>
     <div class="classware-title">
       <!--<input type="text" :placeholder="cardContent.name"></input>-->
-      {{cardContent.name}}
+      {{cardContent.name}} <span @click="editFromLibrary">({{ $t('message.edit_from_library') }})</span>
     </div>
     <div class="classware-layout">
       <div class="row">{{ $t('message.choose_animation') }}</div>
@@ -78,6 +78,19 @@ export default {
     },
     select: function(value) {
       this.selected = value
+    },
+    editFromLibrary: function() {
+      console.log('edit from library')
+      let categoryList = db.getNonOfficialResourceCategories()
+      let isOfficialCategory = _.find(categoryList, (o) => {
+        return o.uuid === this.cardContent.category
+      })
+      if (isOfficialCategory) {
+        EventBus.$emit(Events.DISPLAY_SAME_SCREEN_EDIT_RESOURCE, this.cardContent)
+      } else {
+        var f7 = Utils.getF7()
+        f7.alert(this.$t('message.cannot_edit_preload'), this.$t('message.forbidden'))
+      }
     },
     deleteClasswareItem: function() {
       var f7 = Utils.getF7()
@@ -164,6 +177,12 @@ export default {
   border: none;
   background-color: transparent;
 }
+
+.classware-title span {
+  margin-left: 0.25em;
+  color: red;
+}
+
 .settings-dialog .classware-layout {
   position: absolute;
   top: 27%;

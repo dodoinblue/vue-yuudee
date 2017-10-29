@@ -45,6 +45,8 @@ export default {
       // Edit card
       missing_info_body: 'Please choose name, category and image before save',
       missing_info_title: 'Missing infomation',
+      edit_from_library: 'Edit from library',
+      cannot_edit_preload: 'Cannot edit preloaded cards',
       // Edit category
       require_category_title: 'Category title is required',
       cannot_edit_in_all: 'Cannot edit in "All" category',
@@ -121,6 +123,8 @@ export default {
       // Edit card
       missing_info_body: '请选择名称、分类和图片，然后保存',
       missing_info_title: '缺少信息',
+      edit_from_library: '去素材库编辑',
+      cannot_edit_preload: '不能编辑自带卡片',
       // Edit category
       require_category_title: '必须输入一个名称',
       cannot_edit_in_all: '不能在”全部“中编辑',

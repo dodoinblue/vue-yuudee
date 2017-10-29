@@ -66,6 +66,8 @@
     <yd-display-card-settings v-if="showCardSettings" :card="cardInEdit"></yd-display-card-settings>
     <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
     <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
+    <yd-edit-card-dialog v-if="showEditResCardDialog" :cardInEdit="cardInEdit"></yd-edit-card-dialog>
+
   </transition>
   <div class="dark-overlay" v-if="isOverlay"></div>
   <!--Multi-touch areas-->
@@ -248,6 +250,7 @@ import Utils from '../utils'
 import YdDisplayClasswareSettings from '../components/YdDisplayClasswareSettings'
 import YdDisplayCardSettings from '../components/YdDisplayCardSettings'
 import YdEditCategoryDialog from '../components/YdEditCategoryDialog'
+import YdEditCardDialog from '../components/YdEditCardDialog'
 import _ from 'lodash'
 
 export default {
@@ -261,6 +264,7 @@ export default {
       cardInEdit: {},
       showClasswareSettings: false,
       showNewClasswareCategorySettings: false,
+      showEditResCardDialog: false,
       firstStartup: false,
       touchAreas: [
         { name: 'touch-top-left', pressed: false },
@@ -269,7 +273,7 @@ export default {
       ]
     }
   },
-  components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog },
+  components: { YdDrawer, YdDisplayClasswareSettings, YdDisplayCardSettings, YdEditCategoryDialog, YdEditCardDialog },
   watch: {
     editMode: function(val, oldVal) {
       window.ga.trackEvent('USER_EVENT', 'EDITMODE', 'CHANGE', val, false)
@@ -285,6 +289,9 @@ export default {
       return classwareObj.name
     },
     showCardSettings: function() {
+      if (this.showEditResCardDialog) {
+        return false
+      }
       if (this.cardInEdit && this.cardInEdit.type === 'card') {
         return true
       }
@@ -364,6 +371,18 @@ export default {
       // TODO: Close drawers or warn if root is not the same with top classware
       this.showClasswareSettings = false
     })
+    EventBus.$on(Events.DISPLAY_SAME_SCREEN_EDIT_RESOURCE, (doc) => {
+      console.log('from display: ')
+      console.log(doc)
+      // this.showCardSettings = false
+      this.cardInEdit = doc
+      this.showEditResCardDialog = true
+    })
+    // for eidt resource dialog to be closed
+    EventBus.$on(Events.RESOURCE_NEW_CARD_CLOSE, () => {
+      this.showEditResCardDialog = false
+      this.cardInEdit = {}
+    })
     EventBus.$on(Events.DISPLAY_NEW_ROOT_CLASSWARE, (doc) => {
       window.ga.trackEvent('USER_EVENT', 'DISPLAY', 'ROOT_COURSEWARE_CHANGED')
       window.setTimeout(() => {
@@ -404,6 +423,8 @@ export default {
             this.showClasswareSettings = false
           } else if (this.showNewClasswareCategorySettings) {
             this.showNewClasswareCategorySettings = false
+          } else if (this.showEditResCardDialog) {
+            this.showEditResCardDialog = false
           } else if (!_.isEmpty(this.cardInEdit)) {
             this.cardInEdit = {}
           } else if (this.drawers.length > 1) {
