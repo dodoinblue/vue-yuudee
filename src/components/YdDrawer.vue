@@ -433,7 +433,7 @@ export default {
   },
   mounted() {
     this.createSwiper()
-    this.createDraggable()
+    // // this.createDraggable()
   }
 }
 </script>
