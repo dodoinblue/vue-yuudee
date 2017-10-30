@@ -67,7 +67,6 @@
     <yd-display-classware-settings v-if="showClasswareSettings" :classwareId="rootUuid"></yd-display-classware-settings>
     <yd-edit-category-dialog v-if="showCategorySettings" :card="cardInEdit" :newCategory="showNewClasswareCategorySettings"></yd-edit-category-dialog>
     <yd-edit-card-dialog v-if="showEditResCardDialog" :cardInEdit="cardInEdit"></yd-edit-card-dialog>
-
   </transition>
   <div class="dark-overlay" v-if="isOverlay"></div>
   <!--Multi-touch areas-->
@@ -79,12 +78,23 @@
             v-bind:press-options="{ time: 50 }"
             :key="area.name"
             >
+      <transition name="flash">
+        <img v-if="showHintDots" class="circle-dot" src="static/img/circle-dot.png">
+      </transition>
     </v-touch>
+    <img class="unlock-icon" src="static/img/unlockicon.png" @click="showHint">
   </div>
 
   <!-- Helper overlay -->
   <div id="helper-overlay" v-if="firstStartup">
-    <img src="../../static/img/new-user-helper-overlay.png">
+    <div v-for="(area, index) in touchAreas"
+        class="touch-area" :class="area.name"
+        v-bind:press-options="{ time: 50 }"
+        :key="area.name"
+        >
+      <img class="circle-dot" src="static/img/circle-dot.png">
+    </div>
+    <img class="guide-arrows" src="static/img/guide.png">
     <div id="helper-content" class="row">
       <span>{{ $t('message.helper_message') }} </span>
       <div class="col-33">
@@ -142,10 +152,9 @@
   left: 0px;
   height: 100%;
   width: 100%;
-
 }
 
-#helper-overlay img {
+#helper-overlay .guide-arrows {
   top: 0px;
   left: 0px;
   width: 100%;
@@ -201,13 +210,43 @@
   left: 0px;
 }
 
+.touch-top-left .circle-dot {
+  position: absolute;
+  height: 32px;
+  width: 32px;
+  top: 10px;
+  left: 10px;
+}
+
 .touch-area.touch-top-right {
   top: 0px;
   right: 0px;
 }
+.touch-top-right .circle-dot {
+  position: absolute;
+  height: 32px;
+  width: 32px;
+  top: 10px;
+  right: 10px;
+}
 .touch-area.touch-bottom-right {
   bottom: 0px;
   right: 0px;
+}
+.touch-bottom-right .circle-dot {
+  position: absolute;
+  height: 32px;
+  width: 32px;
+  bottom: 10px;
+  right: 10px;
+}
+
+.unlock-icon {
+  position: absolute;
+  height: 32px;
+  width: 32px;
+  bottom: 10px;
+  left: 10px;
 }
 
 .dark-overlay {
@@ -239,6 +278,20 @@
   transform: translateY(100%);
   z-index: 1;;
 }
+
+@keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+.flash-enter-active {
+  animation: flash .5s;
+}
 </style>
 
 <script>
@@ -265,6 +318,7 @@ export default {
       showClasswareSettings: false,
       showNewClasswareCategorySettings: false,
       showEditResCardDialog: false,
+      showHintDots: false,
       firstStartup: false,
       touchAreas: [
         { name: 'touch-top-left', pressed: false },
@@ -326,6 +380,12 @@ export default {
     helperDone: function() {
       this.firstStartup = false
       db.setNewUserHelperFlag(false)
+    },
+    showHint: function() {
+      this.showHintDots = true
+      setTimeout(() => {
+        this.showHintDots = false
+      }, 750)
     },
     onChooseRootClassware: function(uuid) {
       this.f7.closeModal(this.popover, false)
