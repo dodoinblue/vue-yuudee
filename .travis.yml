@@ -33,7 +33,7 @@ script:
   - ls $ANDROID_HOME/platform-tools/
   - mkdir www
   - ls
-  - npm install -g cordova cordova-splash cordova-icon
+  - npm install -g cordova@7.0.1 cordova-splash cordova-icon
   - npm install
-  - cordova platform add android
+  - cordova platform add android@6.2.3
   - cordova build android
