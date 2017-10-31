@@ -95,14 +95,16 @@
       <img class="circle-dot" src="static/img/circle-dot.png">
     </div>
     <img class="guide-arrows" src="static/img/guide.png">
-    <div id="helper-content" class="row">
-      <span>{{ $t('message.helper_message') }} </span>
-      <div class="col-33">
+    <div id="helper-content">
+      <div class="row helper-text">
+        {{ $t('message.helper_message') }}
       </div>
-      <div class="col-33 app-logo">
-        <a href='#' class="button button-fill color-blue button-raised" @click="helperDone">{{ $t('message.confirm') }}</a>
-      </div>
-      <div class="col-33">
+      <div class="row helper-button">
+        <div class="col-33"></div>
+        <div class="col-33">
+          <a href='#' class="button button-fill color-blue button-raised" @click="helperDone">{{ $t('message.confirm') }}</a>
+        </div>
+        <div class="col-33"></div>
       </div>
     </div>
   </div>
@@ -170,11 +172,21 @@
   top: 37%;
   height: 20%;
   text-align: center;
+  align-content: center;
+  align-items: center;
 }
 
-#helper-content span {
+.helper-text {
+  display: inline-block;
+  margin-top: 1em;
   font-size: 1.2em;
+  width: 100%;
   color: white;
+  text-align: center;
+}
+
+.helper-button {
+  margin-top: 1em;
 }
 
 /* Settings Layer */
