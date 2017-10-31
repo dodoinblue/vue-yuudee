@@ -289,7 +289,7 @@ export default {
 }
 
 .yd-card img {
-  max-width: 100%;
+  width: 100%;
 }
 
 /*.yd-card .card-frame {
