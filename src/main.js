@@ -60,7 +60,7 @@ var initApp = function() {
 document.addEventListener('deviceready', /* eslint-disable no-undef */ function() {
   console.log('device ready')
   window.ga.startTrackerWithId('UA-104921838-2', 30)
-  window.ga.setAppVersion('1.3.0')
+  window.ga.setAppVersion('1.3.1')
   window.ga.enableUncaughtExceptionReporting(true)
   db.initDB().then(function() {
     initApp()
