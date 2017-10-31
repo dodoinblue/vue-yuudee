@@ -12,7 +12,7 @@
     <div class="classware-layout">
       <div class="row">{{ $t('message.choose_layout') }}</div>
       <div class="row">
-        <div v-for="setting in gridSettings" class="col col-50" :key="setting.id" @click="select(setting.size)">
+        <div v-for="setting in gridSettings" class="col" :class="gridSettings.length === 3 ? 'col-33' : 'col-50'" :key="setting.id" @click="select(setting.size)">
           <img class="layout" :class="{'selected': setting.size == selectedGridSize}" :src="setting.pic">
         </div>
       </div>
@@ -36,18 +36,7 @@ export default {
   props: ['classwareId'],
   data() {
     return {
-      gridSettings: [
-        {
-          id: 0,
-          size: 1,
-          pic: 'static/img/parent_settingspop_layout1_1.png'
-        },
-        {
-          id: 1,
-          size: 2,
-          pic: 'static/img/parent_settingspop_layout2_2.png'
-        }
-      ],
+      gridSettings: [],
       selectedGridSize: 2,
       classwareInfo: {}
     }
@@ -92,6 +81,7 @@ export default {
       this.classwareInfo = {
         name: this.$t('message.all')
       }
+      this.selectedGridSize = db.getDefaultGridSize().row
     } else {
       this.classwareInfo = db.getClasswareItemByUuid(this.classwareId)
       if (this.classwareInfo.row) {
@@ -99,6 +89,38 @@ export default {
       } else {
         this.selectedGridSize = db.getDefaultGridSize().row
       }
+    }
+    if (window.innerWidth < 480) {
+      this.gridSettings = [
+        {
+          id: 0,
+          size: 1,
+          pic: 'static/img/parent_settingspop_layout1_1.png'
+        },
+        {
+          id: 1,
+          size: 2,
+          pic: 'static/img/parent_settingspop_layout2_2.png'
+        }
+      ]
+    } else {
+      this.gridSettings = [
+        {
+          id: 0,
+          size: 1,
+          pic: 'static/img/parent_settingspop_layout1_1.png'
+        },
+        {
+          id: 1,
+          size: 2,
+          pic: 'static/img/parent_settingspop_layout2_2.png'
+        },
+        {
+          id: 2,
+          size: 3,
+          pic: 'static/img/parent_settingspop_layout3_3.png'
+        }
+      ]
     }
     window.ga.trackEvent('USER_EVENT', 'DISPLAY_COURSE_SETTING', 'ENTER')
   },
