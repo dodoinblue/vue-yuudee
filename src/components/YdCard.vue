@@ -329,7 +329,7 @@ export default {
   max-width: 100%;
   text-align: center;
   position: absolute;
-  top: 66%;
+  top: 68%;
   left: 12.18%;
   right: 12.82%;
   height: 20%;
@@ -351,12 +351,6 @@ export default {
   /*z-index: 10;*/
   padding-top: 0.2em;
   color: rgb(80,45,17);
-}
-
-.card-text div {
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%); 
 }
 
 .yd-card .card-edit-button {
