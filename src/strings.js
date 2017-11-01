@@ -45,7 +45,7 @@ export default {
       // Edit card
       missing_info_body: 'Please choose name, category and image before save',
       missing_info_title: 'Missing infomation',
-      edit_from_library: 'Edit from library',
+      edit_from_library: 'Edit',
       cannot_edit_preload: 'Cannot edit preloaded cards',
       // Edit category
       require_category_title: 'Category title is required',
